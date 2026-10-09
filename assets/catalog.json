@@ -212,6 +212,24 @@
    "note": ""
   },
   {
+   "file": "assets/characters/pets/ani_blackleopard.webp",
+   "group": "characters/pets",
+   "bytes": 100390,
+   "note": "blackleopard"
+  },
+  {
+   "file": "assets/characters/pets/ani_leopardcat.webp",
+   "group": "characters/pets",
+   "bytes": 167682,
+   "note": "leopardcat"
+  },
+  {
+   "file": "assets/characters/pets/ani_shepherd.webp",
+   "group": "characters/pets",
+   "bytes": 146308,
+   "note": "shepherd"
+  },
+  {
    "file": "assets/characters/pets/cat_mikan.webp",
    "group": "characters/pets",
    "bytes": 304064,
@@ -1168,97 +1186,109 @@
   {
    "file": "assets/rooms/station/landscape_bg.webp",
    "group": "rooms/station",
-   "bytes": 295480,
+   "bytes": 239330,
    "note": ""
   },
   {
    "file": "assets/rooms/station/landscape_o_bench_left.webp",
    "group": "rooms/station",
-   "bytes": 17030,
+   "bytes": 16696,
    "note": ""
   },
   {
    "file": "assets/rooms/station/landscape_o_bench_right.webp",
    "group": "rooms/station",
-   "bytes": 15234,
+   "bytes": 14774,
    "note": ""
   },
   {
    "file": "assets/rooms/station/landscape_o_counter_front.webp",
    "group": "rooms/station",
-   "bytes": 12024,
+   "bytes": 11852,
    "note": ""
   },
   {
    "file": "assets/rooms/station/landscape_o_entry_rail_left.webp",
    "group": "rooms/station",
-   "bytes": 9028,
+   "bytes": 8806,
    "note": ""
   },
   {
    "file": "assets/rooms/station/landscape_o_entry_rail_right.webp",
    "group": "rooms/station",
-   "bytes": 8954,
+   "bytes": 8652,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/station/landscape_o_platform_near_post.webp",
+   "group": "rooms/station",
+   "bytes": 1534,
    "note": ""
   },
   {
    "file": "assets/rooms/station/landscape_o_ticket_gate_left.webp",
    "group": "rooms/station",
-   "bytes": 4894,
+   "bytes": 3498,
    "note": ""
   },
   {
    "file": "assets/rooms/station/landscape_o_ticket_gate_right.webp",
    "group": "rooms/station",
-   "bytes": 4392,
+   "bytes": 3696,
    "note": ""
   },
   {
    "file": "assets/rooms/station/portrait_bg.webp",
    "group": "rooms/station",
-   "bytes": 255510,
+   "bytes": 225890,
    "note": ""
   },
   {
    "file": "assets/rooms/station/portrait_o_bench_left.webp",
    "group": "rooms/station",
-   "bytes": 9352,
+   "bytes": 9326,
    "note": ""
   },
   {
    "file": "assets/rooms/station/portrait_o_bench_right.webp",
    "group": "rooms/station",
-   "bytes": 9404,
+   "bytes": 8958,
    "note": ""
   },
   {
    "file": "assets/rooms/station/portrait_o_counter_front.webp",
    "group": "rooms/station",
-   "bytes": 7174,
+   "bytes": 6874,
    "note": ""
   },
   {
    "file": "assets/rooms/station/portrait_o_entry_post_left.webp",
    "group": "rooms/station",
-   "bytes": 5052,
+   "bytes": 4828,
    "note": ""
   },
   {
    "file": "assets/rooms/station/portrait_o_entry_post_right.webp",
    "group": "rooms/station",
-   "bytes": 5054,
+   "bytes": 4926,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/station/portrait_o_platform_near_post.webp",
+   "group": "rooms/station",
+   "bytes": 2370,
    "note": ""
   },
   {
    "file": "assets/rooms/station/portrait_o_ticket_gate_back.webp",
    "group": "rooms/station",
-   "bytes": 3966,
+   "bytes": 2866,
    "note": ""
   },
   {
    "file": "assets/rooms/station/portrait_o_ticket_gate_front.webp",
    "group": "rooms/station",
-   "bytes": 4000,
+   "bytes": 3332,
    "note": ""
   },
   {
