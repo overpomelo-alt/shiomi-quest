@@ -658,6 +658,11 @@ body.touch #toast{top:calc(150px + env(safe-area-inset-top,0px));white-space:nor
 .ac-card p{margin:4px 0;font-size:14px;line-height:1.7}
 .ac-card .ac-got{color:var(--paper)}
 .ac-card .ac-lock{opacity:.5}
+/* close-up card of an animal above the dialog (救傷站／動物之家) */
+#dialog .ac-view{position:absolute;left:50%;bottom:calc(100% + 12px);transform:translateX(-50%);width:min(300px,64vw);border-radius:16px;overflow:hidden;border:3px solid rgba(242,193,78,.85);box-shadow:0 10px 28px rgba(0,0,0,.4);pointer-events:none;background:#e8dcc0}
+#dialog .ac-view canvas{display:block;width:100%;height:auto}
+#dialog .ac-view b{position:absolute;left:10px;top:8px;background:rgba(20,16,26,.72);color:#fff3dc;font:700 13px/1 var(--gothic,system-ui);padding:6px 10px;border-radius:999px}
+@media (max-aspect-ratio:1/1){#dialog .ac-view{width:min(260px,62vw)}}
 </style>
 <script id="loader">/* boot loading screen: dark night sky, title, progress, and the class running along the bottom (video cut-outs) */
 (function(){if(document.getElementById('bootLoad'))return;
@@ -2130,7 +2135,7 @@ let toastT=0;function toast(msg){if(CUTON)return;const t=$('toast');t.textConten
    Dialog
    ================================================================ */
 const DLG={open:false,lines:[],i:0,typed:0,full:'',choices:null,onEnd:null};
-function say(who,lines,opts={}){$('dialog').classList.toggle('quiz',!!opts.quiz);if(who&&!opts.quiz&&!opts.noWave&&!opts.choices&&typeof actPlay==='function'&&started&&!INDOOR&&!CUTON&&!P.sit&&!(ACT.on&&ACT.lock))actPlay('wave',{loops:2});{const D=$('dialog');let f=D.querySelector('.dlg-face');if(opts.face){if(!f){f=document.createElement('img');f.className='dlg-face';f.alt='';D.appendChild(f);}f.src=opts.face;f.hidden=false;}else if(f)f.hidden=true;}DLG.open=true;DLG.who=who||'';DLG.lines=lines;DLG.i=0;DLG.choices=opts.choices||null;DLG.onEnd=opts.onEnd||null;$('dialog').hidden=false;$('dialog').querySelector('.who').textContent=DLG.who;startLine();}
+function say(who,lines,opts={}){$('dialog').classList.toggle('quiz',!!opts.quiz);if(who&&!opts.quiz&&!opts.noWave&&!opts.choices&&typeof actPlay==='function'&&started&&!INDOOR&&!CUTON&&!P.sit&&!(ACT.on&&ACT.lock))actPlay('wave',{loops:2});{const D=$('dialog');let f=D.querySelector('.dlg-face');if(opts.face){if(!f){f=document.createElement('img');f.className='dlg-face';f.alt='';D.appendChild(f);}f.src=opts.face;f.hidden=false;}else if(f)f.hidden=true;const av=D.querySelector('.ac-view');if(av)av.hidden=!(typeof AC!=='undefined'&&AC.view);}DLG.open=true;DLG.who=who||'';DLG.lines=lines;DLG.i=0;DLG.choices=opts.choices||null;DLG.onEnd=opts.onEnd||null;$('dialog').hidden=false;$('dialog').querySelector('.who').textContent=DLG.who;startLine();}
 function startLine(){DLG.full=DLG.lines[DLG.i];DLG.typed=0;$('dialog').querySelector('.txt').textContent='';$('dialog').querySelector('.choices').innerHTML='';$('dialog').querySelector('.more').hidden=true;}
 function choose(who,text,choices,extra={}){say(who,[text],Object.assign({choices},extra));}
 function showChoices(){const box=$('dialog').querySelector('.choices');box.innerHTML='';DLG.choices.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.innerHTML=`<b>${i+1}</b>`;b.appendChild(document.createTextNode(c.label));b.onclick=e=>{e.stopPropagation();pickChoice(i);};box.appendChild(b);});
@@ -6425,10 +6430,26 @@ const AC_ADOPT=[
   {q:'狗狗每天需要什麼？',o:['散步、運動，還有陪伴和訓練','一直關在籠子裡','一個禮拜出門一次就好','只要有飯吃就好'],e:'狗狗需要每天出門散步、動一動，也需要主人陪。大型犬像狼犬，需要的運動量更大。'},
   {q:'如果以後不想養了，可以怎麼做？',o:['一開始就想清楚，養了就照顧牠一輩子','帶到山上放生','放在路邊讓別人撿','送到河邊'],e:'棄養是違法的，也會讓狗狗流浪受苦。養之前想清楚，是對牠最大的負責。'},
   {q:'為什麼很多人會幫狗狗結紮？',o:['減少意外生小狗、讓流浪狗變少','讓狗狗長得更快','讓狗狗變聰明','讓狗狗不用吃飯'],e:'結紮可以減少意外懷孕，流浪狗就不會越生越多。'}];
+
+// ---- close-up: while you talk about an animal, it walks up to the fence in front of you and a large drawn card of it sits above the dialog
+const AC_VIEW={lc:{sid:'ani_leopardcat',name:'石虎・小斑',seq:['front_sit','groom','alert','front_sit','sniff','eat'],at:[92,-44.6],bg:['#cfe3b4','#8fbf6a']},
+  bl:{sid:'ani_blackleopard',name:'黑豹・墨影',seq:['front_sit','yawn','groom','front_sit','alert','lie'],at:[104,-44.4],bg:['#d9d2bf','#8b9a6a']},
+  dog:{sid:'ani_shepherd',name:'狼犬（等待新家）',seq:['front_sit','wag_A','wag_B','wag_A','paw','alert'],at:[101.5,-50.4],bg:['#f1e2bf','#c9a76a']}};
+function acView(k,name){const V=AC_VIEW[k];if(!V||!SPRITES[V.sid])return;AC.view={k,sid:V.sid,name:name||V.name,t:0,i:0,img:null};
+  loadImg(SPRITES[V.sid].src).then(im=>{if(AC.view&&AC.view.sid===V.sid)AC.view.img=im;}).catch(()=>{});
+  const D=$('dialog');let av=D.querySelector('.ac-view');if(!av){av=document.createElement('div');av.className='ac-view';av.innerHTML='<canvas width="420" height="330"></canvas><b></b>';D.appendChild(av);}
+  av.querySelector('b').textContent=AC.view.name;av.hidden=false;
+  const o=AC[k];if(o&&!o.cine&&o.g.visible){o.st='walk';o.mv=true;o.anim=null;o.tx=V.at[0];o.tz=V.at[1];o.spd=k==='bl'?1.2:1.1;o.t=12;o.come=1;}}
+function acViewTick(dt){const v=AC.view;if(!v)return;if(!DLG.open){AC.view=null;return;}v.t+=dt;const V=AC_VIEW[v.k];if(v.t>1.5){v.t=0;v.i=(v.i+1)%V.seq.length;}
+  const av=$('dialog').querySelector('.ac-view');if(!av||av.hidden||!v.img)return;const cv=av.querySelector('canvas'),g=cv.getContext('2d'),M=SPRITES[v.sid];
+  const gr=g.createLinearGradient(0,0,0,330);gr.addColorStop(0,V.bg[0]);gr.addColorStop(1,V.bg[1]);g.fillStyle=gr;g.fillRect(0,0,420,330);
+  g.fillStyle='rgba(0,0,0,.16)';g.beginPath();g.ellipse(210,300,120,18,0,0,7);g.fill();
+  const key=V.seq[v.i],f=M.act&&M.act[key]!=null?M.act[key]:0,[sx,sy]=fxy(M,f),s=Math.min(1.85,240/(M.hpx||150)),br=1+Math.sin(performance.now()/500)*.008;
+  g.save();g.translate(210,314);g.scale(1,br);g.drawImage(v.img,sx,sy,M.cw,M.ch,-M.cw*s/2,-M.ch*s+ (M.foot||4)*s,M.cw*s,M.ch*s);g.restore();}
 function acW(){W.wild=W.wild||{};['lc','bl'].forEach(k=>{const w=W.wild[k]=W.wild[k]||{};w.n=+w.n||0;w.done=Array.isArray(w.done)?w.done:[];w.last=w.last||'';w.rel=+w.rel||0;});return W.wild;}
 function acMenu(){choose('保育員 小岑','歡迎來到 Sqoyaw 動物之家！這裡有等待新家的狗狗，也有受傷、被救回來的保育動物。今天想做什麼？',[
   {label:'🐕 領養狗狗',fn:()=>acAdopt()},{label:'🐾 照顧石虎',fn:()=>acCare('lc')},{label:'🐾 照顧黑豹',fn:()=>acCare('bl')},{label:'📖 保育動物圖鑑',fn:()=>acBook()},{label:'先不用，謝謝',fn:()=>{}}]);}
-function acCare(k){if(!W.seat)return;const C=AC_CARE[k],w=acW()[k];
+function acCare(k){if(!W.seat)return;const C=AC_CARE[k],w=acW()[k];acView(k);
   if(!w.met){w.met=1;save();say('保育員 小岑',[C.intro,'每天來幫忙一次，回答對一題，就算完成今天的照顧工作。'],{noWave:1,onEnd:()=>acCare(k)});return;}
   if(w.last===todayStr()&&!TS()){say(C.name,[`今天已經幫${C.who}做完照顧工作了。`,'動物也需要安靜休息，明天再來吧！'],{noWave:1});return;}
   const left=C.tasks.filter(t=>!w.done.includes(t.id)),pool=left.length?left:C.tasks,t=pool[Math.floor(rand()*pool.length)];
@@ -6458,10 +6479,10 @@ function acCine(o,dt){const c=o.cine;c.t+=dt;const G_=AC.gate,gx=92,lx=o.g.posit
       say('保育員 小岑',['小斑回家了！謝謝你這幾天的照顧。','……啊，剛剛又送來一隻在路邊受傷的石虎。接下來也拜託你了！'],{noWave:1});}}
   else if(c.step===5&&c.t>3){o.cine=null;o.slow=true;o.g.position.set(TB.x+rr(o.b[0],o.b[1]),AC.y,TB.z+rr(o.b[2],o.b[3]));o.g.visible=true;o.st='idle';o.t=2;}
   if(c&&c.step>=1&&c.step<5)o.g.position.y=o.g.position.z>-36?tribeH(o.g.position.x-TB.x,o.g.position.z):AC.y;}
-function acTick(dt){if(!AC.objs.length||!tbIn())return;const px=P.pos.x-TB.x,pz=P.pos.z;if(Math.abs(px-98)>80||Math.abs(pz+48)>80)return;
+function acTick(dt){acViewTick(dt);if(!AC.objs.length||!tbIn())return;const px=P.pos.x-TB.x,pz=P.pos.z;if(Math.abs(px-98)>80||Math.abs(pz+48)>80)return;
   AC.objs.forEach(o=>{if(o.cine){acCine(o,dt);return;}if(!o.g.visible)return;o.t-=dt;
     if(o.st==='walk'){const dx=o.tx-(o.g.position.x-TB.x),dz=o.tz-o.g.position.z,d=Math.hypot(dx,dz);
-      if(d<.15||o.t<0){o.st='idle';o.mv=false;o.t=rr(3,7);const a=o.idle[Math.floor(rand()*o.idle.length)];o.anim=a?{type:a,t:0,dur:o.t}:null;}
+      if(d<.15||o.t<0){o.st='idle';o.mv=false;if(o.come){o.come=0;o.t=AC.view?14:5;o.anim=null;o.g.rotation.y=Math.atan2(P.pos.x-o.g.position.x,P.pos.z-o.g.position.z);}else{o.t=rr(3,7);const a=o.idle[Math.floor(rand()*o.idle.length)];o.anim=a?{type:a,t:0,dur:o.t}:null;}}
       else{const s=Math.min(d,o.spd*dt);o.g.position.x+=dx/d*s;o.g.position.z+=dz/d*s;o.g.rotation.y=Math.atan2(dx,dz);o.ph+=dt*o.spd*6;}}
     else if(o.t<0){if(rand()<.55){const b=o.b;o.st='walk';o.mv=true;o.anim=null;o.tx=rr(b[0],b[1]);o.tz=rr(b[2],b[3]);o.spd=o.k==='bl'?1.05:o.k==='dog'?1.2:.85;o.t=14;}
       else{o.t=rr(3,7);const a=o.idle[Math.floor(rand()*o.idle.length)];o.anim=a?{type:a,t:0,dur:o.t}:null;}}});}
@@ -6469,7 +6490,7 @@ function acTick(dt){if(!AC.objs.length||!tbIn())return;const px=P.pos.x-TB.x,pz=
 function acRefresh(){const d=AC.dog;if(d)d.g.visible=!(W.pet&&W.pet.kind==='dog'&&W.pet.coat==='shepherd');}
 function acAdopt(){if(!W.seat)return;
   if(W.pet){say('保育員 小岑',[`你已經有${W.pet.name}了。`,'好好照顧一隻寵物最重要。有空常來看看這裡的狗狗！'],{noWave:1});return;}
-  const av=AC_DOGS.filter(d=>SPRITES['ani_'+d.coat]);
+  acView('dog');const av=AC_DOGS.filter(d=>SPRITES['ani_'+d.coat]);
   choose('動物之家','這些狗狗在等新家。領養前，我們會先問你幾個問題，確定你準備好了。',[...av.map(d=>({label:`🐕 ${d.name}（${d.desc}）`,fn:()=>acAdoptQuiz(d,shuffle(AC_ADOPT.slice()).slice(0,3),0)})),{label:'再想想',fn:()=>{}}]);}
 function acAdoptQuiz(d,qs,i){if(i>=qs.length){say('保育員 小岑',['三題都答對了！看得出來你準備好了。','幫牠取一個名字吧！'],{noWave:1,onEnd:()=>askName(d.def,name=>acAdoptDone(d,name))});return;}
   const t=qs[i],opts=shuffle(t.o.map((s,j)=>({s,ok:j===0})));
