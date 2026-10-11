@@ -1502,9 +1502,39 @@
    "note": ""
   },
   {
+   "file": "assets/tex/asphalt.webp",
+   "group": "tex",
+   "bytes": 99910,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/concrete.webp",
+   "group": "tex",
+   "bytes": 55608,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/grass.webp",
+   "group": "tex",
+   "bytes": 94486,
+   "note": "surface texture"
+  },
+  {
    "file": "assets/tex/roof_metal.webp",
    "group": "tex",
    "bytes": 13144,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/soil.webp",
+   "group": "tex",
+   "bytes": 53966,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/terrazzo.webp",
+   "group": "tex",
+   "bytes": 64660,
    "note": "surface texture"
   },
   {
@@ -1523,6 +1553,12 @@
    "file": "assets/tex/wall_tile.webp",
    "group": "tex",
    "bytes": 30606,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/wood_plank.webp",
+   "group": "tex",
+   "bytes": 23026,
    "note": "surface texture"
   },
   {
