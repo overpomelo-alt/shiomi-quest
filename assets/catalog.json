@@ -1502,6 +1502,30 @@
    "note": ""
   },
   {
+   "file": "assets/tex/roof_metal.webp",
+   "group": "tex",
+   "bytes": 13144,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/wall_pebble.webp",
+   "group": "tex",
+   "bytes": 78024,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/wall_plaster.webp",
+   "group": "tex",
+   "bytes": 12794,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/wall_tile.webp",
+   "group": "tex",
+   "bytes": 30606,
+   "note": "surface texture"
+  },
+  {
    "file": "assets/ui/loading-run.webp",
    "group": "ui",
    "bytes": 464186,
