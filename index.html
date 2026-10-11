@@ -1887,7 +1887,7 @@ function cutPatch(m){if(!m||m.userData.cutP)return;m.userData.cutP=true;const pr
   m.customProgramCacheKey=()=>(pk?pk():'')+'|cut';m.needsUpdate=true;}
 function camInside(p){const CL=cgQuery(p.x-.4,p.z-.4,p.x+.4,p.z+.4,_rq);for(const c of CL){if(!c.see||p.y>c.y1+1.5||p.y<c.y0)continue;
   if(c.o){const q=c.o,rx=p.x-q.cx,rz=p.z-q.cz;if(Math.abs(rx*q.ux+rz*q.uz)<q.hw+.3&&Math.abs(rx*q.vx+rz*q.vz)<q.hd+.3)return true;}else if(p.x>c.x0-.3&&p.x<c.x1+.3&&p.z>c.z0-.3&&p.z<c.z1+.3)return true;}return false;}
-function rayDist(o,d,maxD,solid){let best=maxD;const sk=CUTU.on&&!solid;const ex=o.x+d.x*maxD,ez=o.z+d.z*maxD;const CL=cgQuery(Math.min(o.x,ex)-.5,Math.min(o.z,ez)-.5,Math.max(o.x,ex)+.5,Math.max(o.z,ez)+.5,_rq);for(const c of CL){if(c.y1<.9||(sk&&c.see))continue;
+function rayDist(o,d,maxD,solid){let best=maxD;const sk=CUTU.on&&!solid;const ex=o.x+d.x*maxD,ez=o.z+d.z*maxD;const CL=cgQuery(Math.min(o.x,ex)-.5,Math.min(o.z,ez)-.5,Math.max(o.x,ex)+.5,Math.max(o.z,ez)+.5,_rq);for(const c of CL){if(c.y1<.9||c.nc||(sk&&c.see))continue;
   let tmin=0,tmax=best;let ax;if(c.o){const q=c.o,rx=o.x-q.cx,rz=o.z-q.cz;ax=[[rx*q.ux+rz*q.uz,d.x*q.ux+d.z*q.uz,-q.hw,q.hw],[o.y,d.y,c.y0,c.y1],[rx*q.vx+rz*q.vz,d.x*q.vx+d.z*q.vz,-q.hd,q.hd]];}else ax=[[o.x,d.x,c.x0,c.x1],[o.y,d.y,c.y0,c.y1],[o.z,d.z,c.z0,c.z1]];let ok=true;
   for(const [oo,dd,a,b] of ax){if(Math.abs(dd)<1e-6){if(oo<a||oo>b){ok=false;break;}}else{let t1=(a-oo)/dd,t2=(b-oo)/dd;if(t1>t2){const t=t1;t1=t2;t2=t;}tmin=Math.max(tmin,t1);tmax=Math.min(tmax,t2);if(tmin>tmax){ok=false;break;}}}
   if(ok&&tmin>0.2&&tmin<best)best=tmin;}return best;}
@@ -3201,13 +3201,13 @@ $('loginForm').addEventListener('submit',async e=>{e.preventDefault();if(LOGGING
     if(cl&&old)old=mergeSaves(cl,old);else if(cl)old=cl;
     if(old&&rt&&(+old.last||0)<rt){try{localStorage.removeItem(SKEY(seat));}catch(e){}old=null;}
     clearTimeout(CLOUD.timer);CLOUD.timer=0;CLOUD.dirty=false;CLOUD.at=0;CLOUD.okT=0;CLOUD.fails=0;CLOUD.ver=cok;CLOUD.base=old?(+old.last||0):0;CLOUD.st=cok?'ok':'fail';}
-  Object.assign(W,{seat,name,coins:CFG.startCoins,items:{},glass:[],st:{},safety:null,time:0,look:null,pet:null,catFriend:{},tips:{},submitted:false,home:null,furn:{},homeSeen:false,daily:null,req:{},reqReady:{},reqNote:{},reads:[],newsSeen:[],att:{},adv:{},tcSeen:false,pomo:{},hist:[],seenQ:{},histInit:true,stSeen:false,ledger:[],play:{},moneyGoal:null,gifts:[],wild:null});
+  Object.assign(W,{seat,name,coins:CFG.startCoins,items:{},glass:[],st:{},safety:null,time:0,look:null,pet:null,catFriend:{},tips:{},submitted:false,home:null,furn:{},homeSeen:false,daily:null,req:{},reqReady:{},reqNote:{},reads:[],newsSeen:[],att:{},adv:{},tcSeen:false,pomo:{},hist:[],seenQ:{},histInit:true,stSeen:false,ledger:[],play:{},moneyGoal:null,gifts:[],wild:null,clean:null});
   PLAY.warned=0;PLAY.snooze=0;if(!old)setTimeout(()=>led(CFG.startCoins,'開始的零用錢','其他'),0);
   if(old){Object.assign(W,old,{seat,name,histInit:!!old.histInit});W.glass=Array.isArray(W.glass)?W.glass:[];W.st=W.st||{};W.items=W.items||{};cleanLook(W.look);histBackfill();}
   save();refreshGlass();renderPouch();applyLook(W.look);setupPet();if(!W.look)openDress(()=>start());else start();
   setTimeout(()=>toast(old?`歡迎回來，${name}！`:`${name}，歡迎來到平等車站！`),1600);{const gc=n=>{if(started&&W.seat===seat){if(CLOUD.st==='ok')giftCheck();}else if(n<30)setTimeout(()=>gc(n+1),3000);};setTimeout(()=>gc(0),5000);}setTimeout(()=>{if(newsUnseen())toast('公告板有老師的新消息！');},5200);});
 function logout(){save();cloudFlush();r2Off();s2Off();closePortal();CY_IN=false;$('bTeacher').hidden=true;$('bPortal').hidden=true;document.body.classList.remove('tsess','cine');closeCard();stopQTimer();CH_IN=false;ISL_IN=false;TC_IN=false;ST_IN=false;$('ride').hidden=true;HOME.from=null;closeCabin();if(MZ_IN){MZ_IN=false;$('mzMap').hidden=true;LANTERN.intensity=0;sky.visible=true;scene.background=null;}closeDecor();teardownPet();if(INDOOR){INDOOR=false;}HOME_IN=false;$('homeBar').hidden=true;MART.basket=[];if(MART.bm)MART.bm.visible=false;if(DLG.open)closeDlg();started=false;MISSION.active=false;P.sit=null;P.pos.set(0,0,24);P.vel.set(0,0,0);P.yaw=PI;
-  applyLook(LOOK_DEF);CATS.forEach(c=>{c.follow=0;});Object.assign(W,{seat:'',name:'',coins:0,items:{},glass:[],st:{},safety:null,time:0,look:null,pet:null,catFriend:{},tips:{},submitted:false,home:null,furn:{},homeSeen:false,daily:null,req:{},reqReady:{},reqNote:{},reads:[],newsSeen:[],att:{},adv:{},tcSeen:false,pomo:{},hist:[],seenQ:{},histInit:true,stSeen:false,ledger:[],play:{},moneyGoal:null,gifts:[],wild:null});refreshGlass();QT.pin=null;QT.last='';tipQ=[];playT=0;$('qTip').hidden=true;renderPouch();renderPet();
+  applyLook(LOOK_DEF);CATS.forEach(c=>{c.follow=0;});Object.assign(W,{seat:'',name:'',coins:0,items:{},glass:[],st:{},safety:null,time:0,look:null,pet:null,catFriend:{},tips:{},submitted:false,home:null,furn:{},homeSeen:false,daily:null,req:{},reqReady:{},reqNote:{},reads:[],newsSeen:[],att:{},adv:{},tcSeen:false,pomo:{},hist:[],seenQ:{},histInit:true,stSeen:false,ledger:[],play:{},moneyGoal:null,gifts:[],wild:null,clean:null});refreshGlass();QT.pin=null;QT.last='';tipQ=[];playT=0;$('qTip').hidden=true;renderPouch();renderPet();
   document.body.classList.remove('playing');const t=$('title');t.hidden=false;t.classList.remove('gone');$('inSeat').value='';$('inName').value='';$('inSeat').focus({preventScroll:true});}
 renderPouch();
 
@@ -6037,16 +6037,19 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
   // red-tile roof cap, stair tower with clock, flag platform, PU track, covered basketball court (風雨球場), gate & fence
   {const SG=new T.Group();G.add(SG);const Y0=H(-61,30);
    const B=(w,h,d,m,x,y,z,ni)=>{const o=mk(bx(w,h,d),m,x,Y0+y,z,SG,!ni);if(ni)o.userData.noInk=1;return o;};
-   const WALL=lam('#f0e3c4'),WALL2=lam('#e6d5b0'),COLR=lam('#b5604a'),PARA=lam('#f7f3ea'),BAND=lam('#3f8a8a'),SLAB=lam('#d9d2c4'),ROOFR=lam('#b0503a'),
+   const WALL=lam('#ece0c6'),WALL2=lam('#e2d3b2'),COLR=lam('#e6d8ba'),PARA=lam('#8e8b85'),BAND=lam('#77746e'),SLAB=lam('#cfc9bd'),ROOFR=lam('#5e3d2c'),
      DOORG=lam('#4f8a6a'),GLASS=lam('#bcd9e6'),FRAME=lam('#5d6b6f'),STONE=lam('#9a958a'),METAL=lam('#8fa0ad'),COURT=lam('#3d6fa8'),WHITE=lam('#f4f2ec');
-   const x0=-73,x1=-53,L=x1-x0,cx=(x0+x1)/2,zb=15.6,zc=20,zf=22,fh=3.3,NF=3,HT=NF*fh;
+   const x0=-73,x1=-53,L=x1-x0,cx=(x0+x1)/2,zb=15.6,zc=20,zf=22,fh=3.4,NF=2,HT=NF*fh;
    // classroom block + corridor slabs, columns and parapets
    B(L,HT,zc-zb,WALL,cx,HT/2,(zb+zc)/2);B(L+.1,.6,zc-zb+.1,WALL2,cx,.3,(zb+zc)/2);
    B(L,.16,zf-zc+.2,SLAB,cx,.08,(zc+zf)/2+.1,true);
    for(let k=1;k<=NF;k++){B(L+.3,.28,zf-zc+.45,SLAB,cx,k*fh,(zc+zf)/2+.12);}
    for(let k=1;k<NF;k++){B(L+.3,1,.2,PARA,cx,k*fh+.62,zf+.25);B(L+.32,.2,.24,BAND,cx,k*fh+1.02,zf+.25);}
    B(L+.3,.9,.2,PARA,cx,HT+.55,zf+.25);B(L+.32,.2,.24,BAND,cx,HT+.9,zf+.25);
-   const nb=5,bw=L/nb;for(let i=0;i<=nb;i++)B(.45,HT,.45,COLR,x0+i*bw,HT/2,zf+.1);
+   const nb=5,bw=L/nb;for(let i=0;i<=nb;i++){B(.55,HT,.55,COLR,x0+i*bw,HT/2,zf+.1);B(.1,1.6,.1,lam('#e8c33a'),x0+i*bw-.27,.8,zf+.38,true);B(.1,1.6,.1,lam('#e8c33a'),x0+i*bw+.27,.8,zf+.38,true);}
+   // Atayal diamond tiles (red / blue) on every balcony parapet, as on the real building
+   {const dm=[lam('#c8463a'),lam('#3b62a8')],dg=new T.PlaneGeometry(.7,.7),wg=new T.PlaneGeometry(1,1);for(let k=1;k<=NF;k++)for(let i=0;i<nb;i++){const xm=x0+(i+.5)*bw,y=Y0+k*fh+(k<NF?.62:.55);
+       const w=new T.Mesh(wg,lam('#f2efe8'));w.position.set(xm,y,zf+.36);w.rotation.z=PI/4;SG.add(w);const d=new T.Mesh(dg,dm[(i+k)%2]);d.position.set(xm,y,zf+.37);d.rotation.z=PI/4;SG.add(d);}}
    for(let k=0;k<NF;k++)for(let i=0;i<nb;i++){const bx0=x0+i*bw,y=k*fh;B(1.05,2.15,.08,DOORG,bx0+.95,y+1.1,zc+.04);
      [bw*.5,bw*.78].forEach(o=>{B(1.25,1.15,.06,FRAME,bx0+o+.2,y+1.75,zc+.03,true);B(1.1,1,.07,GLASS,bx0+o+.2,y+1.75,zc+.05,true);});
      [bw*.3,bw*.7].forEach(o=>{B(1.4,1.2,.06,FRAME,bx0+o,y+1.75,zb-.03,true);B(1.25,1.05,.07,GLASS,bx0+o,y+1.75,zb-.05,true);});}
@@ -6061,13 +6064,22 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
    addCol(TB.x+x0,TB.x+x1,zb,zc,Y0+HT+3);addCol(TB.x-53.1,TB.x-49.7,15.9,21.3,Y0+HT+3);
    for(let i=0;i<=nb;i++)addCol(TB.x+x0+i*bw-.25,TB.x+x0+i*bw+.25,zf-.15,zf+.35,Y0+HT);
    sign(cx,Y0+HT+1.55,zf+.4,0,'臺中市和平區平等國民小學',8.4,'#2f6b4a','#fff6dc');
+   // the wooden deck (木平台) with its teal canopy and orange beams, between the classrooms and the track
+   {const dx=-56,dz=25.2,dw=9,dd=4.2,wood=lam('#5f6a5a'),plank=lam('#6f7a68');B(dw,.3,dd,wood,dx,.15,dz);
+     for(let k=0;k<9;k++)B(dw-.2,.04,.06,plank,dx,.31,dz-dd/2+.3+k*.45,true);
+     const arc=mk(new T.CylinderGeometry(dw/2,dw/2,.3,28,1,false,PI/2,PI),wood,dx,Y0+.15,dz+dd/2,SG);arc.scale.z=.32;
+     const cg=new T.MeshLambertMaterial({color:col('#3fb7ad'),transparent:true,opacity:.72,side:T.DoubleSide,depthWrite:false});const OR=lam('#e07b2c');
+     for(let k=0;k<6;k++){const x=dx-dw/2+.6+k*(dw-1.2)/5;const bm=B(.18,.22,dd+2.4,OR,x,4.6,dz+.6);bm.rotation.x=-.16;B(.16,4.4,.16,lam('#f2efe8'),x,2.3,dz+dd/2+1.2);addCol(TB.x+x-.15,TB.x+x+.15,dz+dd/2+1.05,dz+dd/2+1.35,Y0+4.4);}
+     for(let k=0;k<3;k++){const bm=B(dw+.4,.16,.16,OR,dx,4.5-k*.18,dz-1+k*1.6);}
+     const cv=mk(bx(dw+.6,.06,dd+2.6),cg,dx,Y0+4.78,dz+.6,SG,false);cv.rotation.x=-.16;cv.userData.noInk=1;
+     inter(P_(dx,dz),2.2,'坐在木平台上',()=>say(null,['木平台被太陽曬得暖暖的。','下課的時候，大家常在這裡畫畫、寫學習單。'],{noWave:1}));}
    // flag platform + 3 poles
    {const fx=-63,fz=24.9;B(4.4,.6,2.2,STONE,fx,.3,fz);B(4.6,.1,2.4,WALL2,fx,.62,fz,true);[0,1].forEach(k=>B(2,.2,.35,STONE,fx,.1,fz+1.25+k*.3,true));
      [-1.5,0,1.5].forEach((o,i)=>{mk(cy(.05,.06,i===1?8:7,8),METAL,fx+o,Y0+.6+(i===1?4:3.5),fz-.6,SG);});addCol(TB.x+fx-2.2,TB.x+fx+2.2,fz-1.1,fz+1.1,Y0+.7);
      const fl=mk(new T.PlaneGeometry(1.3,.85),lam('#3d6fa8',{side:T.DoubleSide}),fx+.66,Y0+8.1,fz-.6,G,false);TB.flag=fl;
      for(let k=0;k<4;k++){mk(ico(.45,0),pick([M.leaf,M.leaf2]),fx-5+k*1.2,Y0+.45,fz,G,false);mk(sph(.12,6,5),lam(pick(['#f06a8a','#f2c14e','#f7f2e8'])),fx-5+k*1.2,Y0+.85,fz,G,false);}}
    // bulletin board (公告欄)
-   {const bx0=-56.5,bz=23.6;[-1.3,1.3].forEach(o=>{B(.14,2.4,.14,FRAME,bx0+o,1.2,bz);addCol(TB.x+bx0+o-.15,TB.x+bx0+o+.15,bz-.15,bz+.15,Y0+2.4);});B(2.6,1.4,.1,lam('#3f6b4a'),bx0,1.6,bz);B(2.9,.12,.5,ROOFR,bx0,2.42,bz);
+   {const bx0=-47.6,bz=18.6;[-1.3,1.3].forEach(o=>{B(.14,2.4,.14,FRAME,bx0+o,1.2,bz);addCol(TB.x+bx0+o-.15,TB.x+bx0+o+.15,bz-.15,bz+.15,Y0+2.4);});B(2.6,1.4,.1,lam('#3f6b4a'),bx0,1.6,bz);B(2.9,.12,.5,ROOFR,bx0,2.42,bz);
      ['#f7f2e8','#f2c14e','#bfe3f5','#f6b0a0'].forEach((c,k)=>B(.5,.6,.02,lam(c),bx0-.9+k*.6,1.6+(k%2?.12:-.1),bz+.07,true));}
    // PU track + infield
    {const [c,q]=C2(512,280);q.fillStyle='#b8573f';q.fillRect(0,0,512,280);q.fillStyle='#5f9a48';q.beginPath();q.ellipse(256,140,190,82,0,0,7);q.fill();
@@ -6075,11 +6087,10 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
      q.globalAlpha=.25;q.fillStyle='#4a8a3c';for(let k=0;k<9;k++)q.fillRect(80+k*40,62,20,156);q.globalAlpha=1;q.strokeStyle='rgba(255,255,255,.85)';q.lineWidth=2;q.strokeRect(186,104,140,72);q.beginPath();q.moveTo(256,104);q.lineTo(256,176);q.stroke();
      const fm=mk(new T.PlaneGeometry(21,12),lam('#ffffff',{map:TX(c),polygonOffset:true,polygonOffsetFactor:-2}),-62,Y0+.06,34,G,false);fm.rotation.x=-PI/2;}
    // covered basketball court (風雨球場)
-   {const kx=-48.5,kz=33.5,kw=5.6,kl=12;const [c,q]=C2(128,256);q.fillStyle='#3d6fa8';q.fillRect(0,0,128,256);q.fillStyle='#c8573f';q.fillRect(8,8,112,240);q.strokeStyle='#fff';q.lineWidth=3;q.strokeRect(10,10,108,236);q.beginPath();q.moveTo(10,128);q.lineTo(118,128);q.stroke();
-     q.beginPath();q.arc(64,128,18,0,7);q.stroke();[10,246].forEach(y=>{q.beginPath();q.arc(64,y,40,y<100?0:PI,y<100?PI:2*PI);q.stroke();});
+   {const kx=-48.5,kz=33.5,kw=5.6,kl=12;const [c,q]=C2(128,256);q.fillStyle='#3f8f6e';q.fillRect(0,0,128,256);q.fillStyle='#3a8466';q.fillRect(8,8,112,240);q.strokeStyle='#fff';q.lineWidth=3;q.strokeRect(10,10,108,236);q.beginPath();q.moveTo(10,128);q.lineTo(118,128);q.stroke();
+     q.beginPath();q.arc(64,128,18,0,7);q.stroke();q.fillStyle='#ffffff';q.beginPath();q.ellipse(64,128,16,9,0,0,7);q.fill();q.fillStyle='#3b62a8';q.beginPath();q.ellipse(64,128,9,5,0,0,7);q.fill();[10,246].forEach(y=>{q.beginPath();q.arc(64,y,40,y<100?0:PI,y<100?PI:2*PI);q.stroke();});
      const ct=mk(new T.PlaneGeometry(kw,kl),lam('#ffffff',{map:TX(c),polygonOffset:true,polygonOffsetFactor:-3}),kx,Y0+.07,kz,G,false);ct.rotation.x=-PI/2;
-     for(let i=0;i<3;i++)[-1,1].forEach(s=>{const z=kz-kl/2+i*kl/2,x=kx+s*(kw/2+.35);B(.18,6.6,.18,METAL,x,3.3,z);addCol(TB.x+x-.15,TB.x+x+.15,z-.15,z+.15,Y0+6);});
-     {const ar=new T.Group();ar.position.set(kx,Y0+6.6,kz);SG.add(ar);for(let k=0;k<8;k++){const a=-.6+k*1.2/7,seg=mk(bx(kw/8*1.06,.12,kl+1),lam('#a9b6bf'),Math.sin(a)*kw*.62,Math.cos(a)*1.2-1.2+.9,0,ar);seg.rotation.z=-a;}}
+     // (the real court is open-air: no pillars, no roof)
      // shoot / dunk at either hoop (student action frames + a real ball that flies to the rim)
      [-1,1].forEach(s=>{const rz=kz+s*(kl/2-.8),fz=rz-s*3.4;inter(new T.Vector3(TB.x+kx,Y0,fz),1.7,'投籃（籃球場）',()=>tbHoop(kx,Y0,rz,fz,s));});
      [-1,1].forEach(s=>{const z=kz+s*(kl/2-.3);B(.14,3,.14,METAL,kx,1.5,z);B(1.2,.8,.06,WHITE,kx,3.1,z-s*.2);const rim=mk(new T.TorusGeometry(.24,.025,6,14),lam('#e0674b'),kx,Y0+2.75,z-s*.5,SG,false);rim.rotation.x=PI/2;
@@ -6092,13 +6103,23 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
        const yy=H(mx,mz)-Y0;const w_=B(ll,.7,.22,WALL2,mx,yy+.35,mz);w_.rotation.y=Math.atan2(-(bz-az),bx_-ax);const r=B(ll,.06,.06,FRAME,mx,yy+1.4,mz,true);r.rotation.y=w_.rotation.y;B(.1,1.4,.1,FRAME,ax,yy+.7,az,true);
        addCol(TB.x+Math.min(ax,bx_)-.15,TB.x+Math.max(ax,bx_)+.15,Math.min(az,bz)-.15,Math.max(az,bz)+.15,H(mx,mz)+1.5);}};
      fence(gx,15.4,gx,gz0-.5);fence(gx,gz1+.5,gx,45.2);fence(gx,45.2,-74,45.2);}
+   // the big blue fish slide (mosaic tiles) next to the court
+   {const fx=-48.3,fz=41.4,g=new T.Group();g.position.set(TB.x+fx,Y0,TB.z+fz);scene.add(g);g.userData.dyn=true;
+     const [c,q]=C2(256,128);q.fillStyle='#3a6fc4';q.fillRect(0,0,256,128);for(let i=0;i<900;i++){q.fillStyle=pick(['#4f86d6','#2f5fae','#7aa7e6','#e8eef8','#3a6fc4']);q.fillRect(rr(0,256),rr(0,128),5,5);}
+     const fm=lam('#ffffff',{map:TX(c)});const body=mk(sph(1,18,12),fm,0,1.05,0,g);body.scale.set(2.2,1.1,.95);
+     const tail=mk(new T.ConeGeometry(.9,1.4,4),fm,-2.6,1.05,0,g);tail.rotation.z=PI/2;tail.scale.z=.35;
+     [1,-1].forEach(sd=>{const e=mk(sph(.32,12,8),lam('#ffffff'),1.25,1.45,sd*.62,g,false);e.scale.z=.4;const pp=mk(sph(.15,10,8),lam('#1c2a44'),1.33,1.47,sd*.72,g,false);pp.scale.z=.4;});
+     const mouth=mk(sph(.28,10,8),lam('#2a3a5a'),2.12,.82,0,g,false);mouth.scale.set(.5,.6,1.1);
+     const sl=mk(bx(2.4,.08,.9),lam('#e9eef6'),.2,.9,1.25,g);sl.rotation.z=-.5;
+     addCol(TB.x+fx-3.2,TB.x+fx+2.4,fz-1.1,fz+1.1,Y0+2.2);inter(P_(fx,fz+2.4),2,'溜魚滑梯',()=>say(null,['咻——從大魚的背上溜下來！','這隻藍色的大魚，是平等國小的招牌溜滑梯。'],{noWave:1}));}
    // swings + trees
    {const sx=-70.2,sz=25;[-1.4,1.4].forEach(o=>{const a=B(.12,2.6,.12,lam('#e0a020'),sx+o,1.3,sz-.6);a.rotation.x=.22;const b=B(.12,2.6,.12,lam('#e0a020'),sx+o,1.3,sz+.6);b.rotation.x=-.22;addCol(TB.x+sx+o-.2,TB.x+sx+o+.2,sz-.9,sz+.9,Y0+2.6);});
      B(3,.12,.12,lam('#e0a020'),sx,2.5,sz);[-.6,.6].forEach(o=>{B(.6,.06,.25,lam('#e0674b'),sx+o,.6,sz);[-.25,.25].forEach(p=>B(.02,1.85,.02,FRAME,sx+o+p,1.55,sz,true));});
-     [[-70,43.6],[-65,43.6],[-60,43.6],[-55,43.6],[-50.5,43.6],[-72.8,30],[-72.8,38]].forEach(([x,z])=>{mk(cy(.18,.26,1.8,7),M.trunk,x,Y0+.9,z,SG);mk(ico(1.5,1),pick([M.leaf,M.leaf2]),x,Y0+2.9,z,SG);addCol(TB.x+x-.3,TB.x+x+.3,z-.3,z+.3,Y0+4);});}
+     [[-70,43.6],[-65,43.6],[-60,43.6],[-55,43.6],[-72.8,30],[-72.8,38]].forEach(([x,z])=>{mk(cy(.18,.26,1.8,7),M.trunk,x,Y0+.9,z,SG);mk(ico(1.5,1),pick([M.leaf,M.leaf2]),x,Y0+2.9,z,SG);addCol(TB.x+x-.3,TB.x+x+.3,z-.3,z+.3,Y0+4);});}
    sqBatch(G,SG);
    reserve(-62,20,12);reserve(-60,34,14);reserve(-48.5,33,7);reserve(-42,24.8,3.5);flagAt('school',-37,27);inter(P_(-38,28.5),1.8,'平等國小（走讀打卡）',()=>sqStory('school'));
-   inter(P_(-56.5,25),1.8,'看平等國小的公告欄',()=>openBoard('news'));}
+   inter(P_(-64,21.2),1.8,'五年級教室：打掃時間',()=>cleanStart());
+   inter(P_(-47.6,20),1.8,'看平等國小的公告欄',()=>openBoard('news'));}
   // 獵人步道登山口 (behind the school, west)
   {const x=-73,z=8;[-1.3,1.3].forEach(k=>mk(bx(.3,3,.3),M.woodDark,x,H(x,z+k)+1.5,z+k,G));mk(bx(.4,.4,3.2),M.woodDark,x,H(x,z)+3.1,z,G);
     sign(x+.25,H(x,z)+3.6,z,PI/2,'環山獵人步道',3,'#4a3527','#f3e6c8');post(-70,12.5,1.6);sign(-69.93,H(-70,12.5)+1.5,12.5,PI/2,'解說牌',1.4,'#2f5a3a','#fff','只在入口看，不進入');
@@ -6354,7 +6375,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
       const mid=(r,y,th)=>{const m=mk(bx(l,th,.07),kind==='wire'?wire:woodL,ax+dx/2,Y+y,az+dz/2,G);m.rotation.y=ry;return m;};
       if(kind==='wire'){mid(0,h-.04,.08);mid(0,.12,.08);const pl=new T.Mesh(new T.PlaneGeometry(l,h-.2),AC.mesh);pl.position.set(ax+dx/2,Y+h/2,az+dz/2);pl.rotation.y=ry;pl.userData.noInk=true;G.add(pl);}
       else{mid(0,h*.45,.1);mid(0,h*.85,.1);}
-      addCol(TB.x+Math.min(ax,bx_)-.12,TB.x+Math.max(ax,bx_)+.12,Math.min(az,bz)-.12,Math.max(az,bz)+.12,Y+h);};
+      addCol(TB.x+Math.min(ax,bx_)-.45,TB.x+Math.max(ax,bx_)+.45,Math.min(az,bz)-.45,Math.max(az,bz)+.45,Y+Math.max(h,2.6));COLS[COLS.length-1].nc=1;};
     {const [c,g]=C2(128,128);g.clearRect(0,0,128,128);g.strokeStyle='rgba(70,78,74,.75)';g.lineWidth=2;for(let i=-128;i<256;i+=16){g.beginPath();g.moveTo(i,0);g.lineTo(i+128,128);g.stroke();g.beginPath();g.moveTo(i,128);g.lineTo(i+128,0);g.stroke();}
       const t=TX(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(1,1);AC.mesh=new T.MeshBasicMaterial({map:t,transparent:true,side:T.DoubleSide,depthWrite:false,toneMapped:false});
       AC.mesh.onBeforeCompile=sh=>{sh.vertexShader=sh.vertexShader.replace('#include <uv_vertex>','#include <uv_vertex>\n#ifdef USE_UV\nvUv=vUv*vec2(6.,2.);\n#endif');};}
@@ -6364,7 +6385,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
     fence(98,-45.5,110,-45.5,3,'wire');fence(98,-45.5,98,-36,3,'wire');fence(110,-45.5,110,-36,3,'wire');fence(98,-36,110,-36,3,'wire');
     // the leopard cat's release gate (south side, towards the hills): hinged at x=91
     {const gg=new T.Group();gg.position.set(TB.x+91,Y,TB.z-36);scene.add(gg);gg.userData.dyn=true;const pnl=new T.Mesh(new T.PlaneGeometry(2,2),AC.mesh);pnl.position.set(1,1.05,0);gg.add(pnl);
-      mk(bx(2,.08,.08),wire,1,2.1,0,gg);mk(bx(2,.08,.08),wire,1,.1,0,gg);mk(bx(.08,2.1,.08),wire,2,1.05,0,gg);AC.gate=gg;addCol(TB.x+91,TB.x+93,-36.12,-35.88,Y+2.2);}
+      mk(bx(2,.08,.08),wire,1,2.1,0,gg);mk(bx(2,.08,.08),wire,1,.1,0,gg);mk(bx(.08,2.1,.08),wire,2,1.05,0,gg);AC.gate=gg;addCol(TB.x+91,TB.x+93,-36.45,-35.55,Y+2.6);COLS[COLS.length-1].nc=1;}
     // shelter cabin with the station sign
     {const g=new T.Group();g.position.set(TB.x+89.2,Y,TB.z-57);scene.add(g);g.userData.dyn=true;
       mk(bx(5.2,2.7,4.6),lam('#efe6d4'),0,1.35,0,g);const r1=mk(bx(5.8,.12,2.7),lam('#3f7f6a'),0,3.05,-1.1,g);r1.rotation.x=.42;const r2=mk(bx(5.8,.12,2.7),lam('#3f7f6a'),0,3.05,1.1,g);r2.rotation.x=-.42;
@@ -6446,6 +6467,38 @@ function acViewTick(dt){const v=AC.view;if(!v)return;if(!DLG.open){AC.view=null;
   g.fillStyle='rgba(0,0,0,.16)';g.beginPath();g.ellipse(210,300,120,18,0,0,7);g.fill();
   const key=V.seq[v.i],f=M.act&&M.act[key]!=null?M.act[key]:0,[sx,sy]=fxy(M,f),s=Math.min(1.85,240/(M.hpx||150)),br=1+Math.sin(performance.now()/500)*.008;
   g.save();g.translate(210,314);g.scale(1,br);g.drawImage(v.img,sx,sy,M.cw,M.ch,-M.cw*s/2,-M.ch*s+ (M.foot||4)*s,M.cw*s,M.ch*s);g.restore();}
+
+// ================================================================
+// 平等國小・打掃時間: review what each cleaning area needs (classroom, corridor, toilets, outdoor area).
+// One area at a time; every right answer explains why; finishing all four areas once a day earns coins.
+// ================================================================
+const CLEAN=[
+  {id:'room',name:'教室',icon:'🧹',qs:[
+    {q:'教室要先掃地還是先拖地？',o:['先掃地，再拖地','先拖地，再掃地','只拖地就好','只掃教室中間'],e:'先把灰塵和紙屑掃起來，再拖地，地板才會乾淨，拖把也不會越拖越髒。'},
+    {q:'掃地之前，椅子要怎麼處理？',o:['把椅子靠上或翻到桌上，才掃得到桌子底下','椅子不用動','把椅子搬到走廊','坐在椅子上掃'],e:'桌子底下最容易藏垃圾，椅子收好才掃得到每個角落。'},
+    {q:'教室的垃圾要怎麼丟？',o:['分類：一般垃圾、資源回收、廚餘分開放','全部丟進同一個垃圾桶','丟到窗戶外面','藏在抽屜裡'],e:'分類好的資源回收（紙類、塑膠、鋁罐）可以再利用，垃圾也會變少。'},
+    {q:'打掃完，掃把和畚箕要怎麼辦？',o:['把垃圾倒乾淨，放回掃具櫃排好','丟在教室後面','借給別班不用還','放在走廊上'],e:'用具放回原位，下一次打掃的人才找得到，也不會絆倒同學。'}]},
+  {id:'hall',name:'走廊',icon:'🪣',qs:[
+    {q:'刷洗走廊的時候，腳上要穿什麼？',o:['雨鞋','拖鞋','光腳','室內鞋'],e:'刷地會有水和清潔劑，穿雨鞋鞋子不會濕，也比較不會滑倒。'},
+    {q:'刷完走廊，地上的水怎麼處理？',o:['用刷子把水推到排水溝，不要留水坑','讓它自己乾','用衣服擦','不用管它'],e:'走廊留水很容易讓同學滑倒，要把水推到排水溝才算完成。'},
+    {q:'換下來的鞋子要放在哪裡？',o:['靠牆排整齊','丟在走廊中間','塞到樓梯下','隨便放就好'],e:'鞋子排整齊靠牆放，走廊才不會擋路，同學也找得到自己的鞋。'}]},
+  {id:'wc',name:'廁所',icon:'🚽',qs:[
+    {q:'打掃廁所要準備什麼？',o:['穿雨鞋、戴手套','什麼都不用','戴帽子就好','穿最漂亮的衣服'],e:'廁所有細菌，戴手套保護雙手，穿雨鞋保護雙腳。'},
+    {q:'廁所的垃圾桶滿了，要怎麼做？',o:['把垃圾袋綁好拿去倒，再換新的袋子','把垃圾壓下去繼續用','倒在地上','留給下一個人'],e:'垃圾袋綁好再拿，才不會掉出來；換上新袋子，下一位同學才能用。'},
+    {q:'洗完廁所要記得什麼？',o:['用具洗乾淨放回去，再把手洗乾淨','直接回教室吃東西','把拖把丟進馬桶','不用洗手'],e:'打掃完一定要洗手，用具也要洗乾淨晾好，才不會發臭。'}]},
+  {id:'yard',name:'外掃區',icon:'🍂',qs:[
+    {q:'外掃區（木平台、操場邊）的落葉要怎麼處理？',o:['掃成一堆，裝進垃圾袋或落葉堆肥區','掃到別班的區域','掃進排水溝','踢到草地上'],e:'落葉掃進排水溝會堵住，下大雨時水就排不出去。'},
+    {q:'在外面打掃看到碎玻璃或尖尖的東西，要怎麼做？',o:['不要用手撿，告訴老師','直接用手撿起來','踢到旁邊','當沒看到'],e:'尖銳的東西很危險，交給大人用工具處理最安全。'},
+    {q:'外掃區下過雨、地上濕濕的，掃地時要注意什麼？',o:['慢慢走、小心滑倒，濕的落葉比較難掃要用力一點','在上面跑步比較快','不用掃，等它乾','用手抓落葉'],e:'山上常下雨，濕濕的木平台和磁磚很滑，打掃時不要奔跑。'}]}];
+function cleanW(){const t=todayStr();W.clean=W.clean&&W.clean.d===t?W.clean:{d:t,done:[],paid:0};return W.clean;}
+function cleanStart(){if(!W.seat)return;const c=cleanW(),left=CLEAN.filter(a=>!c.done.includes(a.id));
+  choose('打掃時間','今天要複習哪一區的打掃工作？'+(left.length?`（還有 ${left.length} 區）`:'（今天四區都複習完了！）'),[
+    ...CLEAN.map(a=>({label:`${a.icon} ${a.name}${c.done.includes(a.id)?' ✔':''}`,fn:()=>cleanArea(a,0)})),{label:'等一下再來',fn:()=>{}}]);}
+function cleanArea(a,i){const t=a.qs[i];if(!t){const c=cleanW();if(!c.done.includes(a.id))c.done.push(a.id);
+    let extra='';if(c.done.length>=CLEAN.length&&!c.paid){c.paid=1;W.coins+=20;led(20,'打掃時間：四區都複習完','獎勵');histAdd('adv','打掃時間：教室、走廊、廁所、外掃區都複習完');renderPouch();extra='四區都完成了，+20 金幣！';}
+    save();SND.pick&&SND.pick();say('打掃時間',[`${a.name}的打掃工作複習完了！`+(extra?' '+extra:''),'真正打掃的時候，也要照這樣做喔。'],{noWave:1,onEnd:()=>{if(c.done.length<CLEAN.length)cleanStart();}});return;}
+  const opts=shuffle(t.o.map((s,j)=>({s,ok:j===0})));
+  choose(`${a.icon} ${a.name}（${i+1}/${a.qs.length}）`,t.q,opts.map(o=>({label:o.s,fn:()=>{if(o.ok)say('答對了！',[t.e],{noWave:1,onEnd:()=>cleanArea(a,i+1)});else say('再想想看',[t.e,'讀完了嗎？再選一次。'],{noWave:1,onEnd:()=>cleanArea(a,i)});}})));}
 function acW(){W.wild=W.wild||{};['lc','bl'].forEach(k=>{const w=W.wild[k]=W.wild[k]||{};w.n=+w.n||0;w.done=Array.isArray(w.done)?w.done:[];w.last=w.last||'';w.rel=+w.rel||0;});return W.wild;}
 function acMenu(){choose('保育員 小岑','歡迎來到 Sqoyaw 動物之家！這裡有等待新家的狗狗，也有受傷、被救回來的保育動物。今天想做什麼？',[
   {label:'🐕 領養狗狗',fn:()=>acAdopt()},{label:'🐾 照顧石虎',fn:()=>acCare('lc')},{label:'🐾 照顧黑豹',fn:()=>acCare('bl')},{label:'📖 保育動物圖鑑',fn:()=>acBook()},{label:'先不用，謝謝',fn:()=>{}}]);}
