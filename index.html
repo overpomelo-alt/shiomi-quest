@@ -791,8 +791,8 @@ const PRESETS={
     skyTop:'#040816',skyHorizon:'#1a2748',skyBottom:'#0b1226',fog:'#16213d',fogNear:20,fogFar:640,glowCol:'#c3d0ff',disk:.95,glow:.35,
     clouds:.32,cloudLit:'#3a4670',cloudDark:'#0a0e1e',stars:1,lamps:1,windows:1,exposure:1.3,motes:0,seaSun:.6,night:1,dusk:0,day:0,
     seaDeep:'#040914',seaShallow:'#0d1d33',light:.42,sprTint:'#8e9cc8'},
-  day:{jp:'昼下がり',clock:[14,32],sunDir:[.5,.78,-.35],sunColor:'#fff0da',sunI:1.95,hemiSky:'#b9d6ef',hemiGround:'#7c705c',hemiI:.88,
-    skyTop:'#3a78c4',skyHorizon:'#cfe2ec',skyBottom:'#a9c7d4',fog:'#c4d9e3',fogNear:60,fogFar:1150,glowCol:'#fff3dd',disk:1,glow:.5,
+  day:{jp:'昼下がり',clock:[14,32],sunDir:[.5,.78,-.35],sunColor:'#fff0da',sunI:1.95,hemiSky:'#b9d6ef',hemiGround:'#857862',hemiI:.98,
+    skyTop:'#3a78c4',skyHorizon:'#cfe2ec',skyBottom:'#a9c7d4',fog:'#c4d9e3',fogNear:45,fogFar:820,glowCol:'#fff3dd',disk:1,glow:.5,
     clouds:.6,cloudLit:'#ffffff',cloudDark:'#9fb0c8',stars:0,lamps:0,windows:.04,exposure:.92,motes:.35,seaSun:.7,night:0,dusk:0,day:1,
     seaDeep:'#1b5478',seaShallow:'#3a9aa6',light:1.05,sprTint:'#ffffff'}
 };
@@ -1879,7 +1879,12 @@ function collide(p,r){
 const CUTU={on:false,uCA:{value:new T.Vector3()},uCB:{value:new T.Vector3()},uCR:{value:0}};
 const CUT_V='vec4 cutW4=vec4(transformed,1.0);\n#ifdef USE_INSTANCING\ncutW4=instanceMatrix*cutW4;\n#endif\nvCutW=(modelMatrix*cutW4).xyz;';
 const CUT_F='{if(uCR>0.&&distance(vCutW,uCA)<3.2)discard;vec3 ab=uCB-uCA;float t=dot(vCutW-uCA,ab)/max(dot(ab,ab),1e-4);if(uCR>0.&&t>-.05&&t<.9&&vCutW.y>uCB.y-1.75){float R=uCR*(1.+(1.-t)*2.6);float dd=length(vCutW-(uCA+ab*t));if(dd<R*.86)discard;}}';
-function cutPatch(m){if(!m||m.userData.cutP)return;m.userData.cutP=true;const prev=m.onBeforeCompile,pk=m.customProgramCacheKey?m.customProgramCacheKey.bind(m):null;
+// outline shells: through a cut-away hole you look at the inside of the far walls' shells, which would read as a black blob — drop shell pixels seen through the hole (between camera and player only)
+const CUT_SH='{if(uCR>0.){vec3 ab=uCB-uCA;float L=max(length(ab),1e-3);vec3 dr=ab/L;vec3 v=vCutW-uCA;float df=dot(v,dr);float tf=df/L;if(tf>-.05&&tf<1.&&vCutW.y>uCB.y-2.5){float dn=max(df-6.,3.2);float tn=min(dn/L,.9);float ang=uCR*.86*(1.+(1.-tn)*2.6)/dn;if(length(v-dr*df)<ang*max(df,1e-3))discard;}}}';
+function cutPatch(m){if(!m||m.userData.cutP)return;m.userData.cutP=true;
+  // solid walls get their inside drawn too, so a hole looks into a lit room instead of at the black outline shell behind it (thin textured props like signs stay one-sided)
+  m.userData.side0=m.side;
+  if(m.side===T.FrontSide&&!m.transparent&&(m.isMeshLambertMaterial||m.isMeshToonMaterial||m.isMeshPhongMaterial)&&(!m.map||EM.windows.includes(m)))m.side=T.DoubleSide;const prev=m.onBeforeCompile,pk=m.customProgramCacheKey?m.customProgramCacheKey.bind(m):null;
   m.onBeforeCompile=(sh,r)=>{if(prev)prev.call(m,sh,r);Object.assign(sh.uniforms,{uCA:CUTU.uCA,uCB:CUTU.uCB,uCR:CUTU.uCR});
     if(sh.vertexShader.includes('#include <project_vertex>')&&sh.fragmentShader.includes('#include <clipping_planes_fragment>')){
       sh.vertexShader='varying vec3 vCutW;\n'+sh.vertexShader.replace('#include <project_vertex>','#include <project_vertex>\n'+CUT_V);
@@ -5319,7 +5324,7 @@ void main(){vCutW=(modelMatrix*vec4(position,1.)).xyz;vec4 mvPosition=modelViewM
 #include <fog_vertex>
 }`,fragmentShader:`uniform vec3 uCol;varying vec3 vCutW;uniform vec3 uCA,uCB;uniform float uCR;
 #include <fog_pars_fragment>
-void main(){${CUT_F}gl_FragColor=vec4(uCol,1.);
+void main(){${CUT_F}${CUT_SH}gl_FragColor=vec4(uCol,1.);
 #include <fog_fragment>
 }`});
 Object.assign(INK.lineOut.uniforms,{uCA:CUTU.uCA,uCB:CUTU.uCB,uCR:CUTU.uCR});cutPatch(INK.line);   // the back-face outlines must open up together with the walls they outline, or a dark shell stays behind
@@ -5340,6 +5345,50 @@ function inkTown(root){const list=[];root.traverse(o=>{if(o.isMesh&&!o.userData.
     const w=new T.Vector3();o.getWorldScale(w);const mx=Math.max(s.x*w.x,s.y*w.y,s.z*w.z);if(mx<.25)return;
     inkNormals(g);const h=new T.Mesh(g,INK.lineOut);h.userData.inkLine=true;h.castShadow=false;h.receiveShadow=false;h.renderOrder=o.renderOrder;o.add(h);n++;});return n;}
 try{scene.updateMatrixWorld(true);INK.nTown=inkTown(scene);}catch(e){console.error(e);}
+// ---- surface detail: world-space painted grain / blotches / rain streaks on flat-coloured surfaces + soft contact shadow where walls meet the ground
+// one 256² tileable noise texture (R blotches, G grain, B vertical streaks, A big patches), sampled on the face's dominant plane; per-material strength by colour
+const DET=(()=>{const N=256,hs=(x,y,s)=>{let h=(x*374761393+y*668265263+s*982451653)|0;h=Math.imul(h^(h>>>13),1274126177);return ((h^(h>>>16))>>>0)/4294967295;};
+  const vn=(x,y,f,s)=>{const fx=x*f/N,fy=y*f/N,ix=Math.floor(fx),iy=Math.floor(fy),u=fx-ix,v=fy-iy,a=hs(ix%f,iy%f,s),b=hs((ix+1)%f,iy%f,s),c=hs(ix%f,(iy+1)%f,s),d=hs((ix+1)%f,(iy+1)%f,s),su=u*u*(3-2*u),sv=v*v*(3-2*v);return a+(b-a)*su+(c-a)*sv+(a-b-c+d)*su*sv;};
+  const vn2=(x,y,fx_,fy_,s)=>{const fx=x*fx_/N,fy=y*fy_/N,ix=Math.floor(fx),iy=Math.floor(fy),u=fx-ix,v=fy-iy,a=hs(ix%fx_,iy%fy_,s),b=hs((ix+1)%fx_,iy%fy_,s),c=hs(ix%fx_,(iy+1)%fy_,s),d=hs((ix+1)%fx_,(iy+1)%fy_,s),su=u*u*(3-2*u),sv=v*v*(3-2*v);return a+(b-a)*su+(c-a)*sv+(a-b-c+d)*su*sv;};
+  const D=new Uint8Array(N*N*4);
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const i=(y*N+x)*4;
+    const r=vn(x,y,4,1)*.5+vn(x,y,8,2)*.28+vn(x,y,16,3)*.14+vn(x,y,32,4)*.08;
+    const g=hs(x,y,9)*.55+vn(x,y,64,5)*.3+vn(x,y,128,6)*.15;
+    const b=vn2(x,y,48,3,7)*.6+vn2(x,y,96,6,8)*.4;
+    const a=vn(x,y,2,10)*.6+vn(x,y,4,11)*.4;
+    D[i]=Math.round(255*Math.min(1,Math.max(0,(r-.5)*1.7+.5)));D[i+1]=Math.round(255*g);D[i+2]=Math.round(255*Math.min(1,Math.max(0,(b-.5)*1.8+.5)));D[i+3]=Math.round(255*Math.min(1,Math.max(0,(a-.5)*1.8+.5)));}
+  const t=new T.DataTexture(D,N,N,T.RGBAFormat);t.wrapS=t.wrapT=T.RepeatWrapping;t.magFilter=T.LinearFilter;t.minFilter=T.LinearMipmapLinearFilter;t.generateMipmaps=true;t.anisotropy=Math.min(4,MAXANI);t.needsUpdate=true;
+  return {tex:{value:t},on:{value:1},n:0};})();
+const DET_V='vec4 detW4=vec4(transformed,1.0);\n#ifdef USE_INSTANCING\ndetW4=instanceMatrix*detW4;\n#endif\nvDetW=(modelMatrix*detW4).xyz;vDetN=(vec4(transformedNormal,0.)*viewMatrix).xyz;vDetG=aGnd;';
+const DET_F=`{vec3 an=abs(normalize(vDetN));float vert=1.-smoothstep(.55,.8,an.y);
+  vec2 p=an.y>max(an.x,an.z)?vDetW.xz:(an.x>an.z?vDetW.zy:vDetW.xy);
+  vec4 g1=texture2D(uDetT,p*.43),g2=texture2D(uDetT,p*.071),g3=texture2D(uDetT,p*.0123),g4=texture2D(uDetT,vec2(p.x*.11,p.y*.05+.37));
+  float k=1.+(g1.g-.5)*uDet.x*2.+(g2.r-.5)*uDet.y*2.+(g3.a-.5)*uDet.y*1.4-smoothstep(.56,.92,g4.b)*smoothstep(.35,.7,g2.r)*uDet.z*2.2*vert;
+  vec3 c=diffuseColor.rgb*k;c=mix(c,c*uDetTint,smoothstep(.38,.72,g3.a*.7+g2.r*.3));
+  if(vDetG>100.){float h=vDetW.y-(vDetG-500.);c*=mix(1.,mix(1.-uDet.w,1.,smoothstep(.0,1.25,h))*mix(1.,1.035,smoothstep(1.5,4.5,h)),vert);}
+  diffuseColor.rgb=mix(diffuseColor.rgb,c,uDetOn);}`;
+function detClass(m){if(!m||!m.isMeshLambertMaterial||m.transparent||m.userData.noDet)return null;
+  if(m.emissive&&m.emissiveIntensity>0&&(m.emissive.r+m.emissive.g+m.emissive.b)>.05)return null;
+  const hsl={};m.color.getHSL(hsl);const tx=m.map?.6:1;
+  if(m.vertexColors)return {d:[.05,.11,0,.4],t:[1.1,1.05,.84]};
+  if(hsl.l<.035)return {d:[.07*tx,.06*tx,.03,.2],t:[1,1,1]};
+  if(hsl.h>.16&&hsl.h<.46&&hsl.s>.16)return {d:[.07*tx,.15*tx,0,.42],t:[1.17,1.08,.7]};                 // grass / leaves
+  if(hsl.s<.2)return {d:[.075*tx,.1*tx,(hsl.l>.35?.13:.08)*tx,.46],t:[1.03,1.0,.94]};                    // concrete, plaster, tile, metal
+  return {d:[.055*tx,.085*tx,.06*tx,.42],t:[1.04,1.0,.93]};}                                              // paint, wood, roof colours
+function detPatch(m){if(!m||m.userData.detP)return false;const c=detClass(m);if(!c)return false;m.userData.detP=true;DET.n++;
+  const prev=m.onBeforeCompile,pk=m.customProgramCacheKey?m.customProgramCacheKey.bind(m):null,U={uDet:{value:new T.Vector4(...c.d)},uDetTint:{value:new T.Vector3(...c.t)}};
+  m.onBeforeCompile=(sh,r)=>{if(prev)prev.call(m,sh,r);
+    if(!sh.vertexShader.includes('#include <project_vertex>')||!sh.vertexShader.includes('#include <defaultnormal_vertex>')||!sh.fragmentShader.includes('#include <color_fragment>'))return;
+    Object.assign(sh.uniforms,U,{uDetT:DET.tex,uDetOn:DET.on});
+    sh.vertexShader='attribute float aGnd;varying vec3 vDetW,vDetN;varying float vDetG;\n'+sh.vertexShader.replace('#include <project_vertex>','#include <project_vertex>\n'+DET_V);
+    sh.fragmentShader='uniform sampler2D uDetT;uniform vec4 uDet;uniform vec3 uDetTint;uniform float uDetOn;varying vec3 vDetW,vDetN;varying float vDetG;\n'+sh.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\n'+DET_F);};
+  m.customProgramCacheKey=()=>'det'+(pk?pk():'');m.needsUpdate=true;return true;}
+function detPass(root){let n=0;root.traverse(o=>{if(!o.isMesh||o.userData.inkLine||o.isSkinnedMesh)return;(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(detPatch(m))n++;});});return n;}
+// ground height under each vertex (lower of the house pad and the bare slope), stored +500 so "no attribute" (0) means no contact shadow
+function detGround(geo,mw){const p=geo.attributes.position,n=p.count,a=new Float32Array(n),v=new T.Vector3(),C=new Map();
+  for(let i=0;i<n;i++){v.fromBufferAttribute(p,i).applyMatrix4(mw);const k=Math.round(v.x*4)*100003+Math.round(v.z*4);let g=C.get(k);
+    if(g===undefined){g=groundH(v.x,v.z);if(v.x>2300&&TB.terrH){const lx=v.x-TB.x;g=Math.min(g,TB.terrH(lx,v.z));}C.set(k,g);}a[i]=g+500;}
+  geo.setAttribute('aGnd',new T.BufferAttribute(a,1));}
 // frame-rate guard: drop the outline shells on slow devices (cel light stays)
 const INKPERF={t:0,n:0,done:false};
 function inkPerf(dt){if(INKPERF.done||!started)return;INKPERF.t+=dt;INKPERF.n++;if(INKPERF.t>8){INKPERF.done=true;const fps=INKPERF.n/INKPERF.t;if(fps<27){INK.lineOut.visible=false;console.log('ink outlines off, fps',fps.toFixed(1));}}}
@@ -5875,7 +5924,7 @@ function sqBatch(G,HG){
      const pos=new Float32Array(n*3),nor=new Float32Array(n*3),uv=new Float32Array(n*2),idx=new Uint32Array(ni);let vo=0,io=0;
      b.list.forEach(g=>{const c=g.attributes.position.count;pos.set(g.attributes.position.array,vo*3);nor.set(g.attributes.normal.array,vo*3);if(g.attributes.uv)uv.set(g.attributes.uv.array,vo*2);
        if(g.index){const a=g.index.array;for(let k=0;k<a.length;k++)idx[io+k]=a[k]+vo;io+=a.length;}else{for(let k=0;k<c;k++)idx[io+k]=vo+k;io+=c;}vo+=c;g.dispose();});
-     const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(pos,3));geo.setAttribute('normal',new T.BufferAttribute(nor,3));geo.setAttribute('uv',new T.BufferAttribute(uv,2));geo.setIndex(new T.BufferAttribute(idx,1));geo.computeBoundingSphere();geo.computeBoundingBox();
+     const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(pos,3));geo.setAttribute('normal',new T.BufferAttribute(nor,3));geo.setAttribute('uv',new T.BufferAttribute(uv,2));geo.setIndex(new T.BufferAttribute(idx,1));geo.computeBoundingSphere();geo.computeBoundingBox();try{detGround(geo,G.matrixWorld);}catch(e){}
      const m=new T.Mesh(geo,b.m);m.userData.bld=1;m.castShadow=!b.ni;m.receiveShadow=true;if(b.ni){m.userData.ink=true;if(b.m.isMeshLambertMaterial&&!b.m.transparent)try{inkLambert(b.m);}catch(e){}}G.add(m);});
    G.remove(HG);}
 function tbMySeat(){const n=parseInt(W.seat,10);return n>0?((n-1)%5)+1:0;}
@@ -5920,7 +5969,7 @@ function sqCheck(id){const st=SQW.find(s=>s.id===id);if(!st)return;W.sqw=W.sqw||
     else toast(`📍 走讀打卡：${st.n}（${n}/${SQW.length}）`);save();}}
 function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sqCheck(id)});}
 (function(){
-  const G=new T.Group();G.position.set(TB.x,0,TB.z);scene.add(G);TB.g=G;const tc=new T.Color(),t2=new T.Color();
+  const G=new T.Group();G.position.set(TB.x,0,TB.z);scene.add(G);TB.g=G;const tc=new T.Color(),t2=new T.Color(),tc2=new T.Color();
   const P_=(x,z,dy=0)=>new T.Vector3(TB.x+x,tribeH(x,z)+dy,TB.z+z);const H=(x,z)=>tribeH(x,z);
   // signboards: framed wooden/painted boards with an icon (no more plain white-with-black-text)
   const SIGN_IC=[[/國小/,'🏫'],[/幼兒園/,'🧸'],[/7-ELEVEN/,'🏪'],[/商店|商行|雜貨|五金|農資/,'🏪'],[/早餐/,'🍳'],[/小吃|麵/,'🍜'],[/愛玉/,'🍧'],[/果|蔬菜/,'🍎'],[/教會|天主堂/,'⛪'],[/文物館/,'🏛️'],[/公車/,'🚌'],[/派出所/,'👮'],[/宮/,'🏮'],[/馬鈴薯/,'🥔'],[/露營/,'⛺'],[/吊橋/,'🌉'],[/登山口|步道/,'🥾'],[/空野原|水月|波波家|天空/,'🛏️'],[/同學巷/,'🏠'],[/機車/,'🛵'],[/理髮/,'💈'],[/解說/,'📜']];
@@ -5948,7 +5997,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
   const xs=axis(-186,162,460,1.6),zs=axis(-142,202,460,1.6),nx=xs.length,nz=zs.length;
   const pos=new Float32Array(nx*nz*3),cl=new Float32Array(nx*nz*3),idx=[];
   const colAt=(lx,lz,h)=>{const n=fbm(lx*.12+3,lz*.12);const e=sqE(lx,lz);
-    if(e>1.5){tc.set('#4a7440').lerp(t2.set('#2c5132'),clamp(n*1.3-.2,0,1)*.8);const tr=(1-smooth(40,75,h))*smooth(1.5,8,e);if(tr>0){const st=((h*.55)%1+1)%1;tc.lerp(t2.set(st<.38?'#8fc24f':'#5f9a3c'),tr*(.55+.3*n));}if(h>120)tc.lerp(t2.set('#6d8a8c'),smooth(120,220,h));return;}
+    if(e>1.5){tc.set('#4a7440').lerp(t2.set('#2c5132'),clamp(n*1.3-.2,0,1)*.8);const tr=(1-smooth(40,75,h))*smooth(1.5,8,e);if(tr>0){const st=((h*.55)%1+1)%1;tc.lerp(t2.set('#5f9a3c').lerp(tc2.set('#8fc24f'),smooth(.15,.45,st)*smooth(.95,.6,st)),tr*(.26+.16*n));}if(h>120)tc.lerp(t2.set('#6d8a8c'),smooth(120,220,h));return;}
     if(Math.abs(lx-sqRX(lz))<15&&h<-12){tc.set('#8a8676').lerp(t2.set('#6f7470'),n);return;}
     tc.set('#9fb466').lerp(t2.set('#7f9e50'),n);{const st=((h*.7)%1+1)%1;if(st<.3)tc.lerp(t2.set('#b4cc72'),.35);}tc.lerp(t2.set('#a8956f'),clamp((fbm(lx*.05,lz*.05)-.55)*2.2,0,.45));
     };
@@ -5995,7 +6044,8 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
     for(let i=0;i<9;i++){q.fillStyle=`rgba(90,80,60,${.03+rand()*.05})`;q.beginPath();q.ellipse(rand()*128,rand()*256,6+rand()*18,4+rand()*14,rand()*3,0,7);q.fill();}
     const gr=q.createLinearGradient(0,0,128,0);gr.addColorStop(0,'rgba(60,55,45,.28)');gr.addColorStop(.1,'rgba(60,55,45,0)');gr.addColorStop(.9,'rgba(60,55,45,0)');gr.addColorStop(1,'rgba(60,55,45,.28)');q.fillStyle=gr;q.fillRect(0,0,128,256);
     q.fillStyle='rgba(70,65,58,.55)';q.fillRect(0,0,128,2);q.fillRect(0,128,128,1.5);q.strokeStyle='rgba(70,65,58,.35)';q.lineWidth=1;q.beginPath();q.moveTo(30,40);q.lineTo(38,62);q.lineTo(33,80);q.moveTo(96,170);q.lineTo(88,190);q.stroke();return TX(c,true);})();
-  const asphTex=(edge)=>{const [c,q]=C2(128,128);q.fillStyle='#5f5e5a';q.fillRect(0,0,128,128);for(let i=0;i<2400;i++){const v=rand();q.fillStyle=v<.5?'rgba(0,0,0,.10)':'rgba(255,255,255,.08)';q.fillRect(rand()*128,rand()*128,1+rand()*1.5,1+rand()*1.5);}
+  const asphTex=(edge)=>{const [c,q]=C2(128,128);q.fillStyle='#5f5e5a';q.fillRect(0,0,128,128);for(let i=0;i<2400;i++){const v=rand();q.fillStyle=v<.5?'rgba(0,0,0,.055)':'rgba(255,255,255,.045)';q.fillRect(rand()*128,rand()*128,1+rand()*1.2,1+rand()*1.2);}
+    for(let i=0;i<6;i++){q.fillStyle=`rgba(${rand()<.5?'20,20,24':'120,118,110'},${.04+rand()*.04})`;q.beginPath();q.ellipse(14+rand()*100,rand()*128,5+rand()*14,8+rand()*22,rand()*3,0,7);q.fill();}
     if(edge){q.fillStyle='rgba(245,243,235,.9)';q.fillRect(5,0,4,128);q.fillRect(119,0,4,128);}return TX(c,true);};
   const laneM=lam('#ffffff',Object.assign({map:concTex},RO(-2)));const mainM=lam('#ffffff',Object.assign({map:asphTex(true)},RO(-3)));
   const kerbM=lam('#d4cfc4',RO(-5)),drainM=lam('#ffffff',Object.assign({map:(()=>{const [c,q]=C2(32,64);q.fillStyle='#6d6a63';q.fillRect(0,0,32,64);q.fillStyle='#4a4741';for(let y=4;y<64;y+=8)q.fillRect(4,y,24,3);q.fillStyle='rgba(255,255,255,.15)';q.fillRect(0,0,32,2);return TX(c,true);})()},RO(-4)));
@@ -7042,6 +7092,7 @@ function frame(){
   updateUI(dt);updateMarkers();blinkPeople(dt);trackerTick(dt);TM.ring.rotation.z+=dt*.8;sky.position.copy(camera.position);
   if(S2.retry&&ST_IN&&!S2.on&&!CUTON&&started&&s2Ok()){s2Enter();}
   if(R2.on)r2Draw(dt);else if(S2.on)s2Draw(dt);else if(h2Active())h2Draw(dt);else{h2Hide();renderer.render(scene,camera);}requestAnimationFrame(frame);}
+try{console.log('detail materials',detPass(scene));}catch(e){console.error(e);}
 applyEnv();clockBase=performance.now();
 requestAnimationFrame(frame);
 renderer.compile(scene,camera);
