@@ -3390,7 +3390,7 @@ function dogPose(o,dt){const c=o.spr,A_=c.meta.act;let fr=null,rz=0,lift=0;
 // sheet 's' (act0Ns) sports: jump, dribble, catch                           -> 's.<anim>'
 // The d/i/s sequences (frames, per-frame time, loop) come straight from the art manifests via meta.anims.
 const ACTMAP={hero1:'01',sailor:'02',hoodie:'03',sporty:'04',green:'05',redcap:'06'};
-const ACTS={wave:{f:[2,3,4,3],d:[.2,.16,.2,.16]},laugh:{f:[5],d:[1.3]},hold:{f:[6],d:[.5]},shoot:{f:[6,7,8,9,10],d:[.35,.24,.18,.14,.6],rel:3,side:1},dunk:{f:[6,11,12,13,14],d:[.3,.26,.18,.26,.45],rel:4,side:1},sit:{f:[0],d:[1e9]},sitS:{f:[1],d:[1e9],side:1}};
+const ACTS={wave:{f:[2,3,4,3],d:[.2,.16,.2,.16]},laugh:{f:[5],d:[1.3]},hold:{f:[6],d:[.5]},shoot:{f:[6,7,8,9,10],d:[.35,.24,.18,.14,.6],rel:3,side:1},dunk:{f:[6,11,12,13,14],d:[.25,.32,.2,.38,.45],rel:3,side:1},sit:{f:[0],d:[1e9]},sitS:{f:[1],d:[1e9],side:1}};
 const ACT={c:null,id:null,cs:{},a:null,name:'',t:0,i:0,loops:1,cb:null,onRel:null,on:false,lock:false,hold:false,held:false};
 function actSid(suf){return SPR.id&&ACTMAP[SPR.id]?'act'+ACTMAP[SPR.id]+(suf||''):null;}
 // sequences that begin/end on a plain standing frame: the seat versions drop those (the body is already at the seat)
@@ -3433,7 +3433,9 @@ function actTick(dt){if(!ACT.on)return;if(INDOOR&&!ACT.indoor){actStop();return;
   if(!ACT.held)while(ACT.t>a.d[ACT.i]){ACT.t-=a.d[ACT.i];ACT.i++;if(a.rel!=null&&ACT.i===a.rel&&ACT.onRel){const f=ACT.onRel;ACT.onRel=null;f();}
     if(ACT.i>=a.f.length){if(a.loop){ACT.i=0;}else if(--ACT.loops>0){ACT.i=0;}else if(ACT.hold){ACT.i=a.f.length-1;ACT.held=true;break;}else{actStop();return;}}}
   const pos=_sp.copy(pl.g.position);if(P.sit)pos.copy(P.sit.pos);
-  if(ACT.name==='dunk'){const a=ACT.a,T0=a.d[0]+a.d[1],T1=T0+a.d[2]+a.d[3];let tt=ACT.t;for(let k=0;k<ACT.i;k++)tt+=a.d[k];const u=clamp((tt-T0+.1)/(T1-T0+.05),0,1);pos.y+=Math.sin(u*PI)*.62;}
+  if(ACT.name==='dunk'){const a=ACT.a,Ta=a.d[0],T0=Ta+a.d[1],T1=T0+a.d[2]+a.d[3];let tt=ACT.t;for(let k=0;k<ACT.i;k++)tt+=a.d[k];
+    if(ACT.dk){const ap=clamp((tt-Ta*.5)/(T0+a.d[2]*.6-Ta*.5),0,1),e=ap*ap*(3-2*ap);pos.z=lerp(ACT.dk.z0,ACT.dk.z1,e);P.pos.z=pos.z;}
+    const up=clamp((tt-T0)/(a.d[2]),0,1),down=clamp((tt-(T1-.05))/.22,0,1);pos.y+=ACT.dk?(1.15*Math.sin(up*PI/2)*(1-down*down)):Math.sin(clamp((tt-T0+.1)/(T1-T0+.05),0,1)*PI)*.62;}
   const [d,side]=camRel(c,pos,ACT.yaw!=null?ACT.yaw:P.yaw);const M=c.meta;
   let f=a.f[ACT.i],flip=1;
   if(ACT.name==='seat'&&M.anims&&M.anims.sit_front&&M.anims.sit_side&&ACT.held){const S_=M.anims;f=Math.abs(d)<.55?S_.sit_side.f[S_.sit_side.f.length-1]:S_.sit_front.f[S_.sit_front.f.length-1];}
@@ -6118,7 +6120,6 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
      [[-70,43.6],[-65,43.6],[-60,43.6],[-55,43.6],[-72.8,30],[-72.8,38]].forEach(([x,z])=>{mk(cy(.18,.26,1.8,7),M.trunk,x,Y0+.9,z,SG);mk(ico(1.5,1),pick([M.leaf,M.leaf2]),x,Y0+2.9,z,SG);addCol(TB.x+x-.3,TB.x+x+.3,z-.3,z+.3,Y0+4);});}
    sqBatch(G,SG);
    reserve(-62,20,12);reserve(-60,34,14);reserve(-48.5,33,7);reserve(-42,24.8,3.5);flagAt('school',-37,27);inter(P_(-38,28.5),1.8,'平等國小（走讀打卡）',()=>sqStory('school'));
-   inter(P_(-64,21.2),1.8,'五年級教室：打掃時間',()=>cleanStart());
    inter(P_(-47.6,20),1.8,'看平等國小的公告欄',()=>openBoard('news'));}
   // 獵人步道登山口 (behind the school, west)
   {const x=-73,z=8;[-1.3,1.3].forEach(k=>mk(bx(.3,3,.3),M.woodDark,x,H(x,z+k)+1.5,z+k,G));mk(bx(.4,.4,3.2),M.woodDark,x,H(x,z)+3.1,z,G);
@@ -6468,37 +6469,6 @@ function acViewTick(dt){const v=AC.view;if(!v)return;if(!DLG.open){AC.view=null;
   const key=V.seq[v.i],f=M.act&&M.act[key]!=null?M.act[key]:0,[sx,sy]=fxy(M,f),s=Math.min(1.85,240/(M.hpx||150)),br=1+Math.sin(performance.now()/500)*.008;
   g.save();g.translate(210,314);g.scale(1,br);g.drawImage(v.img,sx,sy,M.cw,M.ch,-M.cw*s/2,-M.ch*s+ (M.foot||4)*s,M.cw*s,M.ch*s);g.restore();}
 
-// ================================================================
-// 平等國小・打掃時間: review what each cleaning area needs (classroom, corridor, toilets, outdoor area).
-// One area at a time; every right answer explains why; finishing all four areas once a day earns coins.
-// ================================================================
-const CLEAN=[
-  {id:'room',name:'教室',icon:'🧹',qs:[
-    {q:'教室要先掃地還是先拖地？',o:['先掃地，再拖地','先拖地，再掃地','只拖地就好','只掃教室中間'],e:'先把灰塵和紙屑掃起來，再拖地，地板才會乾淨，拖把也不會越拖越髒。'},
-    {q:'掃地之前，椅子要怎麼處理？',o:['把椅子靠上或翻到桌上，才掃得到桌子底下','椅子不用動','把椅子搬到走廊','坐在椅子上掃'],e:'桌子底下最容易藏垃圾，椅子收好才掃得到每個角落。'},
-    {q:'教室的垃圾要怎麼丟？',o:['分類：一般垃圾、資源回收、廚餘分開放','全部丟進同一個垃圾桶','丟到窗戶外面','藏在抽屜裡'],e:'分類好的資源回收（紙類、塑膠、鋁罐）可以再利用，垃圾也會變少。'},
-    {q:'打掃完，掃把和畚箕要怎麼辦？',o:['把垃圾倒乾淨，放回掃具櫃排好','丟在教室後面','借給別班不用還','放在走廊上'],e:'用具放回原位，下一次打掃的人才找得到，也不會絆倒同學。'}]},
-  {id:'hall',name:'走廊',icon:'🪣',qs:[
-    {q:'刷洗走廊的時候，腳上要穿什麼？',o:['雨鞋','拖鞋','光腳','室內鞋'],e:'刷地會有水和清潔劑，穿雨鞋鞋子不會濕，也比較不會滑倒。'},
-    {q:'刷完走廊，地上的水怎麼處理？',o:['用刷子把水推到排水溝，不要留水坑','讓它自己乾','用衣服擦','不用管它'],e:'走廊留水很容易讓同學滑倒，要把水推到排水溝才算完成。'},
-    {q:'換下來的鞋子要放在哪裡？',o:['靠牆排整齊','丟在走廊中間','塞到樓梯下','隨便放就好'],e:'鞋子排整齊靠牆放，走廊才不會擋路，同學也找得到自己的鞋。'}]},
-  {id:'wc',name:'廁所',icon:'🚽',qs:[
-    {q:'打掃廁所要準備什麼？',o:['穿雨鞋、戴手套','什麼都不用','戴帽子就好','穿最漂亮的衣服'],e:'廁所有細菌，戴手套保護雙手，穿雨鞋保護雙腳。'},
-    {q:'廁所的垃圾桶滿了，要怎麼做？',o:['把垃圾袋綁好拿去倒，再換新的袋子','把垃圾壓下去繼續用','倒在地上','留給下一個人'],e:'垃圾袋綁好再拿，才不會掉出來；換上新袋子，下一位同學才能用。'},
-    {q:'洗完廁所要記得什麼？',o:['用具洗乾淨放回去，再把手洗乾淨','直接回教室吃東西','把拖把丟進馬桶','不用洗手'],e:'打掃完一定要洗手，用具也要洗乾淨晾好，才不會發臭。'}]},
-  {id:'yard',name:'外掃區',icon:'🍂',qs:[
-    {q:'外掃區（木平台、操場邊）的落葉要怎麼處理？',o:['掃成一堆，裝進垃圾袋或落葉堆肥區','掃到別班的區域','掃進排水溝','踢到草地上'],e:'落葉掃進排水溝會堵住，下大雨時水就排不出去。'},
-    {q:'在外面打掃看到碎玻璃或尖尖的東西，要怎麼做？',o:['不要用手撿，告訴老師','直接用手撿起來','踢到旁邊','當沒看到'],e:'尖銳的東西很危險，交給大人用工具處理最安全。'},
-    {q:'外掃區下過雨、地上濕濕的，掃地時要注意什麼？',o:['慢慢走、小心滑倒，濕的落葉比較難掃要用力一點','在上面跑步比較快','不用掃，等它乾','用手抓落葉'],e:'山上常下雨，濕濕的木平台和磁磚很滑，打掃時不要奔跑。'}]}];
-function cleanW(){const t=todayStr();W.clean=W.clean&&W.clean.d===t?W.clean:{d:t,done:[],paid:0};return W.clean;}
-function cleanStart(){if(!W.seat)return;const c=cleanW(),left=CLEAN.filter(a=>!c.done.includes(a.id));
-  choose('打掃時間','今天要複習哪一區的打掃工作？'+(left.length?`（還有 ${left.length} 區）`:'（今天四區都複習完了！）'),[
-    ...CLEAN.map(a=>({label:`${a.icon} ${a.name}${c.done.includes(a.id)?' ✔':''}`,fn:()=>cleanArea(a,0)})),{label:'等一下再來',fn:()=>{}}]);}
-function cleanArea(a,i){const t=a.qs[i];if(!t){const c=cleanW();if(!c.done.includes(a.id))c.done.push(a.id);
-    let extra='';if(c.done.length>=CLEAN.length&&!c.paid){c.paid=1;W.coins+=20;led(20,'打掃時間：四區都複習完','獎勵');histAdd('adv','打掃時間：教室、走廊、廁所、外掃區都複習完');renderPouch();extra='四區都完成了，+20 金幣！';}
-    save();SND.pick&&SND.pick();say('打掃時間',[`${a.name}的打掃工作複習完了！`+(extra?' '+extra:''),'真正打掃的時候，也要照這樣做喔。'],{noWave:1,onEnd:()=>{if(c.done.length<CLEAN.length)cleanStart();}});return;}
-  const opts=shuffle(t.o.map((s,j)=>({s,ok:j===0})));
-  choose(`${a.icon} ${a.name}（${i+1}/${a.qs.length}）`,t.q,opts.map(o=>({label:o.s,fn:()=>{if(o.ok)say('答對了！',[t.e],{noWave:1,onEnd:()=>cleanArea(a,i+1)});else say('再想想看',[t.e,'讀完了嗎？再選一次。'],{noWave:1,onEnd:()=>cleanArea(a,i)});}})));}
 function acW(){W.wild=W.wild||{};['lc','bl'].forEach(k=>{const w=W.wild[k]=W.wild[k]||{};w.n=+w.n||0;w.done=Array.isArray(w.done)?w.done:[];w.last=w.last||'';w.rel=+w.rel||0;});return W.wild;}
 function acMenu(){choose('保育員 小岑','歡迎來到 Sqoyaw 動物之家！這裡有等待新家的狗狗，也有受傷、被救回來的保育動物。今天想做什麼？',[
   {label:'🐕 領養狗狗',fn:()=>acAdopt()},{label:'🐾 照顧石虎',fn:()=>acCare('lc')},{label:'🐾 照顧黑豹',fn:()=>acCare('bl')},{label:'📖 保育動物圖鑑',fn:()=>acBook()},{label:'先不用，謝謝',fn:()=>{}}]);}
@@ -6743,11 +6713,11 @@ function hoopDrill(kx,y0,rz,fz,s,kind){const X=TB.x+kx;P.pos.set(X+.7,y0,fz);P.v
   if(!BALL.m){BALL.m=new T.Mesh(new T.SphereGeometry(.13,14,10),lam('#e0732a'));scene.add(BALL.m);}
   const to=new T.Vector3(P.pos.x,y0+.95,P.pos.z).addScaledVector(new T.Vector3(Math.sin(yaw),0,Math.cos(yaw)),.35),from=to.clone().addScaledVector(new T.Vector3(Math.sin(yaw),0,Math.cos(yaw)),5);from.y+=.4;
   actPlay('s.catch',{lock:true,yaw,cb:()=>{toast('接到了！');actPlay('laugh');}});BALL.sw=1;BALL.in=false;BALL.stop=true;BALL.from=from;BALL.to=to;BALL.t=0;BALL.dur=.34;BALL.m.visible=true;BALL.m.position.copy(from);}
-function hoopGo(kx,y0,rz,fz,s,dunk){const X=TB.x+kx,sx=X+(dunk?.35:.7);P.pos.set(sx,y0,dunk?rz-s*.62:fz);P.vel.set(0,0,0);const yaw=Math.atan2(X-sx,rz-P.pos.z);P.yaw=yaw;pl.g.rotation.y=yaw;cam.yaw=Math.atan2(1,0);cam.pitch=.12;
+function hoopGo(kx,y0,rz,fz,s,dunk){const X=TB.x+kx,sx=X+(dunk?0:.7),z1=rz-s*.55;P.pos.set(sx,y0,dunk?rz-s*3.1:fz);P.vel.set(0,0,0);const yaw=Math.atan2(X-sx,rz-P.pos.z);P.yaw=yaw;pl.g.rotation.y=yaw;cam.yaw=Math.atan2(1,0);cam.pitch=.12;
   if(!BALL.m){BALL.m=new T.Mesh(new T.SphereGeometry(.13,14,10),lam('#e0732a'));scene.add(BALL.m);}BALL.m.visible=false;
   const rim=new T.Vector3(X,y0+2.75,rz-s*.02),made=dunk||Math.random()<.68;
-  actPlay(dunk?'dunk':'shoot',{lock:true,yaw,onRel:()=>{const h=new T.Vector3(sx-.2,y0+(dunk?2.9:1.95),P.pos.z+s*.25);BALL.sw=0;BALL.stop=false;BALL.from=h;BALL.to=made?rim.clone():rim.clone().add(new T.Vector3(.35,.15,s*.25));BALL.t=0;BALL.dur=dunk?.18:.75;BALL.in=made;BALL.m.visible=true;BALL.m.position.copy(h);},
-    cb:()=>{setTimeout(()=>{toast(made?(dunk?'💥 灌籃成功！太帥了！':'🏀 進了！好球！'):'差一點點！再試一次？');if(made)actPlay('laugh');},250);}});}
+  actPlay(dunk?'dunk':'shoot',{lock:true,yaw,onRel:()=>{const h=dunk?new T.Vector3(X,y0+2.95,z1+s*.2):new T.Vector3(sx-.2,y0+1.95,P.pos.z+s*.25);BALL.sw=0;BALL.stop=false;BALL.from=h;BALL.to=made?rim.clone():rim.clone().add(new T.Vector3(.35,.15,s*.25));BALL.t=0;BALL.dur=dunk?.16:.75;BALL.in=made;BALL.m.visible=true;BALL.m.position.copy(h);},
+    cb:()=>{if(dunk){P.pos.z=z1;ACT.dk=null;}setTimeout(()=>{toast(made?(dunk?'💥 灌籃成功！太帥了！':'🏀 進了！好球！'):'差一點點！再試一次？');if(made)actPlay('laugh');},250);}});ACT.dk=dunk?{z0:rz-s*3.1,z1}:null;}
 function ballTick(dt){(TB.nets||[]).forEach(n=>{if(n.sw>0){n.sw=Math.max(0,n.sw-dt*1.6);const k=n.sw;n.m.scale.set(1+Math.sin(k*18)*.08*k,1+.35*k,1+Math.cos(k*16)*.08*k);n.m.position.y=n.y0!=null?n.y0-.07*k:(n.y0=n.m.position.y);}});if(!BALL.m||BALL.t<0)return;BALL.t+=dt;const k=Math.min(1,BALL.t/BALL.dur);const p=BALL.m.position;
   if(BALL.stop&&k>=1){BALL.stop=false;BALL.t=-1;BALL.m.visible=false;return;}
   if(k<1){p.lerpVectors(BALL.from,BALL.to,k);p.y+=Math.sin(k*PI)*(BALL.dur>.5?1.6:.2);}
@@ -6883,7 +6853,8 @@ function updateCamera(dt){
     if(!HOME.vo||HOME.vo[0]!==ox||HOME.vo[1]!==oy||HOME.vo[2]!==innerWidth){camera.setViewOffset(innerWidth,innerHeight,ox,oy,innerWidth,innerHeight);HOME.vo=[ox,oy,innerWidth];}
     cam.pos.lerp(want,1-Math.exp(-dt*5));cam.look.lerp(look,1-Math.exp(-dt*6));camera.position.copy(cam.pos);camera.lookAt(cam.look);return;}
   if(HOME.vo){camera.clearViewOffset();HOME.vo=null;}
-  if(!HOME_IN&&!CH_IN&&!MZ_IN&&!TC_IN&&!ST_IN&&!INDOOR&&camera.fov!==50){camera.fov=50;camera.updateProjectionMatrix();}
+  // (outdoors the field of view is eased to its target at the end of this function; forcing it back to 50 here every frame made
+  //  phones held upright — target 64 — pump the zoom back and forth with every uneven frame)
   const idle=performance.now()-lastInput>22000&&started&&!DLG.open;
   if(DRESS.on){const port=camera.aspect<1;const yaw=P.yaw+(port?0:.28)+Math.sin(time*.35)*.2,d=port?3.3:2.35;
     const tg=new T.Vector3(P.pos.x,P.pos.y+(port?.4:.8),P.pos.z);const dir=new T.Vector3(Math.sin(yaw)*Math.cos(.1),Math.sin(.1),Math.cos(yaw)*Math.cos(.1));
