@@ -980,6 +980,54 @@
    "note": ""
   },
   {
+   "file": "assets/rooms/home/home_landscape_bed_blanket_front.webp",
+   "group": "rooms/home",
+   "bytes": 44470,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_landscape_bed_head01.webp",
+   "group": "rooms/home",
+   "bytes": 11182,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_landscape_bed_head02.webp",
+   "group": "rooms/home",
+   "bytes": 12512,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_landscape_bed_head03.webp",
+   "group": "rooms/home",
+   "bytes": 11302,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_landscape_bed_head04.webp",
+   "group": "rooms/home",
+   "bytes": 11616,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_landscape_bed_head05.webp",
+   "group": "rooms/home",
+   "bytes": 11232,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_landscape_bed_head06.webp",
+   "group": "rooms/home",
+   "bytes": 9994,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_landscape_bed_pillow_dent.webp",
+   "group": "rooms/home",
+   "bytes": 7850,
+   "note": ""
+  },
+  {
    "file": "assets/rooms/home/home_landscape_bg.webp",
    "group": "rooms/home",
    "bytes": 195214,
@@ -1091,6 +1139,54 @@
    "file": "assets/rooms/home/home_landscape_wall_wood.webp",
    "group": "rooms/home",
    "bytes": 29484,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_portrait_bed_blanket_front.webp",
+   "group": "rooms/home",
+   "bytes": 52676,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_portrait_bed_head01.webp",
+   "group": "rooms/home",
+   "bytes": 8200,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_portrait_bed_head02.webp",
+   "group": "rooms/home",
+   "bytes": 8710,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_portrait_bed_head03.webp",
+   "group": "rooms/home",
+   "bytes": 8062,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_portrait_bed_head04.webp",
+   "group": "rooms/home",
+   "bytes": 7818,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_portrait_bed_head05.webp",
+   "group": "rooms/home",
+   "bytes": 7680,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_portrait_bed_head06.webp",
+   "group": "rooms/home",
+   "bytes": 7030,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_portrait_bed_pillow_dent.webp",
+   "group": "rooms/home",
+   "bytes": 9046,
    "note": ""
   },
   {
