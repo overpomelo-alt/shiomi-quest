@@ -212,6 +212,12 @@
    "note": ""
   },
   {
+   "file": "assets/characters/pets/ani_blackbear.webp",
+   "group": "characters/pets",
+   "bytes": 147304,
+   "note": "blackbear"
+  },
+  {
    "file": "assets/characters/pets/ani_blackleopard.webp",
    "group": "characters/pets",
    "bytes": 100390,
@@ -222,6 +228,18 @@
    "group": "characters/pets",
    "bytes": 167682,
    "note": "leopardcat"
+  },
+  {
+   "file": "assets/characters/pets/ani_maltese.webp",
+   "group": "characters/pets",
+   "bytes": 192264,
+   "note": "maltese"
+  },
+  {
+   "file": "assets/characters/pets/ani_poodle.webp",
+   "group": "characters/pets",
+   "bytes": 195628,
+   "note": "poodle"
   },
   {
    "file": "assets/characters/pets/ani_shepherd.webp",
@@ -635,6 +653,198 @@
    "file": "assets/rooms/cabin/portrait_o_yoga_mat.webp",
    "group": "rooms/cabin",
    "bytes": 2420,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_bg.webp",
+   "group": "rooms/class",
+   "bytes": 305140,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_bins.webp",
+   "group": "rooms/class",
+   "bytes": 13408,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_broom_cabinet.webp",
+   "group": "rooms/class",
+   "bytes": 12366,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_computer_desk.webp",
+   "group": "rooms/class",
+   "bytes": 6434,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_desk_1.webp",
+   "group": "rooms/class",
+   "bytes": 8824,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_desk_2.webp",
+   "group": "rooms/class",
+   "bytes": 7322,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_desk_3.webp",
+   "group": "rooms/class",
+   "bytes": 9342,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_desk_4.webp",
+   "group": "rooms/class",
+   "bytes": 12908,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_desk_5.webp",
+   "group": "rooms/class",
+   "bytes": 15144,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_low_cabinet_far.webp",
+   "group": "rooms/class",
+   "bytes": 11550,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_low_cabinet_middle.webp",
+   "group": "rooms/class",
+   "bytes": 13070,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_low_cabinet_near.webp",
+   "group": "rooms/class",
+   "bytes": 10280,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_podium.webp",
+   "group": "rooms/class",
+   "bytes": 4652,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_reading_drawers.webp",
+   "group": "rooms/class",
+   "bytes": 6278,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_reading_rack.webp",
+   "group": "rooms/class",
+   "bytes": 15636,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_landscape_o_teacher_table.webp",
+   "group": "rooms/class",
+   "bytes": 2974,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_bg.webp",
+   "group": "rooms/class",
+   "bytes": 396680,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_bins.webp",
+   "group": "rooms/class",
+   "bytes": 14476,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_broom_cabinet.webp",
+   "group": "rooms/class",
+   "bytes": 15444,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_computer_desk.webp",
+   "group": "rooms/class",
+   "bytes": 5382,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_desk_1.webp",
+   "group": "rooms/class",
+   "bytes": 9188,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_desk_2.webp",
+   "group": "rooms/class",
+   "bytes": 8694,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_desk_3.webp",
+   "group": "rooms/class",
+   "bytes": 10214,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_desk_4.webp",
+   "group": "rooms/class",
+   "bytes": 12008,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_desk_5.webp",
+   "group": "rooms/class",
+   "bytes": 14362,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_low_cabinet_far.webp",
+   "group": "rooms/class",
+   "bytes": 8200,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_low_cabinet_middle.webp",
+   "group": "rooms/class",
+   "bytes": 6352,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_low_cabinet_near.webp",
+   "group": "rooms/class",
+   "bytes": 5556,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_podium.webp",
+   "group": "rooms/class",
+   "bytes": 4490,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_reading_drawers.webp",
+   "group": "rooms/class",
+   "bytes": 5428,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_reading_rack.webp",
+   "group": "rooms/class",
+   "bytes": 13056,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/class/class_portrait_o_teacher_table.webp",
+   "group": "rooms/class",
+   "bytes": 3122,
    "note": ""
   },
   {
