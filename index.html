@@ -670,6 +670,9 @@ body.touch #toast{top:calc(150px + env(safe-area-inset-top,0px));white-space:nor
   body.touch #quests.closed .q-nt span{display:none}
   body.touch #quests.closed .q-nt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px}
 }
+/* phone: the "E" hint pill itself is a button — tap it to do the thing */
+body.touch #prompt.show{pointer-events:auto;cursor:pointer}
+body.touch #prompt .key{background:var(--kin);color:var(--ink)}
 </style>
 <script id="loader">/* boot loading screen: dark night sky, title, progress, and the class running along the bottom (video cut-outs) */
 (function(){if(document.getElementById('bootLoad'))return;
@@ -3033,7 +3036,7 @@ function sqRoute(ax,az,bx,bz){const {N,E}=sqGraph();const [s0,ds]=sqNearNode(ax,
   const out=[R[0]];for(let i=0;i<R.length-1;i++){const a=R[i],b=R[i+1];
     if(sqClear(a[0],a[1],b[0],b[1])){out.push(b);continue;}const L=sqAstar(a[0],a[1],b[0],b[1]);if(L)out.push(...L.slice(1));else out.push(b);}
   return out;}
-function sqNavTarget(){if(TS())return null;const nx=SQW.find(x=>!(W.sqw&&W.sqw[x.id]));
+function sqNavTarget(){return null;if(TS())return null;const nx=SQW.find(x=>!(W.sqw&&W.sqw[x.id]));
   if(nx)return {title:'走讀：'+nx.n,pos:new T.Vector3(TB.x+nx.p[0],0,nx.p[1]),sq:true};const h=TB.houses&&TB.houses[tbMySeat()];return h?{title:'回家：'+tbMySeat()+' 號',pos:new T.Vector3(TB.x+h.x,0,h.z),sq:true}:null;}
 // route trail: the same glowing chevrons as the town guide, laid along the path and pulsing forward (Sqoyaw)
 const CRUMBS=(()=>{const mk_=(geo,color,op,ro,po)=>{const m=new T.InstancedMesh(geo,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:op,depthWrite:false,side:T.DoubleSide,toneMapped:false,polygonOffset:true,polygonOffsetFactor:po,polygonOffsetUnits:po}),20);
@@ -3065,7 +3068,7 @@ function updateGuide(dt){const tasks=QT.tasks;if(!tasks)return;let tg=QT.target;
   else if(MZ_IN){const og=ADV.gates.filter(g=>g.open).length;nt.textContent=ADV.mzChest&&ADV.mzChest.claimed?'沿著光走出迷宮':`找到迷宮深處的寶箱（石門 ${og}/3）`;nd.textContent='看右上角的古老地圖；起點的繩子可以回到外面';$('qArrow').style.transform='rotate(0deg)';}
   else if(ISL_IN){const n=(W.adv&&W.adv.isl||[]).filter(Boolean).length;nt.textContent=W.adv&&W.adv.islDone?'搭船回小鎮':`點亮三塊石碑（${n}/3）`;nd.textContent=W.adv&&W.adv.islDone?'碼頭的小船按 E':'石碑前按 E 解謎';$('qArrow').style.transform='rotate(0deg)';}
   else if(INDOOR){nt.textContent=HOME_IN?'先走出房門':CH_IN?'先走出挑戰館':TC_IN?'老師的山上小屋':'先走出便利商店';nd.textContent=HOME_IN?'房門口按 E，或按「出門」':'門口按 E';$('qArrow').style.transform='rotate(0deg)';}
-  else if(tbIn()&&!(tg&&tg.map)){const me=tbMySeat(),n=sqDone(),nx=SQW.find(x=>!(W.sqw&&W.sqw[x.id]));nt.textContent=TS()?'Sqoyaw：大家的家':`走讀 Sqoyaw 打卡 ${n}/${SQW.length}`;nd.textContent=TS()?'每間掛號碼牌的房子門口按 E 看留言板':(nx?`下一站：${nx.n}（插紅旗的地方）`:`全部打卡完成！${me?`回家：${me} 號`:''}`)+(show&&dist>4?`・跟著金色光點走，約 ${Math.round(dist)} 公尺`:show?'・就在這附近':'');if(!show)$('qArrow').style.transform='rotate(0deg)';}
+  else if(tbIn()&&!(tg&&tg.map)){const me=tbMySeat(),n=sqDone(),nx=SQW.find(x=>!(W.sqw&&W.sqw[x.id]));nt.textContent='環山 Sqoyaw';nd.textContent=TS()?'掛號碼牌的房子是同學的家，門口按 E':`自由走走${me?`・你的家是 ${me} 號`:''}・同學巷可以去同學家`;$('qArrow').style.transform='rotate(0deg)';}
   else if(tg){if(tg.map&&dist<3.5){QT.mapNav=null;QT.target=null;toast(`📍 到了：${tg.title.replace(/^導航：/,'')}`);}nt.textContent=tg.title;nd.textContent=tg.pos?(dist<4?'就在這附近，按 E':`約 ${Math.round(dist)} 公尺`):tg.status;}
   else{const all=tasks.filter(t=>!t.optional&&t.id!=='submit').every(t=>t.done);nt.textContent=all?'全部完成！':'自由探索';nd.textContent=all?'按 Q 繳交成績':'點任務清單開始導航';}}
 function trackerTick(dt){if(!started)return;QT.t-=dt;if(QT.t<=0){QT.t=.5;QT.tasks=renderQuests();QT.target=questTarget(QT.tasks);tipCheck();}updateGuide(dt);}
@@ -3154,6 +3157,7 @@ $('bMenu').onclick=()=>{const o=document.body.classList.toggle('menuopen');$('bM
 const uiOpen=()=>!!(document.getElementById('typeq')&&!document.getElementById('typeq').hidden)||!$('card').hidden||!$('teacher').hidden||DRESS.on||!$('decor').hidden||!$('board').hidden||!$('cabin').hidden||!$('msgp').hidden||!$('story').hidden||!!(document.getElementById('shop')&&!document.getElementById('shop').hidden)||!!(document.getElementById('portal')&&!document.getElementById('portal').hidden)||!!(document.getElementById('mapv')&&!document.getElementById('mapv').hidden)||!!(document.getElementById('bag')&&!document.getElementById('bag').hidden);
 let nearest=null;
 let lastAct=0;
+$('prompt').addEventListener('pointerdown',e=>{if(!IS_TOUCH||!$('prompt').classList.contains('show'))return;e.preventDefault();e.stopPropagation();interact();});
 function interact(){if(!started||uiOpen()||CUTON)return;if(DLG.open){advance();return;}
   const now=performance.now();if(now-lastAct<420||ACT.on&&ACT.lock)return;lastAct=now;   // no double-open / double reward from repeated presses
   if(P.sit){standUp();return;}
@@ -3718,7 +3722,7 @@ function enterHome(opts={}){VISIT=null;const go=()=>{INDOOR=true;HOME_IN=true;ST
       setTimeout(()=>say(`${W.name||''}的房間`,first?['早安！這裡是你自己的房間。','書桌上有「家具型錄」，用闖關賺來的金幣可以買家具、換壁紙。','按「佈置」可以把家具擺到喜歡的位置。','準備好了，就從房門走出去，到車站搭火車去闖關吧！']:[pick(['早安！今天也一起加油吧！','又是新的一天！先去哪一關呢？','睡得好嗎？小鎮在等你喔！'])]),700);}};
   if(opts.wake)go();else fadeTo(go);}
 function openLock(){const L=W.homeLock||{mode:'open',pass:''};msgOpen('我的家','門鎖設定',B=>{
-  B.appendChild(el('p',{class:'help',text:'設定同學來你家時能不能進門。同學只能看，不能動你的家具；老師隨時都可以進來看看。'}));
+  B.appendChild(el('p',{class:'help',text:'設定同學和老師來你家時能不能進門。來的人只能看，不能動你的家具。'}));
   const opts=[['open','🟢 歡迎大家來玩','同學走到門口就能進來'],['pass','🔑 要密碼才能進來','只有知道密碼的同學可以進來'],['closed','🔴 暫時不讓人進來','門口的留言板還是可以留言']];
   const pi=el('input',{class:'nb-in',maxlength:'4',inputmode:'numeric',placeholder:'4 位數字密碼',value:L.pass||''});pi.addEventListener('keydown',e=>e.stopPropagation());
   const box=el('div',{});const draw=()=>{box.innerHTML='';opts.forEach(([k,t,d])=>{const b=el('button',{type:'button',class:'nb-card lk-opt'+(L.mode===k?' on':''),html:`<b>${t}</b><small>${d}</small>`});b.onclick=()=>{L.mode=k;draw();};box.appendChild(b);});
@@ -4760,7 +4764,6 @@ async function visitHome(seat){if(!started||VISIT)return;if(CLOUD.st==='fail'){s
   toast('叩叩叩……');let o=null;try{o=await Promise.race([cloudGet(seat),new Promise((_,j)=>setTimeout(()=>j(new Error('t')),6000))]);}catch(e){}
   if(!o||!saveOk(o,resetAt(seat))){say(`${seat} 號的家`,['叩叩叩……','好像還沒有人住進來。'],{noWave:1});return;}
   const nm=o.name||(seat+' 號'),L=o.homeLock||{mode:'open'};const go=()=>visitEnter(seat,nm,o);
-  if(TS())return go();
   if(L.mode==='closed'){say(`${nm}的家`,['門上掛著「暫時不開放」的小牌子。','可以在門口的留言板留言給'+nm+'喔！'],{noWave:1});return;}
   if(L.mode==='pass'){askCode(`${nm}的家`,'門鎖著，要輸入 4 位數密碼',v=>{if(v&&v===String(L.pass))go();else{SND.wrong&&SND.wrong();say(null,['密碼不對，門打不開。'],{noWave:1});}});return;}
   go();}
@@ -4969,7 +4972,7 @@ function r2Move(dt){let ix=0,iy=0;const free=!DLG.open&&started&&!uiOpen();
     else{Q.mv=false;Q.idle+=dt;}
     if(Q.wag>0)Q.wag-=dt;else if(!Q.mv&&Q.idle>2&&Q.idle<7&&Math.random()<dt*.25)Q.wag=1.2;}}
 function r2Nearest(){if(R2.rest){R2.near=null;return null;}let best=null,bd=1e9;const H=r2H(R2.y);
-  for(const s of r2Spots()){const d=Math.hypot(s.def[1]-R2.x,(s.def[2]-R2.y)*1.2);const r=/離開小屋|回到小屋|出門|離開教室/.test(s.def[0])?H*.5:H*.3;if(d<r&&d<bd){bd=d;best=s;}}
+  for(const s of r2Spots()){const d=Math.hypot(s.def[1]-R2.x,(s.def[2]-R2.y)*1.2);const r=(/離開小屋|回到小屋|出門|離開教室/.test(s.def[0])?H*.5:H*.3)*(IS_TOUCH?1.5:1);if(d<r&&d<bd){bd=d;best=s;}}
   R2.near=best;return best?{label:best.label,act:best.act}:null;}
 function r2Cover(g,im,x,y,w,h){if(!im||!im.width)return;const s=Math.max(w/im.width,h/im.height),sw=w/s,sh=h/s;g.drawImage(im,(im.width-sw)/2,(im.height-sh)/2,sw,sh,x,y,w,h);}
 function r2RR(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
@@ -5171,9 +5174,9 @@ function cdogTick(dt){if(!R2.on||R2.room!=='cabin'||!SPRITES.ani_maltese)return;
 function cdogDraw(g){const M=SPRITES.ani_maltese,im=CDOG.img;if(!M||!im)return;const A=M.act||{};let f=0,fl=1;
   if(CDOG.st==='walk'){f=Math.sin(CDOG.ph)>0?1:2;fl=CDOG.flip;}else if(CDOG.wag>0&&A.wag_A!=null)f=Math.floor(CDOG.wag*6)%2?A.wag_B:A.wag_A;
   else if(CDOG.pose==='lie'&&A.lie!=null)f=A.lie;else if(CDOG.pose==='sleep'&&A.sleep!=null)f=A.sleep;else if(CDOG.pose==='wag'&&A.wag_A!=null)f=Math.floor(R2.t*5)%2?A.wag_B:A.wag_A;
-  const H=r2H(CDOG.y)*.34,dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;g.save();g.translate(CDOG.x,CDOG.y);g.fillStyle='rgba(40,20,10,.22)';g.beginPath();g.ellipse(0,0,dw*.26,dw*.06,0,0,7);g.fill();
+  const H=r2H(CDOG.y)*.5,dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;g.save();g.translate(CDOG.x,CDOG.y);g.fillStyle='rgba(40,20,10,.22)';g.beginPath();g.ellipse(0,0,dw*.26,dw*.06,0,0,7);g.fill();
   g.scale(fl,1);const [sx,sy]=fxy(M,f);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+(M.foot!=null?M.foot:4)/M.ch*dh,dw,dh);g.restore();}
-function cdogSpot(){if(R2.room!=='cabin'||!CDOG.img)return null;const H=r2H(CDOG.y)*.34;
+function cdogSpot(){if(R2.room!=='cabin'||!CDOG.img)return null;const H=r2H(CDOG.y)*.5;
   return {def:['雪球',CDOG.x+(CDOG.x<R2.x?H*.35:-H*.35),CDOG.y+3,[CDOG.x-H*.45,CDOG.y-H*.75,H*.9,H*.8]],it:null,label:'摸摸雪球（老師的馬爾濟斯）',
     act:()=>{CDOG.wag=2.6;CDOG.st='idle';CDOG.t=3;CDOG.pose='wag';SND.pick&&SND.pick();say('雪球',[pick(['雪球搖著尾巴，在你腳邊轉了一圈。','雪球舔了舔你的手，好癢！','雪球翻過身來，想要你摸摸肚子。','雪球是老師養的馬爾濟斯，最喜歡在窗邊曬太陽。'])],{noWave:1});}};}
 function r2Draw(dt){R2.t+=dt;cdogTick(dt);const cv=R2.cv,g=R2.g;const dpr=Math.min(1.5,devicePixelRatio||1);const cw=Math.round(cv.clientWidth*dpr),ch=Math.round(cv.clientHeight*dpr);
@@ -5931,7 +5934,7 @@ function s2Move(dt){let ix=0,iy=0;const free=!DLG.open&&started&&!uiOpen();
     if(Q.wag>0)Q.wag-=dt;else if(!Q.mv&&Q.idle>2&&Q.idle<7&&Math.random()<dt*.25)Q.wag=1.2;}}
 function s2Nearest(){let best=null,bd=1e9;const H=s2H(S2.y);
   // standing IN FRONT of a thing (lower on screen) counts from further away than standing behind it — kids stop in front of the gate, not inside it
-  for(const s of s2Spots()){const dy=s.def[2]-S2.y;const d=Math.hypot(s.def[1]-S2.x,dy*(dy<0?.5:1.2));const r=H*(/剪票/.test(s.def[0])?.5:.36);if(d<r&&d<bd){bd=d;best=s;}}
+  for(const s of s2Spots()){const dy=s.def[2]-S2.y;const d=Math.hypot(s.def[1]-S2.x,dy*(dy<0?.5:1.2));const r=H*(/剪票/.test(s.def[0])?.5:.36)*(IS_TOUCH?1.4:1);if(d<r&&d<bd){bd=d;best=s;}}
   S2.near=best;return best?{label:best.label,act:best.act}:null;}
 // draw a rectangular canvas into a (perspective) quad [tl,tr,br,bl] using two affine triangles
 function s2Quad(g,src,q){const w=src.width,h=src.height;
@@ -6116,10 +6119,10 @@ const SQW=[
   {id:'lane2',n:'環山二巷街道與果園',p:[-1,-61],s:['部落的巷道、房子、蹦蹦車（小貨車），還有路邊的果園。','祖先種小米，我們現在種甜柿、水蜜桃、雪梨；秋天甜柿成熟時，整片山都是黃澄澄的。']}];
 function sqDone(){return SQW.filter(s=>W.sqw&&W.sqw[s.id]).length;}
 function sqCheck(id){const st=SQW.find(s=>s.id===id);if(!st)return;W.sqw=W.sqw||{};const f=TB.flags[id];
-  if(!W.sqw[id]&&!TS()){W.sqw[id]=Date.now();const n=sqDone();histAdd&&histAdd('adv',`走讀 Sqoyaw 打卡：${st.n}`);
+  if(!W.sqw[id]&&!TS()){W.sqw[id]=Date.now();const n=sqDone();histAdd&&histAdd('adv',`Sqoyaw 地標打卡：${st.n}`);
     if(f)f.material.color.copy(col('#4fae6c'));SND.pick&&SND.pick();
     if(n>=SQW.length){W.coins+=80;led(80,'走讀 Sqoyaw 全部打卡','獎勵');renderPouch();setTimeout(()=>say('走讀 Sqoyaw',['🎉 八個地方全部打卡完成！+80 金幣','你已經認識 Qalang Sqoyaw 的重要地標了。回家問問長輩：「你小時候的部落跟現在有什麼不一樣？」']),400);}
-    else toast(`📍 走讀打卡：${st.n}（${n}/${SQW.length}）`);save();}}
+    else toast(`📍 地標打卡：${st.n}（${n}/${SQW.length}）`);save();}}
 function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sqCheck(id)});}
 (function(){
   const G=new T.Group();G.position.set(TB.x,0,TB.z);scene.add(G);TB.g=G;const tc=new T.Color(),t2=new T.Color(),tc2=new T.Color();
@@ -6325,42 +6328,42 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
      B(3,.12,.12,lam('#e0a020'),sx,2.5,sz);[-.6,.6].forEach(o=>{B(.6,.06,.25,lam('#e0674b'),sx+o,.6,sz);[-.25,.25].forEach(p=>B(.02,1.85,.02,FRAME,sx+o+p,1.55,sz,true));});
      [[-70,43.6],[-65,43.6],[-60,43.6],[-55,43.6],[-72.8,30],[-72.8,38]].forEach(([x,z])=>{mk(cy(.18,.26,1.8,7),M.trunk,x,Y0+.9,z,SG);mk(ico(1.5,1),pick([M.leaf,M.leaf2]),x,Y0+2.9,z,SG);addCol(TB.x+x-.3,TB.x+x+.3,z-.3,z+.3,Y0+4);});}
    sqBatch(G,SG);
-   reserve(-62,20,12);reserve(-60,34,14);reserve(-48.5,33,7);reserve(-42,24.8,3.5);flagAt('school',-37,27);inter(P_(-38,28.5),1.8,'平等國小（走讀打卡）',()=>sqStory('school'));
+   reserve(-62,20,12);reserve(-60,34,14);reserve(-48.5,33,7);reserve(-42,24.8,3.5);flagAt('school',-37,27);inter(P_(-38,28.5),1.8,'平等國小（地標小故事）',()=>sqStory('school'));
    inter(P_(-47.6,20),1.8,'看平等國小的公告欄',()=>openBoard('news'));}
   // 獵人步道登山口 (behind the school, west)
   {const x=-73,z=8;[-1.3,1.3].forEach(k=>mk(bx(.3,3,.3),M.woodDark,x,H(x,z+k)+1.5,z+k,G));mk(bx(.4,.4,3.2),M.woodDark,x,H(x,z)+3.1,z,G);
     sign(x+.25,H(x,z)+3.6,z,PI/2,'環山獵人步道',3,'#4a3527','#f3e6c8');post(-70,12.5,1.6);sign(-69.93,H(-70,12.5)+1.5,12.5,PI/2,'解說牌',1.4,'#2f5a3a','#fff','只在入口看，不進入');
     [[-77,5],[-78,11],[-80,8],[-76,14]].forEach(([a,b])=>{mk(cy(.2,.3,2,7),M.trunk,a,H(a,b)+1,b,G);mk(ico(1.6,1),M.leaf,a,H(a,b)+3,b,G);});
-    reserve(x,z,4);flagAt('trail',-68,9);inter(P_(-68.5,7),1.8,'獵人步道登山口（走讀打卡）',()=>sqStory('trail'));}
+    reserve(x,z,4);flagAt('trail',-68,9);inter(P_(-68.5,7),1.8,'獵人步道登山口（地標小故事）',()=>sqStory('trail'));}
   // 幼兒園
   {const g=box(9,3.2,5.5,lam('#fff1d8'),-28,13,PI/2);gable(g,9,5.5,3.2,1.4,lam('#e0674b'));mk(bx(1.3,2.1,.08),M.doorWood,0,1.05,2.8,g);[-3,3].forEach(x=>mk(bx(1.6,1,.08),lam('#bfe3f5'),x,1.8,2.8,g,false));
     const sl=mk(bx(.8,.1,3.4),lam('#f2c14e'),-31,H(-31,5.5)+1,5.5,G);sl.rotation.x=.45;mk(bx(1,.1,1),lam('#4f9ad8'),-31,H(-31,3.9)+1.8,3.9,G);addCol(TB.x-31.6,TB.x-30.4,3.3,7.1,H(-31,5.5)+2);
-    sign(-24.82,H(-28,13)+2.5,13,PI/2,'幼兒園環山分所',3.2,'#fff1d8','#c8432b');reserve(-28,13,6);flagAt('kinder',-22,8.5);inter(P_(-22.5,10.5),1.7,'幼兒園（走讀打卡）',()=>sqStory('kinder'));}
+    sign(-24.82,H(-28,13)+2.5,13,PI/2,'幼兒園環山分所',3.2,'#fff1d8','#c8432b');reserve(-28,13,6);flagAt('kinder',-22,8.5);inter(P_(-22.5,10.5),1.7,'幼兒園（地標小故事）',()=>sqStory('kinder'));}
   // 便利商店 7-ELEVEN 環山門市 (far south, beside 台7甲 — a bit of a walk)
   {const g=box(9,3.4,6,lam('#f7f7f4'),-32,166,PI);mk(bx(9.3,.5,6.3),lam('#f7f7f4'),0,3.45,0,g);mk(bx(7,2.3,.08),lam('#cfe4ec'),0,1.25,3.03,g,false);mk(bx(1.8,2.3,.1),lam('#9fc3d6'),2.6,1.15,3.05,g,false);
     mk(bx(9.4,.55,.25),lam('#2f7f4a'),0,2.95,3.12,g);mk(bx(9.4,.12,.27),lam('#e8873a'),0,2.62,3.13,g,false);mk(bx(9.6,.14,1.6),lam('#e9e6df'),0,3.2,3.8,g);
     [-3.4,-1.4,.6].forEach(x=>mk(bx(.9,1.1,.02),lam(pick(['#f2c14e','#e0674b','#4f9ad8'])),x,1.6,3.09,g,false));mk(bx(9.2,.14,2.2),lam('#cfcac0'),0,.07,4.1,g,false);
     [-4.1,4.1].forEach(x=>{mk(cy(.28,.25,.8,10),lam('#3f6f5a'),x,.4,3.7,g);});
     sign(-32,H(-32,166)+2.98,162.71,PI,'7-ELEVEN 環山門市',4.2,'#2f7f4a','#fff');
-    reserve(-32,166,7);flagAt('shop',-24,160.5);inter(P_(-25,159.5),1.8,'便利商店（走讀打卡）',()=>sqStory('shop'));inter(P_(-32,161),1.8,'走進 7-11',()=>enterMart('tribe'));}
+    reserve(-32,166,7);flagAt('shop',-24,160.5);inter(P_(-25,159.5),1.8,'便利商店（地標小故事）',()=>sqStory('shop'));inter(P_(-32,161),1.8,'走進 7-11',()=>enterMart('tribe'));}
   // 以萬果園水果賣場
   {const g=box(8,3.2,5,lam('#efe3cf'),-21,-11,-PI/2);mk(bx(8.4,.12,1.6),lam('#4f8a5b'),0,2.9,3.2,g);
     for(let i=0;i<6;i++){mk(bx(1,.5,.7),M.woodLight,-3+i*1.2,.25,3.2,g,false);for(let k=0;k<4;k++)mk(sph(.14,6,5),lam(['#f08a2a','#f6b0a0','#e8e0a0'][i%3]),-3.3+i*1.2+k*.2,.6,3.2,g,false);}
-    sign(-23.85,H(-21,-11)+3.4,-11,-PI/2,'以萬果園',3,'#f08a2a','#fff','水果賣場');reserve(-21,-11,5);flagAt('fruit',-26,-5);inter(P_(-25.5,-7.5),1.8,'以萬果園（走讀打卡）',()=>sqStory('fruit'));}
+    sign(-23.85,H(-21,-11)+3.4,-11,-PI/2,'以萬果園',3,'#f08a2a','#fff','水果賣場');reserve(-21,-11,5);flagAt('fruit',-26,-5);inter(P_(-25.5,-7.5),1.8,'以萬果園（地標小故事）',()=>sqStory('fruit'));}
   // 阿來小吃店
   {const g=box(5,2.8,4.5,lam('#efe3cf'),-3,13,PI/2);mk(bx(5.4,.12,1.4),lam('#e0a020'),0,2.6,2.9,g);sign(-.6,H(-3,13)+2.25,13,PI/2,'阿來小吃店',2.4,'#f2c14e','#3a2a20');reserve(-3,13,4);
     inter(P_(.8,13),1.6,'阿來小吃店',()=>say('阿來小吃店',['部落的小吃店，飄來炒飯和湯麵的香味。','（老闆在忙，下次再來吃吧！）']));}
   // 公車站
   {const x=29,z=17;[-1.6,1.6].forEach(k=>mk(cy(.07,.07,2.6,8),M.metalDark,x+k,H(x+k,z)+1.3,z+.8,G));mk(bx(4,.12,2),lam('#3b6ea5'),x,H(x,z)+2.65,z+.3,G);
     mk(bx(3,.08,.5),M.woodLight,x,H(x,z)+.45,z+.8,G,false);post(x-2.6,z-.6,2.4);sign(x-2.6,H(x-2.6,z)+2.5,z-.65,PI,'環山 公車站',2,'#2f6b56','#fff','台7甲');
-    reserve(x,z,3);flagAt('bus',25,20);inter(P_(26,21.5),2,'環山部落公車站（走讀打卡）',()=>sqStory('bus'));
-    inter(P_(30.5,20.5),1.6,'搭公車',()=>choose('環山公車站','要搭車去哪裡呢？',[{label:'🚉 平等車站',fn:()=>trainRide('平等',()=>enterStation({now:true}),'🚌')},{label:'🌊 汐見町（去闖關）',fn:()=>trainRide('汐見町',()=>arriveShiomi(),'🚌')},{label:'📍 看走讀打卡卡',fn:()=>sqCard()},{label:'再逛一下',fn:null}]));}
+    reserve(x,z,3);flagAt('bus',25,20);inter(P_(26,21.5),2,'環山部落公車站（地標小故事）',()=>sqStory('bus'));
+    inter(P_(30.5,20.5),1.6,'搭公車',()=>choose('環山公車站','要搭車去哪裡呢？',[{label:'🚉 平等車站',fn:()=>trainRide('平等',()=>enterStation({now:true}),'🚌')},{label:'🌊 汐見町（去闖關）',fn:()=>trainRide('汐見町',()=>arriveShiomi(),'🚌')},{label:'📍 看地標打卡卡',fn:()=>sqCard()},{label:'再逛一下',fn:null}]));}
   // three churches
   {const church=(x,z,ry,wall,roof,name,tall)=>{const g=box(7,4,10,lam(wall),x,z,ry);gable(g,7,10,4,2.2,lam(roof));const t=tall?7.5:5.2;mk(bx(2.2,t,2.2),lam(wall),0,t/2,-4.2,g);
       const sp=mk(new T.ConeGeometry(1.6,2.6,4),lam(roof),0,t+1.3,-4.2,g);sp.rotation.y=PI/4;mk(bx(.18,1.6,.18),lam('#f2efe8'),0,t+3.3,-4.2,g,false);mk(bx(1,.18,.18),lam('#f2efe8'),0,t+3.5,-4.2,g,false);
       mk(bx(1.6,2.6,.08),M.doorWood,0,1.3,-5.03,g);const sgn=sign(0,0,0,0,name,3.2,'#f2efe8','#3a2a20');G.remove(sgn);g.add(sgn);sgn.position.set(0,t-1.2,-5.33);sgn.rotation.y=PI;reserve(x,z,7);};
     church(21,-32,PI/2,'#f4f0e6','#b8452f','環山天主堂',false);church(-3,-11,PI/2,'#eef2f5','#3b6ea5','真耶穌教會',false);church(60,-34,PI/2,'#f3ead3','#7a4a3a','長老教會',true);
-    flagAt('church',14.5,-31.5);inter(P_(14,-29.8),1.8,'教會（走讀打卡）',()=>sqStory('church'));}
+    flagAt('church',14.5,-31.5);inter(P_(14,-29.8),1.8,'教會（地標小故事）',()=>sqStory('church'));}
   // 石板屋, 泰雅文物館 + granary, 眺望點
   {const sl=lam('#8a8680',{map:(()=>{const [c,g]=C2(128,128);g.fillStyle='#8a8680';g.fillRect(0,0,128,128);for(let y=0;y<128;y+=10)for(let x=-(y%20);x<128;x+=22){g.fillStyle=pick(['#7a766f','#96928a','#6f6b65']);g.fillRect(x+1,y+1,20,8);}return TX(c,true);})()});
     const g=box(6,2.2,5,sl,-22,-30,0);gable(g,6,5,2.2,1,sl);mk(bx(1,1.7,.08),M.woodDark,0,.85,2.53,g);reserve(-22,-30,4.5);
@@ -6390,7 +6393,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
     [[-1.5,.85],[-1.5,-.85],[1.4,.85],[1.4,-.85]].forEach(([x,z])=>{const w=mk(cy(.32,.32,.25,12),M.black,x,.32,z,t);w.rotation.x=PI/2;});for(let k=0;k<6;k++)mk(sph(.2,8,6),lam('#f08a2a'),-1.4+(k%3)*.5,1.15,(k<3?-.3:.3),t,false);
     addCol(TB.x+tx-2.3,TB.x+tx+2.3,tz-1.6,tz+1.6,H(tx,tz)+2.4);reserve(tx,tz,3.5);
     inter(P_(tx-2.5,tz+1.5),1.8,'坐蹦蹦車',()=>choose('蹦蹦車','噗噗噗～要載你去哪裡？',[{label:'🏠 我家門口',fn:()=>tbRide('home')},{label:'🏫 平等國小',fn:()=>tbRide('school')},{label:'🍊 甜柿果園',fn:()=>tbRide('orchard')},{label:'🌉 四季蘭溪吊橋',fn:()=>tbRide('bridge')},{label:'🚌 公車站',fn:()=>tbRide('bus')},{label:'🏪 7-11',fn:()=>tbRide('shop')},{label:'🐾 動物之家',fn:()=>tbRide('animals')},{label:'不用了',fn:null}]));
-    flagAt('lane2',-1,-61);inter(P_(-.5,-59),1.6,'環山二巷（走讀打卡）',()=>sqStory('lane2'));post(-4,-55,2.2);sign(-4,H(-4,-55)+2.3,-54.95,0,'環山二巷',1.8,'#2f6b56','#fff');}
+    flagAt('lane2',-1,-61);inter(P_(-.5,-59),1.6,'環山二巷（地標小故事）',()=>sqStory('lane2'));post(-4,-55,2.2);sign(-4,H(-4,-55)+2.3,-54.95,0,'環山二巷',1.8,'#2f6b56','#fff');}
   {const fruitM=lam('#f08a2a',{emissive:col('#a04a10'),emissiveIntensity:.2});const FR=new T.InstancedMesh(sph(.2,8,6),fruitM,500);let nf=0;const mm=new T.Matrix4();
     const trees=[];for(let x=-60;x<=-26;x+=5)for(let z=48;z<=76;z+=5)trees.push([x+rr(-.6,.6),z+rr(-.6,.6)]);for(let x=60;x<=92;x+=5)for(let z=-80;z<=-64;z+=5)trees.push([x+rr(-.6,.6),z+rr(-.5,.5)]);
     trees.forEach(([x,z],i)=>{if(sqLaneD(x,z)[0]<2.5)return;const y=H(x,z);mk(cy(.16,.24,1.6,7),M.trunk,x,y+.8,z,G);const cr=mk(ico(1.4,1),lam(i%2?'#5a8a3e':'#4f7f3a'),x,y+2.3,z,G);cr.scale.set(1.1,.85,1.1);
@@ -6846,7 +6849,7 @@ function arriveTribe(at,quiet){if(ST_IN)leaveStation();VISIT=null;if(CLS_IN){CLS
   else if(at&&TB.spots[at])[x,z,yaw]=TB.spots[at];
   warpTown(TB.x+x,TB.z+z,yaw);if(home){cam.yaw=yaw-.55;cam.pitch=.28;cam.dist=Math.max(cam.dist,6);}SND.chime&&SND.chime();
   if(quiet)return;
-  if(!W.tbSeen&&!TS()){W.tbSeen=true;save();const me=tbMySeat();setTimeout(()=>say('Sqoyaw',['歡迎回到 Qalang Sqoyaw！','巷子裡掛著號碼牌的房子，就是全班同學的家。'+(me?`你的家門口掛著「${me} 號」。`:''),'跟著課堂上的走讀路線，到八個地標插著紅旗的地方打卡吧！（公車站可以看打卡卡）','想去汐見町闖關，就到公車站搭車。']),900);}
+  if(!W.tbSeen&&!TS()){W.tbSeen=true;save();const me=tbMySeat();setTimeout(()=>say('Sqoyaw',['歡迎回到 Qalang Sqoyaw！','巷子裡掛著號碼牌的房子，就是全班同學的家。'+(me?`你的家門口掛著「${me} 號」。`:''),'插著紅旗的地方有地標的小故事，有空可以去聽聽。','想去汐見町闖關，就到公車站搭車。']),900);}
   else setTimeout(()=>toast(at==='home'?'走出家門，外面就是 Sqoyaw':'Sqoyaw 到了！'),500);}
 function sqCard(){msgOpen('走讀 Sqoyaw','打卡任務卡',B=>{const n=sqDone();B.appendChild(el('p',{class:'help',text:`已經打卡 ${n} / ${SQW.length} 站。走到插紅旗的地方按 E，聽完小故事就會打卡。全部完成送 80 金幣！`}));
   SQW.forEach((s,i)=>B.appendChild(el('div',{class:'nb-card mp-note'},[el('div',{class:'nb-meta',text:`第 ${i+1} 站 ${W.sqw&&W.sqw[s.id]?'✅ 已打卡':'⬜ 還沒去'}`}),el('b',{text:s.n})])));});}
@@ -7232,7 +7235,7 @@ function updateAmbient(dt){
     const ds=Math.max(0,pz+58.5),near=P.pos.x>72&&pz<-44?1:0;const wv=Math.min(.42,.3/(1+ds/20)+.05+near*.15);
     A.wave.g.gain.setTargetAtTime(wv*(.75+.25*Math.sin(time*.23)),t,.4);A.wave2.g.gain.setTargetAtTime(wv*.25,t,.4);
     A.wind.g.gain.setTargetAtTime(.02+.018*Math.max(0,Math.sin(time*.11))+(P.pos.y>3?.02:0)+near*.02,t,.6);A.wind.fl.frequency.setTargetAtTime(320+120*Math.sin(time*.07),t,.5);
-    A.cic.g.gain.setTargetAtTime(.012*S.day*(.7+.3*Math.sin(time*2.3)),t,.3);
+    A.cic.g.gain.setTargetAtTime(0,t,.3);   // cicada hiss removed (too shrill on phones)
     const n=A.next;
     if((n.wave-=dt)<=0){n.wave=rr(5,9);SND.wave({x:P.pos.x+rr(-15,15),y:-1,z:-58.5},Math.min(1,1.1/(1+ds/25)));}
     A.amb.gain.setTargetAtTime(INDOOR?.22:1,t,.3);
@@ -7263,7 +7266,7 @@ function updateUI(dt){
   if(DLG.open&&DLG.typed<DLG.full.length){DLG.typed=Math.min(DLG.full.length,DLG.typed+dt*42);$('dialog').querySelector('.txt').textContent=DLG.full.slice(0,Math.floor(DLG.typed));if(DLG.typed>=DLG.full.length)lineDone();}
   // nearest interaction
   nearest=null;let best=1e9;
-  if(!DLG.open&&!P.sit&&started&&!uiOpen()){for(const it of INT){if(it.glass&&it.glass.got)continue;if(it.hide&&it.hide())continue;if(it.cat&&it.cat.isPet)continue;const pos=it.cat?it.cat.g.position:it.pos;const dx=pos.x-P.pos.x,dz=pos.z-P.pos.z,d=Math.hypot(dx,dz);if(d>it.r||Math.abs(pos.y-P.pos.y)>2.2)continue;if(d<best){best=d;nearest=it;}}}
+  if(!DLG.open&&!P.sit&&started&&!uiOpen()){for(const it of INT){if(it.glass&&it.glass.got)continue;if(it.hide&&it.hide())continue;if(it.cat&&it.cat.isPet)continue;const pos=it.cat?it.cat.g.position:it.pos;const dx=pos.x-P.pos.x,dz=pos.z-P.pos.z,d=Math.hypot(dx,dz);if(d>(IS_TOUCH?it.r*1.45+.35:it.r)||Math.abs(pos.y-P.pos.y)>2.2)continue;if(d<best){best=d;nearest=it;}}}
   if(R2.on)nearest=(!DLG.open&&!P.sit&&started&&!uiOpen())?r2Nearest():(R2.near=null);
   if(S2.on)nearest=(!DLG.open&&!P.sit&&started&&!uiOpen())?s2Nearest():(S2.near=null);
   const pr=$('prompt');
