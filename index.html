@@ -3486,7 +3486,7 @@ function actTick(dt){if(!ACT.on)return;if(INDOOR&&!ACT.indoor){actStop();return;
     if(ACT.i>=a.f.length){if(a.loop){ACT.i=0;}else if(--ACT.loops>0){ACT.i=0;}else if(ACT.hold){ACT.i=a.f.length-1;ACT.held=true;break;}else{actStop();return;}}}
   const pos=_sp.copy(pl.g.position);if(P.sit)pos.copy(P.sit.pos);
   if(ACT.name==='dunk'){const a=ACT.a,Ta=a.d[0],T0=Ta+a.d[1],T1=T0+a.d[2]+a.d[3];let tt=ACT.t;for(let k=0;k<ACT.i;k++)tt+=a.d[k];
-    if(ACT.dk){const ap=clamp((tt-Ta*.5)/(T0+a.d[2]*.6-Ta*.5),0,1),e=ap*ap*(3-2*ap);pos.z=lerp(ACT.dk.z0,ACT.dk.z1,e);P.pos.z=pos.z;}
+    if(ACT.dk){const ap=clamp((tt-Ta*.5)/(T0+a.d[2]*.6-Ta*.5),0,1),e=ap*ap*(3-2*ap);{const k_=ACT.dk.a||'z';pos[k_]=lerp(ACT.dk.z0,ACT.dk.z1,e);P.pos[k_]=pos[k_];}}
     const up=clamp((tt-T0)/(a.d[2]),0,1),down=clamp((tt-(T1-.05))/.22,0,1);pos.y+=ACT.dk?(1.15*Math.sin(up*PI/2)*(1-down*down)):Math.sin(clamp((tt-T0+.1)/(T1-T0+.05),0,1)*PI)*.62;}
   const [d,side]=camRel(c,pos,ACT.yaw!=null?ACT.yaw:P.yaw);const M=c.meta;
   let f=a.f[ACT.i],flip=1;
@@ -6050,9 +6050,9 @@ function sqSD(x,z){const Pp=SQ_MTN;let d=1e9,ins=false,qx=0,qz=0;for(let i=0,j=P
   if((a[1]>z)!==(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])ins=!ins;const r=sqSegD(x,z,a,b);if(r[0]<d){d=r[0];qx=r[1];qz=r[2];}}return [ins?-d:d,qx,qz];}
 function sqE(lx,lz){return Math.max(0,sqSD(lx,lz)[0]+(fbm(lx*.015+3,lz*.015+9)-.5)*14);}
 function sqPlane(lx,lz){return 3.2+.142*lx-.144*Math.min(lz,60)-.05*Math.max(0,lz-60);}
-function sqBase(lx,lz){
+function sqBase(lx,lz,old){
   let h=sqPlane(lx,lz)+Math.sin(lx*.07+lz*.05)*.35;
-  h=lerp(h,-9.6,smooth(5,0,Math.max(0,Math.abs(lx+60)-14,Math.abs(lz-30)-15)));     // 平等國小 terrace + field
+  h=lerp(h,-9.6,smooth(5,0,Math.max(0,old?Math.abs(lx+60)-14:Math.abs(lx+66.5)-21.5,Math.abs(lz-30)-15)));     // 平等國小 terrace + field (widened west for the lawn, fish slide & pull-up bars)
   h=lerp(h,17.5,smooth(5,0,Math.max(0,Math.abs(lx-50)-28,Math.abs(lz+50)-8)));      // 同學巷 terrace
   h=lerp(h,AC.y,smooth(5,0,Math.max(0,Math.abs(lx-98)-12.6,Math.abs(lz+48)-12.6)));   // 動物之家 yard
   const rd=Math.abs(lx-sqRX(lz));h=lerp(-30,h,smooth(6.5,16,rd));                   // 大甲溪 gorge
@@ -6062,7 +6062,7 @@ function sqBase(lx,lz){
 const SQ_BR={z:-45,x0:-114,x1:-146};
 function tribeH(lx,lz){
   if(Math.abs(lz-SQ_BR.z)<1.4&&lx<SQ_BR.x0&&lx>SQ_BR.x1){const t=(lx-SQ_BR.x0)/(SQ_BR.x1-SQ_BR.x0);return lerp(sqBase(SQ_BR.x0,SQ_BR.z),sqBase(SQ_BR.x1,SQ_BR.z),t)-1.3*Math.sin(t*PI);}  // 四季蘭溪吊橋 deck
-  if(TB.pads)for(const q of TB.pads)if(q.e?(lz>q.cz&&((lx-q.cx)/q.rx)**2+((lz-q.cz)/q.rz)**2<1):(lx>q.x0&&lx<q.x1&&lz>q.z0&&lz<q.z1))return q.y;
+  if(TB.pads)for(const q of TB.pads)if(q.e?((q.e===2||lz>q.cz)&&((lx-q.cx)/q.rx)**2+((lz-q.cz)/q.rz)**2<1):(lx>q.x0&&lx<q.x1&&lz>q.z0&&lz<q.z1))return q.y;
   return TB.terrH?TB.terrH(lx,lz):sqBase(lx,lz);}
 function tbClamp(p){let lx=p.x-TB.x,lz=p.z-TB.z;
   if(Math.abs(lz-SQ_BR.z)<1.3&&lx<SQ_BR.x0+1&&lx>SQ_BR.x1-1){}                                  // on the bridge
@@ -6241,95 +6241,190 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
     const sh=new T.Shape();sh.moveTo(-d/2,0);sh.lineTo(d/2,0);sh.lineTo(0,rh-.05);sh.closePath();const e=mk(new T.ExtrudeGeometry(sh,{depth:w-.02,bevelEnabled:false}),g.children[0].material,-w/2+.01,h,0,g);e.rotation.y=PI/2;};
   const flagAt=(id,x,z)=>{post(x,z,2.2);const f=mk(new T.PlaneGeometry(.8,.5),new T.MeshLambertMaterial({color:col('#e0674b'),side:T.DoubleSide}),x+.42,H(x,z)+2,z,G,false);TB.flags[id]=f;};
   const brick=lam('#ffffff',{map:(()=>{const [c,g]=C2(128,128);g.fillStyle='#e6ddd0';g.fillRect(0,0,128,128);for(let y=0;y<128;y+=16)for(let x=((y/16)%2)*16;x<128+16;x+=32){g.fillStyle=pick(['#a8483a','#b4523f','#9c4234']);g.fillRect(x-15,y+1,30,14);}return TX(c,true);})()});
-  // 平等國小: a real-looking mountain primary school — 3-storey classroom block with open corridors facing the field,
-  // red-tile roof cap, stair tower with clock, flag platform, PU track, covered basketball court (風雨球場), gate & fence
-  {const SG=new T.Group();G.add(SG);const Y0=H(-61,30);
+  // 平等國小 — rebuilt from Tien's campus photos (2026-10): a 2-storey U-shaped classroom block in beige 二丁掛 tile under dark-brown eaves,
+  // grey balcony parapets with the red / blue diamond tiles between white railings, a 3-storey centre tower (window band + front gable),
+  // teal canopy over the wooden deck at its foot, mural stage + flagpole, green court with red keys inside the red PU track,
+  // the blue fish slide on its oval pad, pull-up bars under junipers, concrete-post + red-brick fence, a little storeroom with a goal
+  {const SEED0=seed;const SG=new T.Group();G.add(SG);const Y0=H(-61,30);
    const B=(w,h,d,m,x,y,z,ni)=>{const o=mk(bx(w,h,d),m,x,Y0+y,z,SG,!ni);if(ni)o.userData.noInk=1;return o;};
-   const WALL=lam('#ece0c6'),WALL2=lam('#e2d3b2'),COLR=lam('#e6d8ba'),PARA=lam('#8e8b85'),BAND=lam('#77746e'),SLAB=lam('#cfc9bd'),ROOFR=lam('#5e3d2c'),
-     DOORG=lam('#4f8a6a'),GLASS=lam('#bcd9e6'),FRAME=lam('#5d6b6f'),STONE=lam('#9a958a'),METAL=lam('#8fa0ad'),COURT=lam('#3d6fa8'),WHITE=lam('#f4f2ec');
-   surfSet(WALL,'wall_plaster',1);surfSet(WALL2,'wall_plaster',1);surfSet(SLAB,'terrazzo',1,null,.9,{chroma:.4});surfSet(COLR,'wall_pebble',1);surfSet(PARA,'wall_pebble',1);
-   const x0=-73,x1=-53,L=x1-x0,cx=(x0+x1)/2,zb=15.6,zc=20,zf=22,fh=3.4,NF=2,HT=NF*fh;
-   // classroom block + corridor slabs, columns and parapets
-   B(L,HT,zc-zb,WALL,cx,HT/2,(zb+zc)/2);B(L+.1,.6,zc-zb+.1,WALL2,cx,.3,(zb+zc)/2);
-   B(L,.16,zf-zc+.2,SLAB,cx,.08,(zc+zf)/2+.1,true);
-   for(let k=1;k<=NF;k++){B(L+.3,.28,zf-zc+.45,SLAB,cx,k*fh,(zc+zf)/2+.12);}
-   for(let k=1;k<NF;k++){B(L+.3,1,.2,PARA,cx,k*fh+.62,zf+.25);B(L+.32,.2,.24,BAND,cx,k*fh+1.02,zf+.25);}
-   B(L+.3,.9,.2,PARA,cx,HT+.55,zf+.25);B(L+.32,.2,.24,BAND,cx,HT+.9,zf+.25);
-   const nb=5,bw=L/nb;for(let i=0;i<=nb;i++){B(.55,HT,.55,COLR,x0+i*bw,HT/2,zf+.1);B(.1,1.6,.1,lam('#e8c33a'),x0+i*bw-.27,.8,zf+.38,true);B(.1,1.6,.1,lam('#e8c33a'),x0+i*bw+.27,.8,zf+.38,true);}
-   // Atayal diamond tiles (red / blue) on every balcony parapet, as on the real building
-   {const dm=[lam('#c8463a'),lam('#3b62a8')],dg=new T.PlaneGeometry(.7,.7),wg=new T.PlaneGeometry(1,1);for(let k=1;k<=NF;k++)for(let i=0;i<nb;i++){const xm=x0+(i+.5)*bw,y=Y0+k*fh+(k<NF?.62:.55);
-       const w=new T.Mesh(wg,lam('#f2efe8'));w.position.set(xm,y,zf+.36);w.rotation.z=PI/4;SG.add(w);const d=new T.Mesh(dg,dm[(i+k)%2]);d.position.set(xm,y,zf+.37);d.rotation.z=PI/4;SG.add(d);}}
-   for(let k=0;k<NF;k++)for(let i=0;i<nb;i++){const bx0=x0+i*bw,y=k*fh;B(1.05,2.15,.08,DOORG,bx0+.95,y+1.1,zc+.04);
-     [bw*.5,bw*.78].forEach(o=>{B(1.25,1.15,.06,FRAME,bx0+o+.2,y+1.75,zc+.03,true);B(1.1,1,.07,GLASS,bx0+o+.2,y+1.75,zc+.05,true);});
-     [bw*.3,bw*.7].forEach(o=>{B(1.4,1.2,.06,FRAME,bx0+o,y+1.75,zb-.03,true);B(1.25,1.05,.07,GLASS,bx0+o,y+1.75,zb-.05,true);});}
+   const L_=(c,s)=>{const m=lam(c,{});if(s)surfSet(m,s[0],s[1],null,s[2],{chroma:s[3]});return m;};
+   const WALL=L_('#e3d2b1',['wall_tile',1,.85,.35]),COLR=L_('#ead9bb',['wall_tile',1,.7,.35]),PLINTH=L_('#b5aa96',['wall_pebble',1,.8,.3]),
+     PARA=L_('#8f8c87',['wall_pebble',1,.9,0]),SLAB=L_('#cfc9bd',['terrazzo',1,.9,.4]),ROOF=L_('#5d4c43',['roof_metal',2,.8,.3]),EAVE=lam('#4f3a2f'),
+     PINK=L_('#e6c1b0',['wall_plaster',1,.8,.3]),REDR=L_('#b0473a',['roof_metal',2,.8,.5]),STONE=L_('#a19c92',['wall_pebble',1,.8,.2]),
+     WOOD=L_('#a8774b',['wood_plank',1,1,.6]),FPOST=L_('#aaa69f',['concrete',1,.8,.2]),
+     DOORW=lam('#eef0ec'),GLASS=lam('#bcd9e6'),FRAME=lam('#b7bec1'),GRILL=lam('#8d969a'),RAIL=lam('#f3f3ef'),WHITE=lam('#f4f2ec'),METAL=lam('#9aa7b0'),
+     BLUE=lam('#2c62b8'),BLUE2=lam('#24509a'),TEALP=lam('#3f8f7a'),ORANGE=lam('#e07b2c'),HEDGE=lam('#557f3a'),DARK=lam('#2a2c2e');
+   const DM=[lam('#c8463a'),lam('#3b62a8')];
+   const diamond=(x,y,z,s,k,ry=0)=>{const g=new T.Group();g.position.set(x,Y0+y,z);g.rotation.y=ry;SG.add(g);
+     const w=mk(new T.PlaneGeometry(s,s),lam('#f2efe8'),0,0,0,g,false);w.rotation.z=PI/4;const d=mk(new T.PlaneGeometry(s*.64,s*.64),DM[k%2],0,0,.012,g,false);d.rotation.z=PI/4;w.userData.noInk=d.userData.noInk=1;};
+   // white tube railing between (xa,za) and (xb,zb2), standing on height y
+   const rail=(xa,za,xb,zb2,y,h=1)=>{const l=Math.hypot(xb-xa,zb2-za);if(l<.2)return;const ry=Math.atan2(-(zb2-za),xb-xa),mx=(xa+xb)/2,mz=(za+zb2)/2;
+     [h,.1].forEach(yy=>{const r=B(l,.06,.06,RAIL,mx,y+yy,mz,true);r.rotation.y=ry;});const n=Math.max(2,Math.round(l/.17));for(let k=1;k<n;k++){const t=k/n;B(.035,h,.035,RAIL,xa+(xb-xa)*t,y+h/2,za+(zb2-za)*t,true);}};
+   const gableTri=(half,rh,mat,x,y,z,ry)=>{const sh=new T.Shape();sh.moveTo(-half,0);sh.lineTo(half,0);sh.lineTo(0,rh);sh.closePath();const e=mk(new T.ExtrudeGeometry(sh,{depth:.1,bevelEnabled:false}),mat,x,Y0+y,z,SG);e.rotation.y=ry;return e;};
+   const win=(x,y,z,w,h,ax,n=1)=>{if(ax==='z'){B(w,h,.06,FRAME,x,y,z,true);B(w-.12,h-.12,.07,GLASS,x,y,z+.02*n,true);}else{B(.06,h,w,FRAME,x,y,z,true);B(.07,h-.12,w-.12,GLASS,x+.02*n,y,z,true);}};
+   const x0=-74,x1=-50,L=x1-x0,cx=(x0+x1)/2,zb=15.6,zc=20,zf=22,fh=3.4,NF=2,HT=NF*fh,nb=8,bw=L/nb;   // CLS_DOOR sits on bay 3's door (x0+3*bw+.95)
+   // ---- main classroom block (faces the field) + its open corridors
+   B(L-3,HT,zc-zb,WALL,cx-1.5,HT/2,(zb+zc)/2);B(3,HT,zc-zb,PINK,x1-1.5,HT/2,(zb+zc)/2);B(L+.08,.55,zc-zb+.08,PLINTH,cx,.27,(zb+zc)/2);   // the east bay is the pink, red-roofed end of the photos
+   B(L,.16,zf-zc+.2,SLAB,cx,.08,(zc+zf)/2+.1,true);[fh,HT].forEach(y=>B(L+.3,.3,zf-zc+.45,SLAB,cx,y,(zc+zf)/2+.12));
+   for(let i=0;i<=nb;i++){const x=x0+i*bw;B(.55,HT,.55,COLR,x,HT/2,zf+.1);[fh-.5,HT-.5].forEach((y,k)=>diamond(x,y,zf+.385,.3,i+k));}
+   // 2F balcony: a grey granite panel with a diamond tile in the middle of each bay, white railings either side
+   for(let i=0;i<nb;i++){const a=x0+i*bw+.28,b=x0+(i+1)*bw-.28,m=(a+b)/2,pw=bw*.36;
+     B(pw,1.05,.2,PARA,m,fh+.68,zf+.25);B(pw+.08,.08,.28,PARA,m,fh+1.22,zf+.25,true);diamond(m,fh+.68,zf+.36,.62,i);
+     rail(a,zf+.25,m-pw/2,zf+.25,fh+.15);rail(m+pw/2,zf+.25,b,zf+.25,fh+.15);}
+   // white classroom doors with a grille window + aluminium windows (front), windows at the back
+   for(let k=0;k<NF;k++)for(let i=0;i<nb;i++){const bx0=x0+i*bw,y=k*fh,dx=bx0+.95;
+     B(1.0,2.15,.08,DOORW,dx,y+1.1,zc+.04);B(.56,.52,.09,GRILL,dx,y+1.62,zc+.05,true);
+     [bw*.6,bw*.86].forEach(o=>win(bx0+o,y+1.75,zc+.03,.8,1.2,'z'));[bw*.3,bw*.7].forEach(o=>win(bx0+o,y+1.75,zb-.03,1.2,1.2,'z',-1));}
    sign(CLS_DOOR[0],Y0+2.5,zc+.07,0,'五年級教室',1.5,'#3f7f6a','#fff');inter(P_(CLS_DOOR[0],zc+1.3),1.6,'走進五年級教室',()=>clsEnter());
-   // red-tile pitched roof cap over the whole block
-   {const D=zf-zb+1.2,half=D/2,rh=1.7,sl=Math.hypot(half,rh),zm=(zb+zf)/2;[-1,1].forEach(s=>{const r=B(L+1,.16,sl,ROOFR,cx,HT+.35+rh/2,zm+s*half/2);r.rotation.x=s*Math.atan2(rh,half);});
-     const sh=new T.Shape();sh.moveTo(-half,0);sh.lineTo(half,0);sh.lineTo(0,rh);sh.closePath();[x0-.45,x1+.45].forEach(x=>{const e=mk(new T.ExtrudeGeometry(sh,{depth:.1,bevelEnabled:false}),WALL,x,Y0+HT+.35,zm,SG);e.rotation.y=PI/2;});}
-   // stair tower + clock at the east end
-   {const tx=-51.4,tz=18.6;B(3.4,HT+2,5.4,WALL2,tx,(HT+2)/2,tz);B(3.6,.3,5.6,COLR,tx,HT+2.1,tz);B(.9,HT-1,.08,GLASS,tx,HT/2+.6,tz+2.72,true);
-     for(let k=0;k<NF;k++)B(1.2,.12,.12,FRAME,tx,k*fh+1.9,tz+2.76,true);
-     const ck=mk(new T.CylinderGeometry(.75,.75,.12,24),WHITE,tx,Y0+HT+1.2,tz+2.78,SG,false);ck.rotation.x=PI/2;mk(new T.CylinderGeometry(.85,.85,.08,24),FRAME,tx,Y0+HT+1.2,tz+2.72,SG,false).rotation.x=PI/2;
-     B(.06,.5,.04,FRAME,tx,HT+1.42,tz+2.86,true);const hh=B(.06,.38,.04,FRAME,tx+.13,HT+1.15,tz+2.86,true);hh.rotation.z=1.1;}
-   addCol(TB.x+x0,TB.x+x1,zb,zc,Y0+HT+3);addCol(TB.x-53.1,TB.x-49.7,15.9,21.3,Y0+HT+3);
-   for(let i=0;i<=nb;i++)addCol(TB.x+x0+i*bw-.25,TB.x+x0+i*bw+.25,zf-.15,zf+.35,Y0+HT);
-   sign(cx,Y0+HT+1.55,zf+.4,0,'臺中市和平區平等國民小學',8.4,'#2f6b4a','#fff6dc');
-   // the wooden deck (木平台) with its teal canopy and orange beams, between the classrooms and the track
-   {const dx=-56,dz=25.2,dw=9,dd=4.2,wood=lam('#a8774b',{}),plank=lam('#6e4a2c');surfSet(wood,'wood_plank',1,null,1,{chroma:.6});B(dw,.3,dd,wood,dx,.15,dz);
-     TB.pads=TB.pads||[];TB.pads.push({x0:dx-dw/2,x1:dx+dw/2,z0:dz-dd/2,z1:dz+dd/2,y:Y0+.32},{e:1,cx:dx,cz:dz+dd/2,rx:dw/2,rz:dw/2*.32,y:Y0+.3});   // stand ON the deck, not in it
-     
-     const arc=mk(new T.CylinderGeometry(dw/2,dw/2,.3,28,1,false,PI/2,PI),wood,dx,Y0+.15,dz+dd/2,SG);arc.scale.z=.32;arc.userData.noInk=1;
-     const cg=new T.MeshLambertMaterial({color:col('#3fb7ad'),transparent:true,opacity:.72,side:T.DoubleSide,depthWrite:false});const OR=lam('#e07b2c');
-     for(let k=0;k<6;k++){const x=dx-dw/2+.6+k*(dw-1.2)/5;const bm=B(.18,.22,dd+2.4,OR,x,4.6,dz+.6);bm.rotation.x=-.16;B(.16,4.4,.16,lam('#f2efe8'),x,2.3,dz+dd/2+1.2);addCol(TB.x+x-.15,TB.x+x+.15,dz+dd/2+1.05,dz+dd/2+1.35,Y0+4.4);}
-     for(let k=0;k<3;k++){const bm=B(dw+.4,.16,.16,OR,dx,4.5-k*.18,dz-1+k*1.6);}
-     const cv=mk(bx(dw+.6,.06,dd+2.6),cg,dx,Y0+4.78,dz+.6,SG,false);cv.rotation.x=-.16;cv.userData.noInk=1;
-     inter(P_(dx,dz),2.2,'坐在木平台上',()=>say(null,['木平台被太陽曬得暖暖的。','下課的時候，大家常在這裡畫畫、寫學習單。'],{noWave:1}));}
-   // flag platform + 3 poles
-   {const fx=-63,fz=24.9;B(4.4,.6,2.2,STONE,fx,.3,fz);B(4.6,.1,2.4,WALL2,fx,.62,fz,true);[0,1].forEach(k=>B(2,.2,.35,STONE,fx,.1,fz+1.25+k*.3,true));
-     [-1.5,0,1.5].forEach((o,i)=>{mk(cy(.05,.06,i===1?8:7,8),METAL,fx+o,Y0+.6+(i===1?4:3.5),fz-.6,SG);});addCol(TB.x+fx-2.2,TB.x+fx+2.2,fz-1.1,fz+1.1,Y0+.7);
-     const fl=mk(new T.PlaneGeometry(1.3,.85),lam('#3d6fa8',{side:T.DoubleSide}),fx+.66,Y0+8.1,fz-.6,G,false);TB.flag=fl;
-     for(let k=0;k<4;k++){mk(ico(.45,0),pick([M.leaf,M.leaf2]),fx-5+k*1.2,Y0+.45,fz,G,false);mk(sph(.12,6,5),lam(pick(['#f06a8a','#f2c14e','#f7f2e8'])),fx-5+k*1.2,Y0+.85,fz,G,false);}}
-   // bulletin board (公告欄)
-   {const bx0=-47.6,bz=18.6;[-1.3,1.3].forEach(o=>{B(.14,2.4,.14,FRAME,bx0+o,1.2,bz);addCol(TB.x+bx0+o-.15,TB.x+bx0+o+.15,bz-.15,bz+.15,Y0+2.4);});B(2.6,1.4,.1,lam('#3f6b4a'),bx0,1.6,bz);B(2.9,.12,.5,ROOFR,bx0,2.42,bz);
-     ['#f7f2e8','#f2c14e','#bfe3f5','#f6b0a0'].forEach((c,k)=>B(.5,.6,.02,lam(c),bx0-.9+k*.6,1.6+(k%2?.12:-.1),bz+.07,true));}
-   // PU track + infield
-   {const [c,q]=C2(512,280);q.fillStyle='#b8573f';q.fillRect(0,0,512,280);q.fillStyle='#5f9a48';q.beginPath();q.ellipse(256,140,190,82,0,0,7);q.fill();
-     q.strokeStyle='rgba(255,255,255,.9)';q.lineWidth=2.5;for(let k=0;k<4;k++){q.beginPath();q.ellipse(256,140,194+k*14,86+k*14,0,0,7);q.stroke();}
-     q.globalAlpha=.25;q.fillStyle='#4a8a3c';for(let k=0;k<9;k++)q.fillRect(80+k*40,62,20,156);q.globalAlpha=1;q.strokeStyle='rgba(255,255,255,.85)';q.lineWidth=2;q.strokeRect(186,104,140,72);q.beginPath();q.moveTo(256,104);q.lineTo(256,176);q.stroke();
-     const fm=mk(new T.PlaneGeometry(21,12),lam('#ffffff',{map:TX(c),polygonOffset:true,polygonOffsetFactor:-2}),-62,Y0+.06,34,G,false);fm.rotation.x=-PI/2;}
-   // covered basketball court (風雨球場)
-   {const kx=-48.5,kz=33.5,kw=5.6,kl=12;const [c,q]=C2(128,256);q.fillStyle='#3f8f6e';q.fillRect(0,0,128,256);q.fillStyle='#3a8466';q.fillRect(8,8,112,240);q.strokeStyle='#fff';q.lineWidth=3;q.strokeRect(10,10,108,236);q.beginPath();q.moveTo(10,128);q.lineTo(118,128);q.stroke();
-     q.beginPath();q.arc(64,128,18,0,7);q.stroke();q.fillStyle='#ffffff';q.beginPath();q.ellipse(64,128,16,9,0,0,7);q.fill();q.fillStyle='#3b62a8';q.beginPath();q.ellipse(64,128,9,5,0,0,7);q.fill();[10,246].forEach(y=>{q.beginPath();q.arc(64,y,40,y<100?0:PI,y<100?PI:2*PI);q.stroke();});
-     const ct=mk(new T.PlaneGeometry(kw,kl),lam('#ffffff',{map:TX(c),polygonOffset:true,polygonOffsetFactor:-3}),kx,Y0+.07,kz,G,false);ct.rotation.x=-PI/2;
-     // (the real court is open-air: no pillars, no roof)
-     // shoot / dunk at either hoop (student action frames + a real ball that flies to the rim)
-     [-1,1].forEach(s=>{const rz=kz+s*(kl/2-.8),fz=rz-s*3.4;inter(new T.Vector3(TB.x+kx,Y0,fz),1.7,'投籃（籃球場）',()=>tbHoop(kx,Y0,rz,fz,s));});
-     [-1,1].forEach(s=>{const z=kz+s*(kl/2-.3);B(.14,3,.14,METAL,kx,1.5,z);B(1.2,.8,.06,WHITE,kx,3.1,z-s*.2);const rim=mk(new T.TorusGeometry(.24,.025,6,14),lam('#e0674b'),kx,Y0+2.75,z-s*.5,SG,false);rim.rotation.x=PI/2;
+   // low gable roof with the thick dark-brown fascia band of the photos
+   {const D=zf-zb+1.3,half=D/2,rh=1,sl=Math.hypot(half,rh),zm=(zb+zf)/2+.1;[-1,1].forEach(s=>{const r=B(L+.9,.16,sl,ROOF,cx,HT+.3+rh/2,zm+s*half/2);r.rotation.x=s*Math.atan2(rh,half);});
+     [-1,1].forEach(s=>B(L+.95,.42,.14,EAVE,cx,HT+.22,zm+s*(half+.02),true));gableTri(half,rh,PINK,x1+.4,HT+.3,zm,PI/2);
+     {const rh2=1.25,h2=half-.15,sl2=Math.hypot(h2,rh2);[-1,1].forEach(s=>{const r=B(3.6,.16,sl2,REDR,x1-1.5,HT+.62+rh2/2,zm+s*h2/2);r.rotation.x=s*Math.atan2(rh2,h2);});[x1-3.3,x1+.2].forEach(x=>gableTri(h2-.1,rh2*(h2-.1)/h2,PINK,x,HT+.62,zm,PI/2));B(3.4,.3,D-.4,PINK,x1-1.5,HT+.5,zm,true);}}
+   // ---- centre tower: 3 storeys, a band of windows on top, front-facing gable
+   const tx0=x0+4*bw,tx1=x0+6*bw,tcx=(tx0+tx1)/2,tw=tx1-tx0,tH=HT+fh,tz0=zb-.4,tz1=zc+.02,tcz=(tz0+tz1)/2,td=tz1-tz0;
+   B(tw,tH,td,WALL,tcx,tH/2,tcz);B(tw+.1,.2,.3,EAVE,tcx,HT+.85,tz1+.12,true);
+   for(let k=0;k<5;k++)win(tx0+.5+(k+.5)*(tw-1)/5,HT+1.75,tz1+.03,(tw-1)/5-.1,1.3,'z');
+   {const rh=1.6,half=tw/2+.45,sl=Math.hypot(half,rh);[-1,1].forEach(s=>{const r=B(sl,.18,td+1.1,ROOF,tcx+s*half/2,tH+rh/2,tcz+.15);r.rotation.z=-s*Math.atan2(rh,half);
+       const f=B(sl,.34,.12,EAVE,tcx+s*half/2,tH+rh/2-.06,tcz+.15+(td+1.1)/2,true);f.rotation.z=-s*Math.atan2(rh,half);});
+     gableTri(tw/2,rh*(tw/2)/half,WALL,tcx,tH,tz1-.08,0);gableTri(tw/2,rh*(tw/2)/half,WALL,tcx,tH,tz0-.02,0);}
+   addCol(TB.x+tx0,TB.x+tx1,tz0,tz1,Y0+tH+2);
+   // ---- west wing coming forward (its gable end faces the field), corridor on its east side
+   const wx0=-80,wx1=-76.2,wxc=-74,wz1=28.4,wzm=(zb+wz1)/2,wd=wz1-zb;
+   B(wx1-wx0,HT,wd,WALL,(wx0+wx1)/2,HT/2,wzm);B(wx1-wx0+.08,.55,wd+.08,PLINTH,(wx0+wx1)/2,.27,wzm);
+   B(wxc-wx1,HT,zc-zb,WALL,(wx1+wxc)/2,HT/2,(zb+zc)/2);
+   B(wxc-wx1+.2,.16,wz1-zc,SLAB,(wx1+wxc)/2+.1,.08,(zc+wz1)/2,true);[fh,HT].forEach(y=>B(wxc-wx1+.45,.3,wz1-zc+.3,SLAB,(wx1+wxc)/2+.12,y,(zc+wz1)/2+.15));
+   [25.2,wz1].forEach((z,j)=>{B(.55,HT,.55,COLR,wxc+.1,HT/2,z);[fh-.5,HT-.5].forEach((y,k)=>diamond(wxc+.385,y,z,.3,j+k+1,PI/2));});
+   [[zf+.3,25.2],[25.2,wz1]].forEach(([a,b],i)=>{const m=(a+b)/2,pw=1.1,xx=wxc+.25;B(.2,1.05,pw,PARA,xx,fh+.68,m);B(.28,.08,pw+.08,PARA,xx,fh+1.22,m,true);diamond(xx+.11,fh+.68,m,.62,i+1,PI/2);
+     rail(xx,a+.28,xx,m-pw/2,fh+.15);rail(xx,m+pw/2,xx,b-.28,fh+.15);});
+   rail(wx1+.1,wz1+.02,wxc-.18,wz1+.02,fh+.15);
+   for(let k=0;k<NF;k++){const y=k*fh;[-78.9,-77.2].forEach(x=>win(x,y+1.75,wz1+.03,1.3,1.2,'z'));[17.6,21.2,24.6,27.4].forEach(z=>win(wx0-.03,y+1.75,z,1.2,1.2,'x',-1));
+     [[21.3,1],[23.3,0],[25.6,1],[27.3,0]].forEach(([z,d])=>{if(d){B(.08,2.15,1,DOORW,wx1+.04,y+1.1,z);B(.09,.52,.56,GRILL,wx1+.05,y+1.62,z,true);}else win(wx1+.03,y+1.75,z,1.3,1.2,'x');});}
+   {const half=(wxc-wx0)/2+.45,rh=1,sl=Math.hypot(half,rh),xm=(wx0+wxc)/2,zl=wd+1.3,zm2=(zb+wz1)/2+.05;
+     [-1,1].forEach(s=>{const r=B(sl,.16,zl,ROOF,xm+s*half/2,HT+.3+rh/2,zm2);r.rotation.z=-s*Math.atan2(rh,half);B(.14,.42,zl+.05,EAVE,xm+s*(half+.02),HT+.22,zm2,true);
+       const f=B(sl,.34,.12,EAVE,xm+s*half/2,HT+.3+rh/2-.06,zm2+zl/2,true);f.rotation.z=-s*Math.atan2(rh,half);});
+     gableTri((wxc-wx0)/2,rh*((wxc-wx0)/2)/half,WALL,xm,HT+.3,wz1-.06,0);}
+   addCol(TB.x+wx1,TB.x+x1,zb,zc,Y0+HT+3);addCol(TB.x+wx0,TB.x+wx1,zb,wz1,Y0+HT+3);
+   for(let i=0;i<=nb;i++)addCol(TB.x+x0+i*bw-.28,TB.x+x0+i*bw+.28,zf-.18,zf+.38,Y0+HT);[25.2,wz1].forEach(z=>addCol(TB.x+wxc-.18,TB.x+wxc+.38,z-.28,z+.28,Y0+HT));
+   // hedges in front of the east classrooms
+   [[-54.3,23.05,2.2],[-51.4,23.05,2.2]].forEach(([x,z,w])=>{B(w,.75,.7,HEDGE,x,.37,z);addCol(TB.x+x-w/2,TB.x+x+w/2,z-.35,z+.35,Y0+.8);});
+   // ---- the wooden deck at the tower's foot, under a teal canopy held up by orange struts
+   {const dx0=tx0,dx1=tx1,dz0=zf+.4,dz1=26.3,dxm=(dx0+dx1)/2,dzm=(dz0+dz1)/2,dw=dx1-dx0;B(dw,.3,dz1-dz0,WOOD,dxm,.15,dzm);
+     TB.pads=TB.pads||[];TB.pads.push({x0:dx0,x1:dx1,z0:dz0,z1:dz1,y:Y0+.32});
+     // teal wave-pattern panels along the front edge, open in the middle
+     const [pc,pq]=C2(256,64);pq.fillStyle='#3aa597';pq.fillRect(0,0,256,64);pq.strokeStyle='rgba(255,255,255,.75)';pq.lineWidth=3;for(let r=0;r<3;r++){pq.beginPath();for(let x=0;x<=256;x+=4)pq.lineTo(x,14+r*16+Math.sin(x/16+r)*4);pq.stroke();}
+     const PNL=lam('#ffffff',{map:TX(pc)});[[dx0+.1,dxm-1],[dxm+1,dx1-.1]].forEach(([a,b])=>{const m=(a+b)/2;B(b-a,.7,.08,PNL,m,.65,dz1-.08);B(b-a+.04,.07,.12,TEALP,m,1.02,dz1-.08,true);addCol(TB.x+a,TB.x+b,dz1-.2,dz1+.05,Y0+1.05);});
+     const cg=new T.MeshLambertMaterial({color:col('#3fb7ad'),transparent:true,opacity:.7,side:T.DoubleSide,depthWrite:false});
+     const cz0=zf+.45,cz1=dz1+.5,cyB=3.2,cyF=2.85,cl=Math.hypot(cz1-cz0,cyB-cyF),ca=Math.atan2(cyB-cyF,cz1-cz0);
+     const cv=mk(bx(dw+.2,.05,cl),cg,dxm,Y0+(cyB+cyF)/2,(cz0+cz1)/2,SG,false);cv.rotation.x=ca;cv.userData.noInk=1;
+     [dx0+.15,dx0+1.05,dx1-1.05,dx1-.15].forEach(x=>{B(.16,cyF,.16,TEALP,x,cyF/2,cz1-.1);addCol(TB.x+x-.12,TB.x+x+.12,cz1-.22,cz1+.02,Y0+cyF);});
+     B(dw+.2,.16,.16,TEALP,dxm,cyF,cz1-.1);
+     for(let k=0;k<5;k++){const x=dx0+.4+k*(dw-.8)/4,ya=cyF+.05,yb=fh+1.25,za=cz1-.15,zb_=zf+.3,l=Math.hypot(za-zb_,yb-ya);const st=B(.14,.14,l,ORANGE,x,(ya+yb)/2,(za+zb_)/2);st.rotation.x=Math.atan2(yb-ya,za-zb_);}
+     inter(P_(dxm,dzm),2.2,'坐在木平台上',()=>say(null,['木平台被太陽曬得暖暖的。','下課的時候，大家常在這裡畫畫、寫學習單。'],{noWave:1}));}
+   // ---- mural stage + the flagpole in front of the classrooms
+   {const sx0=-72.8,sx1=-67.4,sz0=23,sz1=25.2,sxm=(sx0+sx1)/2;B(sx1-sx0,.45,sz1-sz0,STONE,sxm,.22,(sz0+sz1)/2);B(sx1-sx0+.06,.06,sz1-sz0+.06,lam('#cfc9bd'),sxm,.47,(sz0+sz1)/2,true);
+     TB.pads.push({x0:sx0,x1:sx1,z0:sz0,z1:sz1,y:Y0+.5});
+     const [mc,mq]=C2(512,224);const sk=mq.createLinearGradient(0,0,0,224);sk.addColorStop(0,'#bfe1f4');sk.addColorStop(1,'#eaf5fa');mq.fillStyle=sk;mq.fillRect(0,0,512,224);
+     mq.fillStyle='#f6e7a8';mq.beginPath();mq.arc(400,52,24,0,7);mq.fill();
+     [['#7fa7cf',80,0],['#5f8fbf',120,40],['#4f7fa8',150,-30]].forEach(([c,h,o])=>{mq.fillStyle=c;mq.beginPath();mq.moveTo(0,224);for(let x=0;x<=512;x+=8)mq.lineTo(x,224-h*.55-Math.abs(Math.sin((x+o)/70))*h*.5);mq.lineTo(512,224);mq.fill();});
+     mq.strokeStyle='#ffffff';mq.lineWidth=5;for(let r=0;r<3;r++){mq.beginPath();for(let x=0;x<=512;x+=6)mq.lineTo(x,180+r*14+Math.sin(x/22+r*2)*5);mq.stroke();}
+     mq.fillStyle='#3e7f4e';for(let k=0;k<9;k++){const x=30+k*55,h=26+(k%3)*10;mq.beginPath();mq.moveTo(x,170);mq.lineTo(x-12,170);mq.lineTo(x-6,170-h);mq.fill();}
+     mq.strokeStyle='#2f4f86';mq.lineWidth=3;for(let k=0;k<4;k++){const x=180+k*28;mq.beginPath();mq.moveTo(x,40+(k%2)*8);mq.quadraticCurveTo(x+7,34+(k%2)*8,x+14,40+(k%2)*8);mq.quadraticCurveTo(x+21,34+(k%2)*8,x+28,40+(k%2)*8);mq.stroke();}
+     [[470,150,'#c8463a'],[470,100,'#3b62a8']].forEach(([x,y,c])=>{mq.save();mq.translate(x,y);mq.rotate(PI/4);mq.fillStyle='#fff';mq.fillRect(-22,-22,44,44);mq.fillStyle=c;mq.fillRect(-14,-14,28,28);mq.restore();});
+     mq.strokeStyle='#8a7f6e';mq.lineWidth=8;mq.strokeRect(4,4,504,216);
+     const mw=4.8,mh=2.1;B(mw+.2,mh+.2,.22,WALL,sxm,.47+mh/2+.1,sz0+.25);const mp=mk(new T.PlaneGeometry(mw,mh),new T.MeshLambertMaterial({map:TX(mc)}),sxm,Y0+.47+mh/2+.1,sz0+.37,SG,false);mp.userData.noInk=1;
+     addCol(TB.x+sxm-mw/2-.1,TB.x+sxm+mw/2+.1,sz0+.1,sz0+.4,Y0+.47+mh+.2);
+     inter(P_(sxm,sz1+1),1.8,'看司令台的壁畫',()=>say(null,['司令台後面的牆上畫著大山、溪水和藍天。','朝會、升旗、表演，大家都在這裡集合。'],{noWave:1}));
+     const fx=-66,fz=24.4;B(1,.32,1,STONE,fx,.16,fz);addCol(TB.x+fx-.5,TB.x+fx+.5,fz-.5,fz+.5,Y0+.4);mk(cy(.05,.07,8.4,8),METAL,fx,Y0+4.5,fz,SG);mk(sph(.12,8,6),lam('#e8c33a'),fx,Y0+8.75,fz,SG,false);
+     const [fc,fq]=C2(192,128);fq.fillStyle='#d8312e';fq.fillRect(0,0,192,128);fq.fillStyle='#1f3a8f';fq.fillRect(0,0,96,64);fq.fillStyle='#ffffff';fq.save();fq.translate(48,32);for(let k=0;k<12;k++){fq.rotate(PI/6);fq.beginPath();fq.moveTo(0,-26);fq.lineTo(5,-11);fq.lineTo(-5,-11);fq.fill();}fq.restore();
+     fq.beginPath();fq.arc(48,32,12,0,7);fq.fill();fq.fillStyle='#1f3a8f';fq.beginPath();fq.arc(48,32,10,0,7);fq.fill();fq.fillStyle='#ffffff';fq.beginPath();fq.arc(48,32,8.5,0,7);fq.fill();
+     const pv=new T.Group();pv.position.set(fx,Y0+8.1,fz);G.add(pv);const fl=mk(new T.PlaneGeometry(1.35,.9),new T.MeshLambertMaterial({map:TX(fc),side:T.DoubleSide}),.7,0,0,pv,false);TB.flag=pv;}
+   // ---- red PU track (stadium shape) round a grass infield; inner kerb of grey drain grates
+   const tcX=-64.5,tcZ=36.85,TL=28,TW=14.4,HS=TL/2-TW/2;
+   {const pm=36.6,[c,q]=C2(Math.round(TL*pm),Math.round(TW*pm));q.translate(TL*pm/2,TW*pm/2);q.scale(pm,pm);
+     const stad=r=>{q.beginPath();q.moveTo(-HS,-r);q.lineTo(HS,-r);q.arc(HS,0,r,-PI/2,PI/2);q.lineTo(-HS,r);q.arc(-HS,0,r,PI/2,PI*1.5);q.closePath();};
+     stad(TW/2-.05);q.fillStyle='#b5503f';q.fill();q.save();q.globalCompositeOperation='destination-out';stad(4.95);q.fill();q.restore();
+     q.lineWidth=.26;q.strokeStyle='#7d7f80';stad(5.08);q.stroke();q.setLineDash([.08,.1]);q.lineWidth=.16;q.strokeStyle='#4f5254';stad(5.08);q.stroke();q.setLineDash([]);
+     q.strokeStyle='rgba(255,255,255,.92)';q.lineWidth=.05;[5.24,5.72,6.2,6.68,7.1].forEach(r=>{stad(r);q.stroke();});
+     q.lineWidth=.06;q.beginPath();q.moveTo(0,5.24);q.lineTo(0,7.1);q.stroke();q.setLineDash([.35,.3]);q.beginPath();q.moveTo(-HS+1.2,5.48);q.lineTo(-HS+5,5.48);q.stroke();q.setLineDash([]);
+     const fm=mk(new T.PlaneGeometry(TL,TW),new T.MeshLambertMaterial({map:TX(c),alphaTest:.5,polygonOffset:true,polygonOffsetFactor:-2}),tcX,Y0+.06,tcZ,G,false);fm.rotation.x=-PI/2;}
+   // ---- green court with red keys, the school logo in the centre circle, along the infield
+   const kcx=tcX,kz=tcZ,kl=12,kw=5.6;
+   {const pm=64,mx=.6,[c,q]=C2(Math.round((kl+2*mx)*pm),Math.round((kw+2*mx)*pm));q.fillStyle='#3f8a5e';q.fillRect(0,0,c.width,c.height);q.translate(c.width/2,c.height/2);q.scale(pm,pm);
+     q.fillStyle='#4b9a68';q.fillRect(-kl/2,-kw/2,kl,kw);q.fillStyle='#b5473c';[-1,1].forEach(s=>q.fillRect(s>0?kl/2-2.5:-kl/2,-1.05,2.5,2.1));
+     q.strokeStyle='#ffffff';q.lineWidth=.06;q.strokeRect(-kl/2,-kw/2,kl,kw);q.beginPath();q.moveTo(0,-kw/2);q.lineTo(0,kw/2);q.stroke();q.beginPath();q.arc(0,0,.78,0,7);q.stroke();
+     [-1,1].forEach(s=>{const bx_=s*(kl/2-.68);q.strokeRect(s>0?kl/2-2.5:-kl/2,-1.05,2.5,2.1);q.beginPath();q.arc(s*(kl/2-2.5),0,.78,0,7);q.stroke();
+       const a3=Math.asin(2.55/2.6);q.beginPath();q.moveTo(s*kl/2,-2.55);if(s>0)q.arc(bx_,0,2.6,PI+a3,PI-a3,true);else q.arc(bx_,0,2.6,-a3,a3,false);q.lineTo(s*kl/2,2.55);q.stroke();});
+     q.fillStyle='#ffffff';q.beginPath();q.ellipse(0,0,.7,.42,0,0,7);q.fill();q.fillStyle='#2f5fae';q.beginPath();q.ellipse(0,0,.6,.34,0,0,7);q.fill();q.strokeStyle='#ffffff';q.lineWidth=.04;q.beginPath();q.moveTo(-.4,.08);q.quadraticCurveTo(0,-.24,.4,.08);q.stroke();
+     const ct=mk(new T.PlaneGeometry(kl+2*mx,kw+2*mx),new T.MeshLambertMaterial({map:TX(c),polygonOffset:true,polygonOffsetFactor:-3}),kcx,Y0+.07,kz,G,false);ct.rotation.x=-PI/2;
+     // hoops: padded blue pole outside each baseline, blue arm, white board with a red square; shoot / dunk at either end
+     const [rc,rq]=C2(64,48);rq.strokeStyle='#d0392f';rq.lineWidth=5;rq.strokeRect(4,4,56,40);const RSQ=new T.MeshBasicMaterial({map:TX(rc),transparent:true,alphaTest:.3});
+     [-1,1].forEach(s=>{const P0=kcx+s*6.3,bd=kcx+s*5.4,rx=kcx+s*5.1,fx=rx-s*3.4;
+       B(.32,1.8,.32,BLUE2,P0,.9,kz);B(.2,3.3,.2,BLUE,P0,1.65,kz);const arm=B(.9,.16,.16,BLUE,(P0+bd)/2,3.15,kz);const br=B(.75,.12,.12,BLUE,(P0+bd)/2+s*.05,2.75,kz,true);br.rotation.z=s*.55;
+       B(.06,.86,1.25,BLUE,bd+s*.03,3.1,kz,true);B(.05,.8,1.2,WHITE,bd,3.1,kz);const sq=mk(new T.PlaneGeometry(.5,.38),RSQ,bd-s*.03,Y0+2.98,kz,G,false);sq.rotation.y=-s*PI/2;
+       const rim=mk(new T.TorusGeometry(.24,.025,6,14),lam('#e0674b'),rx,Y0+2.75,kz,SG,false);rim.rotation.x=PI/2;
        {const [nc,nx]=C2(64,64);nx.strokeStyle='rgba(255,255,255,.95)';nx.lineWidth=3;for(let k=-64;k<128;k+=16){nx.beginPath();nx.moveTo(k,0);nx.lineTo(k+64,64);nx.stroke();nx.beginPath();nx.moveTo(k+64,0);nx.lineTo(k,64);nx.stroke();}
-        const nt=TX(nc,true);nt.repeat.set(3,1);const net=new T.Mesh(new T.CylinderGeometry(.24,.15,.42,14,1,true),new T.MeshBasicMaterial({map:nt,transparent:true,alphaTest:.3,side:T.DoubleSide}));net.position.set(kx,Y0+2.75-.21,z-s*.5);G.add(net);TB.nets=TB.nets||[];TB.nets.push({m:net,z:z-s*.5,sw:0});}addCol(TB.x+kx-.15,TB.x+kx+.15,z-.15,z+.15,Y0+3);});}
-   // gate + fence on the east & south
-   {const gx=-45.2,gz0=22.4,gz1=27.2;[gz0,gz1].forEach(z=>{B(.9,2.6,.9,COLR,gx,1.3,z);B(1.1,.2,1.1,STONE,gx,2.7,z);addCol(TB.x+gx-.45,TB.x+gx+.45,z-.45,z+.45,Y0+2.8);});
+        const nt=TX(nc,true);nt.repeat.set(3,1);const net=new T.Mesh(new T.CylinderGeometry(.24,.15,.42,14,1,true),new T.MeshBasicMaterial({map:nt,transparent:true,alphaTest:.3,side:T.DoubleSide}));net.position.set(TB.x+rx,Y0+2.75-.21,kz);scene.add(net);TB.nets=TB.nets||[];TB.nets.push({m:net,z:kz,sw:0});}
+       addCol(TB.x+P0-.22,TB.x+P0+.22,kz-.22,kz+.22,Y0+3.3);
+       inter(new T.Vector3(TB.x+fx,Y0,kz),1.7,'投籃（籃球場）',()=>tbHoop(kz,Y0,rx,fx,s,'x'));});}
+   // ---- west lawn: pull-up bars under the junipers, the blue fish slide on its oval pad
+   const JUN=[lam('#3f5f36'),lam('#4b6e3c'),lam('#36532f')],LEAF2=[lam('#7fa443'),lam('#93b64e'),lam('#6f963c')];
+   const juniper=(x,z,s=1)=>{const y=H(x,z)-Y0;const tr=B(.3*s,2.6*s,.3*s,M.trunk,x,y+1.3*s,z);tr.rotation.y=.5;
+     for(let k=0;k<14;k++){const a=k*2.4,t=k/13,r=(1.05-t*.65)*s*(.55+.45*((k*7)%3)/2),hh=(1.9+t*3.4)*s;const cc=mk(ico((.82-t*.32)*s,1),JUN[k%3],x+Math.cos(a)*r,Y0+y+hh,z+Math.sin(a)*r,SG);cc.scale.set(1.15,.62+.12*(k%2),1.15);cc.rotation.y=a;}
+     addCol(TB.x+x-.3*s,TB.x+x+.3*s,z-.3*s,z+.3*s,Y0+y+4*s);};
+   const broad=(x,z,s=1)=>{const y=H(x,z)-Y0;B(.32*s,2.4*s,.32*s,M.trunk,x,y+1.2*s,z);[[0,3.2,0,1.7],[.9,2.7,.5,1.2],[-.8,2.9,-.4,1.3],[.2,3.9,-.3,1.1]].forEach(([a,b,c2,r],k)=>mk(ico(r*s,1),LEAF2[k%3],x+a*s,Y0+y+b*s,z+c2*s,SG));
+     addCol(TB.x+x-.3*s,TB.x+x+.3*s,z-.3*s,z+.3*s,Y0+y+4*s);};
+   {const bxx=-83.6,zs=[29.6,30.8,32,33.2],hs=[1.5,1.85,2.2],PM=lam('#d6dadb');zs.forEach((z,k)=>{const h=Math.max(hs[Math.max(0,k-1)],hs[Math.min(2,k)]);mk(cy(.05,.05,h+.05,8),PM,bxx,Y0+(h+.05)/2,z,SG);addCol(TB.x+bxx-.1,TB.x+bxx+.1,z-.1,z+.1,Y0+h);});
+     hs.forEach((h,k)=>{const b=mk(cy(.025,.025,1.2,6),PM,bxx,Y0+h,(zs[k]+zs[k+1])/2,SG,false);b.rotation.x=PI/2;b.userData.noInk=1;});
+     inter(P_(bxx+1.2,31.4),1.6,'拉單槓',()=>say(null,['抓住單槓，用力拉——','一下、兩下、三下！手臂好痠，可是好有成就感！'],{noWave:1}));}
+   {const fxc=-83.6,fzc=39.4,prx=2.3,prz=4.3;const [gc,gq]=C2(128,128);gq.fillStyle='#b4b5b1';gq.fillRect(0,0,128,128);for(let i=0;i<1400;i++){gq.fillStyle=pick(['#9a9b97','#c9cac5','#8a8b88','#d6d6d0']);gq.fillRect(rr(0,128),rr(0,128),2,2);}
+     const gt=TX(gc,true);gt.repeat.set(4,7);const pad=mk(cy(1,1,.28,48),lam('#ffffff',{map:gt}),fxc,Y0+.14,fzc,SG);pad.scale.set(prx,1,prz);
+     const curb=mk(cy(1,1,.2,48),lam('#d4d0c7'),fxc,Y0+.1,fzc,SG);curb.scale.set(prx+.18,1,prz+.18);
+     TB.pads.push({e:2,cx:fxc,cz:fzc,rx:prx+.1,rz:prz+.1,y:Y0+.29});
+     // fish: a squashed sphere, tail tapered, painted side-on (planar UVs so both flanks show the same face)
+     const [c,q]=C2(1024,512);const gr=q.createLinearGradient(0,0,0,512);gr.addColorStop(0,'#5a8be2');gr.addColorStop(.45,'#3c66c9');gr.addColorStop(1,'#2a4c9c');q.fillStyle=gr;q.fillRect(0,0,1024,512);
+     q.strokeStyle='rgba(225,236,255,.55)';q.lineWidth=3;for(let row=0;row<16;row++)for(let k=0;k<22;k++){const x=40+k*30+(row%2)*15,y=50+row*20;if(x>650)continue;q.beginPath();q.arc(x,y,15,0,PI);q.stroke();}
+     q.strokeStyle='rgba(255,255,255,.8)';q.lineWidth=6;[[30,170],[60,230],[40,290]].forEach(([x,y])=>{q.beginPath();q.arc(x+40,y,30,PI*.2,PI*1.6);q.stroke();});
+     const bead=(x,y,k)=>{q.fillStyle=['#e0453a','#ffffff','#f2a33a','#2f5fae'][k%4];q.fillRect(x-7,y-7,14,14);};
+     for(let k=0;k<26;k++){const t=k/25,x=690-Math.sin(t*PI)*40,y=372-t*350;bead(x,y,k);bead(x+16,y,k+2);}
+     for(let k=0;k<34;k++){bead(120+k*17,30+Math.abs(k-17)*.6,k);}
+     q.fillStyle='#ffffff';q.beginPath();q.arc(822,190,66,0,7);q.fill();q.lineWidth=9;q.strokeStyle='#1f2f63';q.stroke();q.fillStyle='#141c33';q.beginPath();q.arc(836,192,36,0,7);q.fill();q.fillStyle='#ffffff';q.beginPath();q.arc(848,180,10,0,7);q.fill();
+     q.strokeStyle='#ffffff';q.lineWidth=11;q.lineCap='round';q.beginPath();q.moveTo(1012,262);q.quadraticCurveTo(900,312,772,280);q.stroke();
+     q.fillStyle='rgba(255,255,255,.85)';q.beginPath();q.moveTo(560,262);q.quadraticCurveTo(620,205,662,252);q.quadraticCurveTo(620,292,560,262);q.fill();q.strokeStyle='#3c66c9';q.lineWidth=3;for(let k=0;k<4;k++){q.beginPath();q.moveTo(572+k*20,260);q.lineTo(612+k*12,228+k*8);q.stroke();}
+     q.fillStyle='#1b2242';q.beginPath();q.moveTo(380,380);q.lineTo(380,330);q.arc(410,330,30,PI,0,false);q.lineTo(440,380);q.closePath();q.fill();
+     const fg=new T.SphereGeometry(1,44,26),pa=fg.attributes.position,uv=fg.attributes.uv;for(let i=0;i<pa.count;i++){const x=pa.getX(i),y=pa.getY(i),z=pa.getZ(i);uv.setXY(i,(x+1)/2,(y+1)/2);const t=x<0?1+x*.42:1-Math.max(0,x-.55)*.3;pa.setXYZ(i,x*3,y*1.25*t,z*1.05*t);}
+     fg.computeVertexNormals();const g=new T.Group();g.position.set(fxc,Y0+.28,fzc);g.rotation.y=PI/2;SG.add(g);mk(fg,new T.MeshLambertMaterial({map:TX(c)}),0,.55,0,g);
+     addCol(TB.x+fxc-1.1,TB.x+fxc+1.1,fzc-2.9,fzc+2.9,Y0+2.2);
+     inter(P_(fxc+2.6,fzc),2,'溜魚滑梯',()=>say(null,['咻——從大魚的背上溜下來！','這隻藍色的大魚，是平等國小的招牌溜滑梯。'],{noWave:1}));
+     B(.8,.9,7.4,HEDGE,-87.2,.45,fzc);addCol(TB.x-87.6,TB.x-86.8,fzc-3.7,fzc+3.7,Y0+1);}
+   [[-82.2,16.9,.95],[-86.5,26.6,.95],[-85.7,30.6,1.1],[-80.8,34.4,.85],[-81.2,44.1,.8],[-86.9,44.2,.85],[-48.3,44.2,.8]].forEach(([x,z,s])=>juniper(x,z,s));
+   broad(-51.3,28.4,.95);broad(-77.6,43.3,.85);
+   [[-80.6,36.6],[-50.4,31.6]].forEach(([x,z])=>{mk(cy(.06,.08,5,8),DARK,x,Y0+2.5,z,SG);mk(bx(.5,.16,.24),DARK,x+.2,Y0+5,z,SG,false);addCol(TB.x+x-.12,TB.x+x+.12,z-.12,z+.12,Y0+5);});
+   // ---- storeroom by the east curve of the track (two white doors) + a small goal
+   {const rx0=-49.3,rx1=-45.9,rz0=34.6,rz1=39.4,rxm=(rx0+rx1)/2,rzm=(rz0+rz1)/2;B(rx1-rx0,2.8,rz1-rz0,WALL,rxm,1.4,rzm);B(rx1-rx0+.06,.4,rz1-rz0+.06,PLINTH,rxm,.2,rzm);
+     const rf=B(rx1-rx0+.9,.14,rz1-rz0+.8,ROOF,rxm,3.0,rzm);rf.rotation.z=-.1;B(.14,.36,rz1-rz0+.85,EAVE,rx0-.45,2.85,rzm,true);
+     [rzm-1.15,rzm+1.15].forEach(z=>{B(.08,2.1,1.0,DOORW,rx0-.04,1.08,z);B(.09,.5,.55,GLASS,rx0-.05,1.6,z,true);});
+     addCol(TB.x+rx0,TB.x+rx1,rz0,rz1,Y0+3.2);
+     const gx=-47.6,gz0=41,gz1=43.6;[gz0,gz1].forEach(z=>{B(.08,1.6,.08,WHITE,gx,.8,z,true);const bk=B(.06,1.75,.06,WHITE,gx+.75,.8,z,true);bk.rotation.z=-.45;addCol(TB.x+gx-.1,TB.x+gx+.9,z-.1,z+.1,Y0+1.6);});B(.08,.08,gz1-gz0,WHITE,gx,1.6,(gz0+gz1)/2,true);
+     const [nc,nq]=C2(64,64);nq.strokeStyle='rgba(245,245,245,.9)';nq.lineWidth=2;for(let k=0;k<=64;k+=8){nq.beginPath();nq.moveTo(k,0);nq.lineTo(k,64);nq.stroke();nq.beginPath();nq.moveTo(0,k);nq.lineTo(64,k);nq.stroke();}
+     const nt=TX(nc,true);nt.repeat.set(4,3);const NM=new T.MeshBasicMaterial({map:nt,transparent:true,alphaTest:.3,side:T.DoubleSide});const bn=mk(new T.PlaneGeometry(gz1-gz0,1.75),NM,gx+.38,Y0+.8,(gz0+gz1)/2,G,false);bn.rotation.y=PI/2;bn.rotation.x=.45;}
+   // ---- fence: grey concrete posts with red-brick panels between (east side keeps the gate)
+   {const [bc,bq]=C2(256,96);bq.fillStyle='#d6cdc0';bq.fillRect(0,0,256,96);for(let r=0;r<12;r++){for(let x=(r%2)*-12;x<256;x+=25){bq.fillStyle=pick(['#a8483a','#b4523f','#9c4234','#b85c46']);bq.fillRect(x+1,r*8+1,23,6.4);}}
+     const BRK=lam('#ffffff',{map:TX(bc)});
+     const fence=(xa,za,xb,zb2)=>{const l=Math.hypot(xb-xa,zb2-za),n=Math.max(1,Math.round(l/2.4)),ry=Math.atan2(-(zb2-za),xb-xa);
+       for(let k=0;k<=n;k++){const t=k/n,px=xa+(xb-xa)*t,pz=za+(zb2-za)*t,py=H(px,pz)-Y0;B(.32,1.75,.32,FPOST,px,py+.87,pz);B(.42,.1,.42,FPOST,px,py+1.79,pz,true);
+         if(k<n){const t2=(k+.5)/n,mx=xa+(xb-xa)*t2,mz=za+(zb2-za)*t2,my=H(mx,mz)-Y0;const p=B(l/n-.32,.95,.18,BRK,mx,my+.47,mz);p.rotation.y=ry;const cp=B(l/n-.3,.07,.24,FPOST,mx,my+.98,mz,true);cp.rotation.y=ry;}}
+       addCol(TB.x+Math.min(xa,xb)-.18,TB.x+Math.max(xa,xb)+.18,Math.min(za,zb2)-.18,Math.max(za,zb2)+.18,Y0+1.8);};
+     const gx=-45.2,gz0=22.4,gz1=27.2;[gz0,gz1].forEach(z=>{B(.9,2.6,.9,COLR,gx,1.3,z);B(1.1,.2,1.1,STONE,gx,2.7,z);addCol(TB.x+gx-.45,TB.x+gx+.45,z-.45,z+.45,Y0+2.8);});
      B(.15,.2,gz1-gz0,FRAME,gx,.1,(gz0+gz1)/2,true);B(.5,.45,gz1-gz0+1.1,COLR,gx,3.05,(gz0+gz1)/2);sign(gx+.32,Y0+3.05,(gz0+gz1)/2,PI/2,'平等國小',3.4,'#3a2a20','#f3e6c8');
-     const fence=(xa,za,xb,zb2)=>{const l=Math.hypot(xb-xa,zb2-za),n=Math.ceil(l/2.4);for(let k=0;k<n;k++){const t0=k/n,t1=(k+1)/n,ax=xa+(xb-xa)*t0,az=za+(zb2-za)*t0,bx_=xa+(xb-xa)*t1,bz=za+(zb2-za)*t1,mx=(ax+bx_)/2,mz=(az+bz)/2,ll=Math.hypot(bx_-ax,bz-az);
-       const yy=H(mx,mz)-Y0;const w_=B(ll,.7,.22,WALL2,mx,yy+.35,mz);w_.rotation.y=Math.atan2(-(bz-az),bx_-ax);const r=B(ll,.06,.06,FRAME,mx,yy+1.4,mz,true);r.rotation.y=w_.rotation.y;B(.1,1.4,.1,FRAME,ax,yy+.7,az,true);
-       addCol(TB.x+Math.min(ax,bx_)-.15,TB.x+Math.max(ax,bx_)+.15,Math.min(az,bz)-.15,Math.max(az,bz)+.15,H(mx,mz)+1.5);}};
-     fence(gx,15.4,gx,gz0-.5);fence(gx,gz1+.5,gx,45.2);fence(gx,45.2,-74,45.2);}
-   // the big blue fish slide (mosaic tiles) next to the court
-   {const fx=-48.3,fz=41.4,g=new T.Group();g.position.set(TB.x+fx,Y0,TB.z+fz);scene.add(g);g.userData.dyn=true;
-     const [c,q]=C2(256,128);q.fillStyle='#3a6fc4';q.fillRect(0,0,256,128);for(let i=0;i<900;i++){q.fillStyle=pick(['#4f86d6','#2f5fae','#7aa7e6','#e8eef8','#3a6fc4']);q.fillRect(rr(0,256),rr(0,128),5,5);}
-     const fm=lam('#ffffff',{map:TX(c)});const body=mk(sph(1,18,12),fm,0,1.05,0,g);body.scale.set(2.2,1.1,.95);
-     const tail=mk(new T.ConeGeometry(.9,1.4,4),fm,-2.6,1.05,0,g);tail.rotation.z=PI/2;tail.scale.z=.35;
-     [1,-1].forEach(sd=>{const e=mk(sph(.32,12,8),lam('#ffffff'),1.25,1.45,sd*.62,g,false);e.scale.z=.4;const pp=mk(sph(.15,10,8),lam('#1c2a44'),1.33,1.47,sd*.72,g,false);pp.scale.z=.4;});
-     const mouth=mk(sph(.28,10,8),lam('#2a3a5a'),2.12,.82,0,g,false);mouth.scale.set(.5,.6,1.1);
-     const sl=mk(bx(2.4,.08,.9),lam('#e9eef6'),.2,.9,1.25,g);sl.rotation.z=-.5;
-     addCol(TB.x+fx-3.2,TB.x+fx+2.4,fz-1.1,fz+1.1,Y0+2.2);inter(P_(fx,fz+2.4),2,'溜魚滑梯',()=>say(null,['咻——從大魚的背上溜下來！','這隻藍色的大魚，是平等國小的招牌溜滑梯。'],{noWave:1}));}
-   // swings + trees
-   {const sx=-70.2,sz=25;[-1.4,1.4].forEach(o=>{const a=B(.12,2.6,.12,lam('#e0a020'),sx+o,1.3,sz-.6);a.rotation.x=.22;const b=B(.12,2.6,.12,lam('#e0a020'),sx+o,1.3,sz+.6);b.rotation.x=-.22;addCol(TB.x+sx+o-.2,TB.x+sx+o+.2,sz-.9,sz+.9,Y0+2.6);});
-     B(3,.12,.12,lam('#e0a020'),sx,2.5,sz);[-.6,.6].forEach(o=>{B(.6,.06,.25,lam('#e0674b'),sx+o,.6,sz);[-.25,.25].forEach(p=>B(.02,1.85,.02,FRAME,sx+o+p,1.55,sz,true));});
-     [[-70,43.6],[-65,43.6],[-60,43.6],[-55,43.6],[-72.8,30],[-72.8,38]].forEach(([x,z])=>{mk(cy(.18,.26,1.8,7),M.trunk,x,Y0+.9,z,SG);mk(ico(1.5,1),pick([M.leaf,M.leaf2]),x,Y0+2.9,z,SG);addCol(TB.x+x-.3,TB.x+x+.3,z-.3,z+.3,Y0+4);});}
+     fence(gx,15.4,gx,gz0-.5);fence(gx,gz1+.5,gx,45.2);fence(gx,45.2,-88,45.2);fence(-88,45.2,-88,15.4);fence(-88,15.4,wx0-.2,15.4);}
+   // bulletin board (公告欄) on the inside of the east fence
+   {const bx0=-46.1,bz=29.6;[-1.3,1.3].forEach(o=>{B(.14,2.4,.14,FRAME,bx0,1.2,bz+o);addCol(TB.x+bx0-.15,TB.x+bx0+.15,bz+o-.15,bz+o+.15,Y0+2.4);});B(.1,1.4,2.6,lam('#3f6b4a'),bx0,1.6,bz);B(.5,.12,2.9,EAVE,bx0,2.42,bz);
+     ['#f7f2e8','#f2c14e','#bfe3f5','#f6b0a0'].forEach((c,k)=>B(.02,.6,.5,lam(c),bx0-.07,1.6+(k%2?.12:-.1),bz-.9+k*.6,true));}
    sqBatch(G,SG);
-   reserve(-62,20,12);reserve(-60,34,14);reserve(-48.5,33,7);reserve(-42,24.8,3.5);flagAt('school',-37,27);inter(P_(-38,28.5),1.8,'平等國小（地標小故事）',()=>sqStory('school'));
-   inter(P_(-47.6,20),1.8,'看平等國小的公告欄',()=>openBoard('news'));}
+   reserve(-62,20,12);reserve(-60,34,14);reserve(-48.5,33,7);reserve(-42,24.8,3.5);
+   seed=(SEED0+2714*0x6D2B79F5)|0;   // the old school block drew 2714 random numbers: keep the village (houses, students' homes) laid out exactly as before
+   flagAt('school',-37,27);inter(P_(-38,28.5),1.8,'平等國小（地標小故事）',()=>sqStory('school'));
+   inter(P_(-47.4,29.6),1.8,'看平等國小的公告欄',()=>openBoard('news'));}
   // 獵人步道登山口 (behind the school, west)
   {const x=-73,z=8;[-1.3,1.3].forEach(k=>mk(bx(.3,3,.3),M.woodDark,x,H(x,z+k)+1.5,z+k,G));mk(bx(.4,.4,3.2),M.woodDark,x,H(x,z)+3.1,z,G);
     sign(x+.25,H(x,z)+3.6,z,PI/2,'環山獵人步道',3,'#4a3527','#f3e6c8');post(-70,12.5,1.6);sign(-69.93,H(-70,12.5)+1.5,12.5,PI/2,'解說牌',1.4,'#2f5a3a','#fff','只在入口看，不進入');
@@ -6373,8 +6468,8 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
     const gr=new T.Group();const gx=-1,gz=-31;gr.position.set(gx,H(gx,gz),gz);G.add(gr);[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>{mk(cy(.12,.14,1.6,8),M.woodDark,a*1.1,.8,b*1.1,gr);mk(cy(.34,.34,.06,12),M.woodLight,a*1.1,1.45,b*1.1,gr,false);});
     mk(bx(2.8,1.7,2.8),lam('#8a6446'),0,2.4,0,gr);[-1,1].forEach(s=>{const r=mk(bx(3.6,.3,2.3),lam('#9a8452'),0,3.75,s*.95,gr);r.rotation.x=s*.62;});addCol(TB.x+gx-1.5,TB.x+gx+1.5,gz-1.5,gz+1.5,H(gx,gz)+5);reserve(gx,gz,3);
     inter(P_(gx,gz+2.6),1.5,'看傳統穀倉',()=>say('穀倉',['這是傳統的穀倉，把房子架高，可以防潮、也防老鼠偷吃。','柱子上圓圓的板子，就是擋老鼠爬上去的。']));}
-  {const x=-73,z=34,y=H(x,z);mk(bx(4,.3,6),M.woodLight,x,y+.15,z,G);mk(bx(.12,1,6),M.woodDark,x-2,y+.8,z,G,false);addCol(TB.x+x-2.3,TB.x+x-1.8,z-3,z+3,y+1.2);[[-3],[3]].forEach(([a])=>mk(bx(4,1,.12),M.woodDark,x,y+.8,z+a,G,false));
-    mk(cy(.08,.1,1.1,8),M.metalDark,x-1,y+.85,z,G);mk(cy(.18,.14,.5,10),M.metalDark,x-1,y+1.45,z,G,false).rotation.z=PI/2;addCol(TB.x+x-1.2,TB.x+x-.8,z-.2,z+.2,y+1.5);reserve(x,z,4);
+  {const x=-85.6,z=21,y=H(x,z);mk(bx(4,.3,6),M.woodLight,x,y+.15,z,G);(TB.pads=TB.pads||[]).push({x0:x-2,x1:x+2,z0:z-3,z1:z+3,y:y+.31});mk(bx(.12,1,6),M.woodDark,x-2,y+.8,z,G,false);addCol(TB.x+x-2.3,TB.x+x-1.8,z-3,z+3,y+1.2);[[-3],[3]].forEach(([a])=>mk(bx(4,1,.12),M.woodDark,x,y+.8,z+a,G,false));
+    mk(cy(.08,.1,1.1,8),M.metalDark,x-1,y+.85,z,G);mk(cy(.18,.14,.5,10),M.metalDark,x-1,y+1.45,z,G,false).rotation.z=PI/2;addCol(TB.x+x-1.2,TB.x+x-.8,z-.2,z+.2,y+1.5);reserve(-73,34,4);   // keep the old reserve spot so the village layout (random stream) stays identical
     inter(P_(x+.5,z),1.8,'眺望點（看四周的山）',()=>say('眺望點',['從這裡可以看到四周的高山：雪山、南湖大山、志佳陽大山……「環山」就是被高山圍起來的意思。','遠一點的地方：四季蘭溪吊橋在部落西側；清泉橋在南方約 2.5 公里，族人暱稱「巴黎鐵橋」；還有 Sqoyaw 天空。']));}
   // 四季蘭溪吊橋 + 志佳陽大山登山口 (far bank)
   {const b=new T.Group();G.add(b);const BZ=SQ_BR.z,X0=SQ_BR.x0,X1=SQ_BR.x1,L=X0-X1;for(let x=X0;x>X1;x-=.5){mk(bx(.42,.1,2.3),M.woodLight,x,tribeH(x,BZ)-.08,BZ,b,false);}
@@ -6566,14 +6661,14 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
     for(let x=-104;x<=146&&n<N;x+=2.6)for(let z=-118;z<=178&&n<N;z+=2.6){const px=x+rr(-.5,.5),pz=z+rr(-.5,.5);
       if(sqSD(px,pz)[0]>-9||Math.abs(px-sqRX(pz))<20)continue;if(Math.hypot((px+5)/50,(pz+4)/42)<1)continue;
       if(sqLaneD(px,pz)[0]<3.5||sqNear(px,pz,SQ_ROAD)[0]<7)continue;if(LM.some(([a,b,r])=>Math.hypot(px-a,pz-b)<r+2))continue;
-      const h=sqBase(px,pz),fr=((h*.45)%1+1)%1;if(fr>.2)continue;
+      const h=sqBase(px,pz,1),fr=((h*.45)%1+1)%1;if(fr>.2)continue;const onSch=px>-94&&px<-73&&pz>9&&pz<51&&Math.abs(sqBase(px,pz)-h)>.01;
       if(rand()<.012&&sheds.length<26){sheds.push([px,pz]);continue;}
-      const s=rr(.75,1.15);sv.set(s,s*rr(.8,1.1),s);pv.set(px,h-.15,pz);q.setFromAxisAngle(T.Object3D.DefaultUp,rr(0,6.3));mm.compose(pv,q,sv);TR.setMatrixAt(n,mm);
-      TR.setColorAt(n,tc.set(pick(['#5f8f3f','#6f9a46','#4f7f3a','#7aa04c'])).convertSRGBToLinear());n++;addCol(TB.x+px-.35,TB.x+px+.35,pz-.35,pz+.35,h+2.5);}
+      const s=rr(.75,1.15);sv.set(s,s*rr(.8,1.1),s);if(onSch)sv.set(0,0,0);pv.set(px,h-.15,pz);q.setFromAxisAngle(T.Object3D.DefaultUp,rr(0,6.3));mm.compose(pv,q,sv);TR.setMatrixAt(n,mm);
+      TR.setColorAt(n,tc.set(pick(['#5f8f3f','#6f9a46','#4f7f3a','#7aa04c'])).convertSRGBToLinear());n++;if(!onSch)addCol(TB.x+px-.35,TB.x+px+.35,pz-.35,pz+.35,h+2.5);}
     TR.count=n;TR.castShadow=false;TR.receiveShadow=true;G.add(TR);
     const sm=[lam('#e9e6dc'),lam('#c9ccd0'),lam('#dfe6e8')],rf=[lam('#4f86bf'),lam('#b8452f'),lam('#8a8f94'),lam('#3f7f6a')];
     sheds.forEach(([x,z])=>{const w=rr(2.6,4),d=rr(2.2,3),y=Math.max(H(x-w/2,z-d/2),H(x+w/2,z+d/2),H(x-w/2,z+d/2),H(x+w/2,z-d/2));const g=new T.Group();g.position.set(x,y,z);g.rotation.y=(rr(0,1)<.5?0:PI/2);G.add(g);
-      mk(bx(w,2,d),pick(sm),0,1,0,g);mk(bx(w+.1,2.5,d+.1),M.concrete,0,-1.25,0,g);const r=mk(bx(w+.5,.1,d+.6),pick(rf),0,2.15,0,g);r.rotation.x=.12;addCol(TB.x+x-w/2-.2,TB.x+x+w/2+.2,z-d/2-.2,z+d/2+.2,y+3);});}
+      mk(bx(w,2,d),pick(sm),0,1,0,g);mk(bx(w+.1,2.5,d+.1),M.concrete,0,-1.25,0,g);const r=mk(bx(w+.5,.1,d+.6),pick(rf),0,2.15,0,g);r.rotation.x=.12;if(x>-94&&x<-73&&z>9&&z<51){g.visible=false;return;}addCol(TB.x+x-w/2-.2,TB.x+x+w/2+.2,z-d/2-.2,z+d/2+.2,y+3);});}
   // ---- 動物之家・野生動物救傷站
   {const Y=AC.y,V=(x,z,dy=0)=>new T.Vector3(TB.x+x,Y+dy,TB.z+z);
     const dirt=lam('#c2a77c',{}),grass=lam('#7fa95a',{}),grass2=lam('#6e9a4e',{});surfSet(dirt,'soil',1,null,.9,{chroma:.3});surfSet(grass,'grass',1,null,.8,{chroma:.3});surfSet(grass2,'grass',1,null,.8,{chroma:.3});const wood=M.woodDark,woodL=lam('#a77b4f'),wire=lam('#8d9590'),rock=lam('#9a958c'),log=lam('#7a5a3c');
@@ -6939,25 +7034,31 @@ function tbTick(dt){const on=tbIn()&&started;const s=TB.mark;
   COLS.forEach(c=>{if(c.x0>2300&&(c.x1-c.x0)*(c.z1-c.z0)>=.9&&Math.min(c.x1-c.x0,c.z1-c.z0)>.5&&c.y1-tribeH((c.x0+c.x1)/2-TB.x,(c.z0+c.z1)/2)>2.6)c.see=1;});})();
 // basketball: walk up to a hoop and choose 投籃 / 灌籃; the ball is a small 3D sphere flying to the rim
 const BALL={m:null,t:-1,from:null,to:null,in:false,dur:.8};
-function tbHoop(kx,y0,rz,fz,s){if(!actOk()){toast('這個角色還沒有投籃動作');return;}
-  choose('籃球場','要怎麼打？',[{label:'🏀 投籃',fn:()=>hoopGo(kx,y0,rz,fz,s,false)},{label:'💥 灌籃',fn:()=>hoopGo(kx,y0,rz,fz,s,true)},
-    ...(actHas('s.dribble')?[{label:'⛹️ 運球',fn:()=>hoopDrill(kx,y0,rz,fz,s,'dribble')}]:[]),...(actHas('s.catch')?[{label:'🤲 接阿澈的傳球',fn:()=>hoopDrill(kx,y0,rz,fz,s,'catch')}]:[]),{label:'算了',fn:null}]);}
+function tbHoop(kx,y0,rz,fz,s,ax){if(!actOk()){toast('這個角色還沒有投籃動作');return;}
+  choose('籃球場','要怎麼打？',[{label:'🏀 投籃',fn:()=>hoopGo(kx,y0,rz,fz,s,false,ax)},{label:'💥 灌籃',fn:()=>hoopGo(kx,y0,rz,fz,s,true,ax)},
+    ...(actHas('s.dribble')?[{label:'⛹️ 運球',fn:()=>hoopDrill(kx,y0,rz,fz,s,'dribble',ax)}]:[]),...(actHas('s.catch')?[{label:'🤲 接阿澈的傳球',fn:()=>hoopDrill(kx,y0,rz,fz,s,'catch',ax)}]:[]),{label:'算了',fn:null}]);}
 // dribble in place (ball is drawn in the frames) / catch a pass: a ball flies in from the front and the catch frames take over
-function hoopDrill(kx,y0,rz,fz,s,kind){const X=TB.x+kx;P.pos.set(X+.7,y0,fz);P.vel.set(0,0,0);
-  if(kind==='dribble'){const yaw=Math.atan2(X-P.pos.x+.01,rz-fz);P.yaw=yaw;pl.g.rotation.y=yaw;cam.yaw=yaw+PI*.5;cam.pitch=.14;actPlay('s.dribble',{lock:true,dur:3.4,yaw,cb:()=>toast('運球很穩！')});return;}
-  const yaw=Math.atan2(X-P.pos.x+.01,rz-fz);P.yaw=yaw;pl.g.rotation.y=yaw;cam.yaw=yaw;cam.pitch=.14;
+// court frame: kx = lateral coordinate of the court's centre line, rz / fz = along-court coordinates of the rim / shooting spot.
+// ax 'z' (old courts): lateral = local x, along = world z.  ax 'x' (平等國小): lateral = world z, along = local x.
+function hpW(ax,l,a){return ax==='x'?[TB.x+a,l]:[TB.x+l,a];}
+function hpV(ax,l,y,a){const w=hpW(ax,l,a);return new T.Vector3(w[0],y,w[1]);}
+function hoopDrill(kx,y0,rz,fz,s,kind,ax){ax=ax||'z';const p0=hpW(ax,kx+.7,fz),rm=hpW(ax,kx,rz);P.pos.set(p0[0],y0,p0[1]);P.vel.set(0,0,0);
+  const yaw=Math.atan2(rm[0]-P.pos.x+.01,rm[1]-P.pos.z);
+  if(kind==='dribble'){P.yaw=yaw;pl.g.rotation.y=yaw;cam.yaw=yaw+PI*.5;cam.pitch=.14;actPlay('s.dribble',{lock:true,dur:3.4,yaw,cb:()=>toast('運球很穩！')});return;}
+  P.yaw=yaw;pl.g.rotation.y=yaw;cam.yaw=yaw;cam.pitch=.14;
   if(!BALL.m){BALL.m=new T.Mesh(new T.SphereGeometry(.13,14,10),lam('#e0732a'));scene.add(BALL.m);}
   const to=new T.Vector3(P.pos.x,y0+.95,P.pos.z).addScaledVector(new T.Vector3(Math.sin(yaw),0,Math.cos(yaw)),.35),from=to.clone().addScaledVector(new T.Vector3(Math.sin(yaw),0,Math.cos(yaw)),5);from.y+=.4;
   actPlay('s.catch',{lock:true,yaw,cb:()=>{toast('接到了！');actPlay('laugh');}});BALL.sw=1;BALL.in=false;BALL.stop=true;BALL.from=from;BALL.to=to;BALL.t=0;BALL.dur=.34;BALL.m.visible=true;BALL.m.position.copy(from);}
-function hoopGo(kx,y0,rz,fz,s,dunk){const X=TB.x+kx,sx=X+(dunk?0:.7),z1=rz-s*.55;P.pos.set(sx,y0,dunk?rz-s*3.1:fz);P.vel.set(0,0,0);const yaw=Math.atan2(X-sx,rz-P.pos.z);P.yaw=yaw;pl.g.rotation.y=yaw;cam.yaw=Math.atan2(1,0);cam.pitch=.12;
+function hoopGo(kx,y0,rz,fz,s,dunk,ax){ax=ax||'z';const AX=ax==='x'?'x':'z',aw=a=>ax==='x'?TB.x+a:a;const sl=kx+(dunk?0:.7),z1=rz-s*.55,pa=dunk?rz-s*3.1:fz;
+  const p0=hpW(ax,sl,pa);P.pos.set(p0[0],y0,p0[1]);P.vel.set(0,0,0);const rm=hpW(ax,kx,rz);const yaw=Math.atan2(rm[0]-P.pos.x,rm[1]-P.pos.z);P.yaw=yaw;pl.g.rotation.y=yaw;cam.yaw=ax==='x'?-s*.45:Math.atan2(1,0);cam.pitch=.12;
   if(!BALL.m){BALL.m=new T.Mesh(new T.SphereGeometry(.13,14,10),lam('#e0732a'));scene.add(BALL.m);}BALL.m.visible=false;
-  const rim=new T.Vector3(X,y0+2.75,rz-s*.02),made=dunk||Math.random()<.68;
-  actPlay(dunk?'dunk':'shoot',{lock:true,yaw,onRel:()=>{const h=dunk?new T.Vector3(X,y0+2.95,z1+s*.2):new T.Vector3(sx-.2,y0+1.95,P.pos.z+s*.25);BALL.sw=0;BALL.stop=false;BALL.ph=null;BALL.floor=y0+.13;BALL.from=h;BALL.to=made?rim.clone():rim.clone().add(new T.Vector3(.35,.15,s*.25));BALL.t=0;BALL.dur=dunk?.16:.75;BALL.in=made;BALL.m.visible=true;BALL.m.position.copy(h);},
-    cb:()=>{if(dunk){P.pos.z=z1;ACT.dk=null;}setTimeout(()=>{toast(made?(dunk?'💥 灌籃成功！太帥了！':'🏀 進了！好球！'):'差一點點！再試一次？');if(made)actPlay('laugh');},250);}});ACT.dk=dunk?{z0:rz-s*3.1,z1}:null;}
+  const rim=hpV(ax,kx,y0+2.75,rz-s*.02),made=dunk||Math.random()<.68;const miss=ax==='x'?new T.Vector3(s*.25,.15,.35):new T.Vector3(.35,.15,s*.25);
+  actPlay(dunk?'dunk':'shoot',{lock:true,yaw,onRel:()=>{const h=dunk?hpV(ax,kx,y0+2.95,z1+s*.2):hpV(ax,sl-.2,y0+1.95,(ax==='x'?P.pos.x-TB.x:P.pos.z)+s*.25);BALL.sw=0;BALL.stop=false;BALL.ph=null;BALL.ax=ax;BALL.floor=y0+.13;BALL.from=h;BALL.to=made?rim.clone():rim.clone().add(miss);BALL.t=0;BALL.dur=dunk?.16:.75;BALL.in=made;BALL.m.visible=true;BALL.m.position.copy(h);},
+    cb:()=>{if(dunk){P.pos[AX]=aw(z1);ACT.dk=null;}setTimeout(()=>{toast(made?(dunk?'💥 灌籃成功！太帥了！':'🏀 進了！好球！'):'差一點點！再試一次？');if(made)actPlay('laugh');},250);}});ACT.dk=dunk?{a:AX,z0:aw(rz-s*3.1),z1:aw(z1)}:null;}
 function ballTick(dt){(TB.nets||[]).forEach(n=>{if(n.sw>0){n.sw=Math.max(0,n.sw-dt*1.6);const k=n.sw;n.m.scale.set(1+Math.sin(k*18)*.08*k,1+.35*k,1+Math.cos(k*16)*.08*k);n.m.position.y=n.y0!=null?n.y0-.07*k:(n.y0=n.m.position.y);}});if(!BALL.m||BALL.t<0)return;BALL.t+=dt;const k=Math.min(1,BALL.t/BALL.dur);const p=BALL.m.position;
   if(BALL.stop&&k>=1){BALL.stop=false;BALL.t=-1;BALL.m.visible=false;return;}
   if(k<1){p.lerpVectors(BALL.from,BALL.to,k);p.y+=Math.sin(k*PI)*(BALL.dur>.5?1.6:.2);}
-  else{const t2=BALL.t-BALL.dur;if(!BALL.ph){p.copy(BALL.to);BALL.ph={vy:BALL.in?-1.2:.6,vx:BALL.in?0:1.1,vz:BALL.in?(Math.random()-.5)*.6:0};}
+  else{const t2=BALL.t-BALL.dur;if(!BALL.ph){p.copy(BALL.to);BALL.ph={vy:BALL.in?-1.2:.6,vx:BALL.in?0:1.1,vz:BALL.in?(Math.random()-.5)*.6:0};if(BALL.ax==='x'){const t_=BALL.ph.vx;BALL.ph.vx=BALL.ph.vz;BALL.ph.vz=t_;}}
     if(BALL.in&&!BALL.sw){BALL.sw=1;(TB.nets||[]).forEach(n=>{if(Math.abs(n.m.position.z-BALL.to.z)<1.2&&Math.abs(n.m.position.x-BALL.to.x)<1.2)n.sw=1;});SND.pick&&SND.pick();}
     const B_=BALL.ph,fl=BALL.floor!=null?BALL.floor:BALL.to.y-2.6;B_.vy-=9.8*dt;p.y+=B_.vy*dt;p.x+=B_.vx*dt;p.z+=B_.vz*dt;
     if(p.y<fl){p.y=fl;B_.vy=Math.abs(B_.vy)>.9?-B_.vy*.55:0;B_.vx*=.75;B_.vz*=.75;}
