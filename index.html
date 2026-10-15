@@ -5163,7 +5163,7 @@ function r2Mirror(g,x,y,w,h){g.save();g.fillStyle='rgba(40,20,10,.25)';g.beginPa
 function r2Sort(o,x){if(!o.line)return o.sort;const [[x1,y1],[x2,y2]]=o.line;const t=clamp((x-x1)/((x2-x1)||1),0,1);return lerp(y1,y2,t);}
 // the teacher's maltese 雪球 trots around the cabin, naps, and wags when you pet it
 const CDOG={x:0,y:0,tx:0,ty:0,t:2,st:'idle',pose:'sit',flip:1,wag:0,img:null,ok:false,ph:0,sk:null};
-function cdogTick(dt){if(!R2.on||R2.room!=='cabin'||!SPRITES.ani_maltese)return;const D=r2D();if(!D)return;
+function cdogTick(dt){CDOG.hide=!!(W.pet&&W.pet.kind==='dog'&&W.pet.coat==='maltese');if(CDOG.hide||!R2.on||R2.room!=='cabin'||!SPRITES.ani_maltese)return;const D=r2D();if(!D)return;
   if(!CDOG.ok){CDOG.ok=true;loadImg(SPRITES.ani_maltese.src).then(im=>CDOG.img=im).catch(()=>{});}
   if(CDOG.sk!==R2.sk){CDOG.sk=R2.sk;[CDOG.x,CDOG.y]=r2Near(D.w*.32,D.h*.8);CDOG.st='idle';CDOG.t=2;}
   CDOG.t-=dt;if(CDOG.wag>0)CDOG.wag-=dt;const H=r2H(CDOG.y);
@@ -5176,7 +5176,7 @@ function cdogDraw(g){const M=SPRITES.ani_maltese,im=CDOG.img;if(!M||!im)return;c
   else if(CDOG.pose==='lie'&&A.lie!=null)f=A.lie;else if(CDOG.pose==='sleep'&&A.sleep!=null)f=A.sleep;else if(CDOG.pose==='wag'&&A.wag_A!=null)f=Math.floor(R2.t*5)%2?A.wag_B:A.wag_A;
   const H=r2H(CDOG.y)*.5,dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;g.save();g.translate(CDOG.x,CDOG.y);g.fillStyle='rgba(40,20,10,.22)';g.beginPath();g.ellipse(0,0,dw*.26,dw*.06,0,0,7);g.fill();
   g.scale(fl,1);const [sx,sy]=fxy(M,f);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+(M.foot!=null?M.foot:4)/M.ch*dh,dw,dh);g.restore();}
-function cdogSpot(){if(R2.room!=='cabin'||!CDOG.img)return null;const H=r2H(CDOG.y)*.5;
+function cdogSpot(){if(R2.room!=='cabin'||!CDOG.img||CDOG.hide)return null;const H=r2H(CDOG.y)*.5;
   return {def:['雪球',CDOG.x+(CDOG.x<R2.x?H*.35:-H*.35),CDOG.y+3,[CDOG.x-H*.45,CDOG.y-H*.75,H*.9,H*.8]],it:null,label:'摸摸雪球（老師的馬爾濟斯）',
     act:()=>{CDOG.wag=2.6;CDOG.st='idle';CDOG.t=3;CDOG.pose='wag';SND.pick&&SND.pick();say('雪球',[pick(['雪球搖著尾巴，在你腳邊轉了一圈。','雪球舔了舔你的手，好癢！','雪球翻過身來，想要你摸摸肚子。','雪球是老師養的馬爾濟斯，最喜歡在窗邊曬太陽。'])],{noWave:1});}};}
 function r2Draw(dt){R2.t+=dt;cdogTick(dt);const cv=R2.cv,g=R2.g;const dpr=Math.min(1.5,devicePixelRatio||1);const cw=Math.round(cv.clientWidth*dpr),ch=Math.round(cv.clientHeight*dpr);
@@ -5192,7 +5192,7 @@ function r2Draw(dt){R2.t+=dt;cdogTick(dt);const cv=R2.cv,g=R2.g;const dpr=Math.m
   if(HOMER)hrBack(g,C);else if(!BATH&&!CLS){r2Slots(g);r2Computer(g);}
   const L=[];if(HOMER)hrItems(g,L);if(R2.sk==='landscape'&&!BATH&&!HOMER&&!CLS)L.push([808,()=>r2Mirror(g,1625,600,80,205)]);const RS=R2.rest&&R2.room==='cabin'&&TROOM.rest?TROOM.rest[R2.sk]:null;if(RS){const sb=(C.occ.find(o=>o.id==='bed')||{sort:R2.y}).sort;L.push([sb,()=>r2RestDraw(g,RS)]);}const HRS=R2.rest&&R2.room==='home';if(HRS){const sb=(C.occ.find(o=>o.id==='bed_end')||{sort:R2.y}).sort;L.push([sb+.5,()=>hrRestDraw(g)]);}
   C.occ.forEach(o=>{if(RS&&o.id==='bed')return;const im0=R2.img[o.file];const side=!CLS&&!o.line&&im0&&im0.width&&(R2.x<o.x+im0.width*.12||R2.x>o.x+im0.width*.88);L.push([side?-1e9:r2Sort(o,R2.x),()=>{const im=R2.img[o.file];if(im&&im.complete)g.drawImage(im,o.x,o.y);if(o.id==='desk')r2Computer(g);}]);});
-  if(R2.room==='cabin'&&CDOG.img)L.push([CDOG.y,()=>cdogDraw(g)]);if(!RS&&!HRS)L.push([R2.act&&R2.act.over!=null?R2.act.over:R2.y,()=>r2Human(g)]);if(PETOBJ)L.push([R2.pet.y,()=>r2Pet(g)]);L.sort((a,b)=>a[0]-b[0]).forEach(e=>e[1]());
+  if(R2.room==='cabin'&&CDOG.img&&!CDOG.hide)L.push([CDOG.y,()=>cdogDraw(g)]);if(!RS&&!HRS)L.push([R2.act&&R2.act.over!=null?R2.act.over:R2.y,()=>r2Human(g)]);if(PETOBJ)L.push([R2.pet.y,()=>r2Pet(g)]);L.sort((a,b)=>a[0]-b[0]).forEach(e=>e[1]());
   const nt=S.night||0;if(nt>.02){g.save();g.globalCompositeOperation='multiply';g.fillStyle=`rgba(120,110,170,${nt*.35})`;g.fillRect(0,0,Wi,Hi);g.restore();}
   const n=R2.near;if(n&&!/離開小屋|回到小屋|出門|離開教室/.test(n.def[0])&&!DLG.open){const h=n.def[3],mx=h[0]+h[2]/2,my=Math.max(R2.cy+30,h[1]-8)+Math.sin(R2.t*4)*6,sz=r2H(R2.y)*.07;
     g.save();g.fillStyle='#fff';g.strokeStyle='rgba(60,30,10,.6)';g.lineWidth=sz*.18;g.beginPath();g.moveTo(mx-sz,my-sz*1.3);g.lineTo(mx+sz,my-sz*1.3);g.lineTo(mx,my);g.closePath();g.stroke();g.fill();g.restore();}}
@@ -6275,7 +6275,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
    for(let k=0;k<NF;k++)for(let i=0;i<nb;i++){const bx0=x0+i*bw,y=k*fh,dx=bx0+.95;
      B(1.0,2.15,.08,DOORW,dx,y+1.1,zc+.04);B(.56,.52,.09,GRILL,dx,y+1.62,zc+.05,true);
      [bw*.6,bw*.86].forEach(o=>win(bx0+o,y+1.75,zc+.03,.8,1.2,'z'));[bw*.3,bw*.7].forEach(o=>win(bx0+o,y+1.75,zb-.03,1.2,1.2,'z',-1));}
-   sign(CLS_DOOR[0],Y0+2.5,zc+.07,0,'五年級教室',1.5,'#3f7f6a','#fff');inter(P_(CLS_DOOR[0],zc+1.3),1.6,'走進五年級教室',()=>clsEnter());
+   sign(CLS_DOOR[0],Y0+2.62,zc+.07,0,'五年級教室',2.2,'#3f7f6a','#fff');inter(P_(CLS_DOOR[0],zc+1.3),1.6,'走進五年級教室',()=>clsEnter());
    // low gable roof with the thick dark-brown fascia band of the photos
    {const D=zf-zb+1.3,half=D/2,rh=1,sl=Math.hypot(half,rh),zm=(zb+zf)/2+.1;[-1,1].forEach(s=>{const r=B(L+.9,.16,sl,ROOF,cx,HT+.3+rh/2,zm+s*half/2);r.rotation.x=s*Math.atan2(rh,half);});
      [-1,1].forEach(s=>B(L+.95,.42,.14,EAVE,cx,HT+.22,zm+s*(half+.02),true));gableTri(half,rh,PINK,x1+.4,HT+.3,zm,PI/2);
@@ -6306,7 +6306,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
    addCol(TB.x+wx1,TB.x+x1,zb,zc,Y0+HT+3);addCol(TB.x+wx0,TB.x+wx1,zb,wz1,Y0+HT+3);
    for(let i=0;i<=nb;i++)addCol(TB.x+x0+i*bw-.28,TB.x+x0+i*bw+.28,zf-.18,zf+.38,Y0+HT);[25.2,wz1].forEach(z=>addCol(TB.x+wxc-.18,TB.x+wxc+.38,z-.28,z+.28,Y0+HT));
    // hedges in front of the east classrooms
-   [[-54.3,23.05,2.2],[-51.4,23.05,2.2]].forEach(([x,z,w])=>{B(w,.75,.7,HEDGE,x,.37,z);addCol(TB.x+x-w/2,TB.x+x+w/2,z-.35,z+.35,Y0+.8);});
+   [[-54.3,23.05,2.2]].forEach(([x,z,w])=>{B(w,.75,.7,HEDGE,x,.37,z);addCol(TB.x+x-w/2,TB.x+x+w/2,z-.35,z+.35,Y0+.8);});
    // ---- the wooden deck at the tower's foot, under a teal canopy held up by orange struts
    {const dx0=tx0,dx1=tx1,dz0=zf+.4,dz1=26.3,dxm=(dx0+dx1)/2,dzm=(dz0+dz1)/2,dw=dx1-dx0;B(dw,.3,dz1-dz0,WOOD,dxm,.15,dzm);
      TB.pads=TB.pads||[];TB.pads.push({x0:dx0,x1:dx1,z0:dz0,z1:dz1,y:Y0+.32});
@@ -6339,26 +6339,26 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
      fq.beginPath();fq.arc(48,32,12,0,7);fq.fill();fq.fillStyle='#1f3a8f';fq.beginPath();fq.arc(48,32,10,0,7);fq.fill();fq.fillStyle='#ffffff';fq.beginPath();fq.arc(48,32,8.5,0,7);fq.fill();
      const pv=new T.Group();pv.position.set(fx,Y0+8.1,fz);G.add(pv);const fl=mk(new T.PlaneGeometry(1.35,.9),new T.MeshLambertMaterial({map:TX(fc),side:T.DoubleSide}),.7,0,0,pv,false);TB.flag=pv;}
    // ---- red PU track (stadium shape) round a grass infield; inner kerb of grey drain grates
-   const tcX=-64.5,tcZ=36.85,TL=28,TW=14.4,HS=TL/2-TW/2;
+   const tcX=-68,tcZ=36.6,TL=24,TW=12,HS=TL/2-TW/2;
    {const pm=36.6,[c,q]=C2(Math.round(TL*pm),Math.round(TW*pm));q.translate(TL*pm/2,TW*pm/2);q.scale(pm,pm);
      const stad=r=>{q.beginPath();q.moveTo(-HS,-r);q.lineTo(HS,-r);q.arc(HS,0,r,-PI/2,PI/2);q.lineTo(-HS,r);q.arc(-HS,0,r,PI/2,PI*1.5);q.closePath();};
-     stad(TW/2-.05);q.fillStyle='#b5503f';q.fill();q.save();q.globalCompositeOperation='destination-out';stad(4.95);q.fill();q.restore();
-     q.lineWidth=.26;q.strokeStyle='#7d7f80';stad(5.08);q.stroke();q.setLineDash([.08,.1]);q.lineWidth=.16;q.strokeStyle='#4f5254';stad(5.08);q.stroke();q.setLineDash([]);
-     q.strokeStyle='rgba(255,255,255,.92)';q.lineWidth=.05;[5.24,5.72,6.2,6.68,7.1].forEach(r=>{stad(r);q.stroke();});
-     q.lineWidth=.06;q.beginPath();q.moveTo(0,5.24);q.lineTo(0,7.1);q.stroke();q.setLineDash([.35,.3]);q.beginPath();q.moveTo(-HS+1.2,5.48);q.lineTo(-HS+5,5.48);q.stroke();q.setLineDash([]);
+     stad(TW/2-.05);q.fillStyle='#b5503f';q.fill();q.save();q.globalCompositeOperation='destination-out';stad(3.85);q.fill();q.restore();
+     q.lineWidth=.26;q.strokeStyle='#7d7f80';stad(3.98);q.stroke();q.setLineDash([.08,.1]);q.lineWidth=.16;q.strokeStyle='#4f5254';stad(3.98);q.stroke();q.setLineDash([]);
+     q.strokeStyle='rgba(255,255,255,.92)';q.lineWidth=.05;[4.12,4.55,4.98,5.41,5.88].forEach(r=>{stad(r);q.stroke();});
+     q.lineWidth=.06;q.beginPath();q.moveTo(0,4.12);q.lineTo(0,5.88);q.stroke();q.setLineDash([.35,.3]);q.beginPath();q.moveTo(-HS+.6,4.34);q.lineTo(-HS+4,4.34);q.stroke();q.setLineDash([]);
      const fm=mk(new T.PlaneGeometry(TL,TW),new T.MeshLambertMaterial({map:TX(c),alphaTest:.5,polygonOffset:true,polygonOffsetFactor:-2}),tcX,Y0+.06,tcZ,G,false);fm.rotation.x=-PI/2;}
    // ---- green court with red keys, the school logo in the centre circle, along the infield
-   const kcx=tcX,kz=tcZ,kl=12,kw=5.6;
+   const kcx=tcX,kz=tcZ,kl=11,kw=5.2;
    {const pm=64,mx=.6,[c,q]=C2(Math.round((kl+2*mx)*pm),Math.round((kw+2*mx)*pm));q.fillStyle='#3f8a5e';q.fillRect(0,0,c.width,c.height);q.translate(c.width/2,c.height/2);q.scale(pm,pm);
-     q.fillStyle='#4b9a68';q.fillRect(-kl/2,-kw/2,kl,kw);q.fillStyle='#b5473c';[-1,1].forEach(s=>q.fillRect(s>0?kl/2-2.5:-kl/2,-1.05,2.5,2.1));
+     q.fillStyle='#4b9a68';q.fillRect(-kl/2,-kw/2,kl,kw);q.fillStyle='#b5473c';[-1,1].forEach(s=>q.fillRect(s>0?kl/2-2.3:-kl/2,-1.05,2.3,2.1));
      q.strokeStyle='#ffffff';q.lineWidth=.06;q.strokeRect(-kl/2,-kw/2,kl,kw);q.beginPath();q.moveTo(0,-kw/2);q.lineTo(0,kw/2);q.stroke();q.beginPath();q.arc(0,0,.78,0,7);q.stroke();
-     [-1,1].forEach(s=>{const bx_=s*(kl/2-.68);q.strokeRect(s>0?kl/2-2.5:-kl/2,-1.05,2.5,2.1);q.beginPath();q.arc(s*(kl/2-2.5),0,.78,0,7);q.stroke();
-       const a3=Math.asin(2.55/2.6);q.beginPath();q.moveTo(s*kl/2,-2.55);if(s>0)q.arc(bx_,0,2.6,PI+a3,PI-a3,true);else q.arc(bx_,0,2.6,-a3,a3,false);q.lineTo(s*kl/2,2.55);q.stroke();});
+     [-1,1].forEach(s=>{const bx_=s*(kl/2-.6);q.strokeRect(s>0?kl/2-2.3:-kl/2,-1.05,2.3,2.1);q.beginPath();q.arc(s*(kl/2-2.3),0,.7,0,7);q.stroke();
+       const a3=Math.asin(2.35/2.45);q.beginPath();q.moveTo(s*kl/2,-2.35);if(s>0)q.arc(bx_,0,2.45,PI+a3,PI-a3,true);else q.arc(bx_,0,2.45,-a3,a3,false);q.lineTo(s*kl/2,2.35);q.stroke();});
      q.fillStyle='#ffffff';q.beginPath();q.ellipse(0,0,.7,.42,0,0,7);q.fill();q.fillStyle='#2f5fae';q.beginPath();q.ellipse(0,0,.6,.34,0,0,7);q.fill();q.strokeStyle='#ffffff';q.lineWidth=.04;q.beginPath();q.moveTo(-.4,.08);q.quadraticCurveTo(0,-.24,.4,.08);q.stroke();
      const ct=mk(new T.PlaneGeometry(kl+2*mx,kw+2*mx),new T.MeshLambertMaterial({map:TX(c),polygonOffset:true,polygonOffsetFactor:-3}),kcx,Y0+.07,kz,G,false);ct.rotation.x=-PI/2;
      // hoops: padded blue pole outside each baseline, blue arm, white board with a red square; shoot / dunk at either end
      const [rc,rq]=C2(64,48);rq.strokeStyle='#d0392f';rq.lineWidth=5;rq.strokeRect(4,4,56,40);const RSQ=new T.MeshBasicMaterial({map:TX(rc),transparent:true,alphaTest:.3});
-     [-1,1].forEach(s=>{const P0=kcx+s*6.3,bd=kcx+s*5.4,rx=kcx+s*5.1,fx=rx-s*3.4;
+     [-1,1].forEach(s=>{const P0=kcx+s*(kl/2+.3),bd=kcx+s*(kl/2-.6),rx=kcx+s*(kl/2-.9),fx=rx-s*3;
        B(.32,1.8,.32,BLUE2,P0,.9,kz);B(.2,3.3,.2,BLUE,P0,1.65,kz);const arm=B(.9,.16,.16,BLUE,(P0+bd)/2,3.15,kz);const br=B(.75,.12,.12,BLUE,(P0+bd)/2+s*.05,2.75,kz,true);br.rotation.z=s*.55;
        B(.06,.86,1.25,BLUE,bd+s*.03,3.1,kz,true);B(.05,.8,1.2,WHITE,bd,3.1,kz);const sq=mk(new T.PlaneGeometry(.5,.38),RSQ,bd-s*.03,Y0+2.98,kz,G,false);sq.rotation.y=-s*PI/2;
        const rim=mk(new T.TorusGeometry(.24,.025,6,14),lam('#e0674b'),rx,Y0+2.75,kz,SG,false);rim.rotation.x=PI/2;
@@ -6376,7 +6376,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
    {const bxx=-83.6,zs=[29.6,30.8,32,33.2],hs=[1.5,1.85,2.2],PM=lam('#d6dadb');zs.forEach((z,k)=>{const h=Math.max(hs[Math.max(0,k-1)],hs[Math.min(2,k)]);mk(cy(.05,.05,h+.05,8),PM,bxx,Y0+(h+.05)/2,z,SG);addCol(TB.x+bxx-.1,TB.x+bxx+.1,z-.1,z+.1,Y0+h);});
      hs.forEach((h,k)=>{const b=mk(cy(.025,.025,1.2,6),PM,bxx,Y0+h,(zs[k]+zs[k+1])/2,SG,false);b.rotation.x=PI/2;b.userData.noInk=1;});
      inter(P_(bxx+1.2,31.4),1.6,'拉單槓',()=>say(null,['抓住單槓，用力拉——','一下、兩下、三下！手臂好痠，可是好有成就感！'],{noWave:1}));}
-   {const fxc=-83.6,fzc=39.4,prx=2.3,prz=4.3;const [gc,gq]=C2(128,128);gq.fillStyle='#b4b5b1';gq.fillRect(0,0,128,128);for(let i=0;i<1400;i++){gq.fillStyle=pick(['#9a9b97','#c9cac5','#8a8b88','#d6d6d0']);gq.fillRect(rr(0,128),rr(0,128),2,2);}
+   {const fxc=-50.6,fzc=32.6,prx=2.3,prz=4.3;const [gc,gq]=C2(128,128);gq.fillStyle='#b4b5b1';gq.fillRect(0,0,128,128);for(let i=0;i<1400;i++){gq.fillStyle=pick(['#9a9b97','#c9cac5','#8a8b88','#d6d6d0']);gq.fillRect(rr(0,128),rr(0,128),2,2);}
      const gt=TX(gc,true);gt.repeat.set(4,7);const pad=mk(cy(1,1,.28,48),lam('#ffffff',{map:gt}),fxc,Y0+.14,fzc,SG);pad.scale.set(prx,1,prz);
      const curb=mk(cy(1,1,.2,48),lam('#d4d0c7'),fxc,Y0+.1,fzc,SG);curb.scale.set(prx+.18,1,prz+.18);
      TB.pads.push({e:2,cx:fxc,cz:fzc,rx:prx+.1,rz:prz+.1,y:Y0+.29});
@@ -6395,16 +6395,16 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
      fg.computeVertexNormals();const g=new T.Group();g.position.set(fxc,Y0+.28,fzc);g.rotation.y=PI/2;SG.add(g);mk(fg,new T.MeshLambertMaterial({map:TX(c)}),0,.55,0,g);
      addCol(TB.x+fxc-1.1,TB.x+fxc+1.1,fzc-2.9,fzc+2.9,Y0+2.2);
      inter(P_(fxc+2.6,fzc),2,'溜魚滑梯',()=>say(null,['咻——從大魚的背上溜下來！','這隻藍色的大魚，是平等國小的招牌溜滑梯。'],{noWave:1}));
-     B(.8,.9,7.4,HEDGE,-87.2,.45,fzc);addCol(TB.x-87.6,TB.x-86.8,fzc-3.7,fzc+3.7,Y0+1);}
-   [[-82.2,16.9,.95],[-86.5,26.6,.95],[-85.7,30.6,1.1],[-80.8,34.4,.85],[-81.2,44.1,.8],[-86.9,44.2,.85],[-48.3,44.2,.8]].forEach(([x,z,s])=>juniper(x,z,s));
-   broad(-51.3,28.4,.95);broad(-77.6,43.3,.85);
-   [[-80.6,36.6],[-50.4,31.6]].forEach(([x,z])=>{mk(cy(.06,.08,5,8),DARK,x,Y0+2.5,z,SG);mk(bx(.5,.16,.24),DARK,x+.2,Y0+5,z,SG,false);addCol(TB.x+x-.12,TB.x+x+.12,z-.12,z+.12,Y0+5);});
+     B(.8,.9,7.4,HEDGE,-47.2,.45,fzc);addCol(TB.x-47.6,TB.x-46.8,fzc-3.7,fzc+3.7,Y0+1);}
+   [[-82.2,16.9,.95],[-86.5,26.6,.95],[-85.7,30.6,1.1],[-80.9,34.2,.85],[-81.2,44.1,.8],[-86.9,44.2,.85],[-84.6,39.4,1],[-86.6,35.6,.9],[-50.8,44,.8],[-54.4,35,.8]].forEach(([x,z,s])=>juniper(x,z,s));
+   broad(-53.6,26.4,.9);broad(-77.6,43.3,.85);
+   [[-80.8,37.2],[-54.6,30.2]].forEach(([x,z])=>{mk(cy(.06,.08,5,8),DARK,x,Y0+2.5,z,SG);mk(bx(.5,.16,.24),DARK,x+.2,Y0+5,z,SG,false);addCol(TB.x+x-.12,TB.x+x+.12,z-.12,z+.12,Y0+5);});
    // ---- storeroom by the east curve of the track (two white doors) + a small goal
-   {const rx0=-49.3,rx1=-45.9,rz0=34.6,rz1=39.4,rxm=(rx0+rx1)/2,rzm=(rz0+rz1)/2;B(rx1-rx0,2.8,rz1-rz0,WALL,rxm,1.4,rzm);B(rx1-rx0+.06,.4,rz1-rz0+.06,PLINTH,rxm,.2,rzm);
+   {const rx0=-49.3,rx1=-45.9,rz0=37.6,rz1=41.8,rxm=(rx0+rx1)/2,rzm=(rz0+rz1)/2;B(rx1-rx0,2.8,rz1-rz0,WALL,rxm,1.4,rzm);B(rx1-rx0+.06,.4,rz1-rz0+.06,PLINTH,rxm,.2,rzm);
      const rf=B(rx1-rx0+.9,.14,rz1-rz0+.8,ROOF,rxm,3.0,rzm);rf.rotation.z=-.1;B(.14,.36,rz1-rz0+.85,EAVE,rx0-.45,2.85,rzm,true);
      [rzm-1.15,rzm+1.15].forEach(z=>{B(.08,2.1,1.0,DOORW,rx0-.04,1.08,z);B(.09,.5,.55,GLASS,rx0-.05,1.6,z,true);});
      addCol(TB.x+rx0,TB.x+rx1,rz0,rz1,Y0+3.2);
-     const gx=-47.6,gz0=41,gz1=43.6;[gz0,gz1].forEach(z=>{B(.08,1.6,.08,WHITE,gx,.8,z,true);const bk=B(.06,1.75,.06,WHITE,gx+.75,.8,z,true);bk.rotation.z=-.45;addCol(TB.x+gx-.1,TB.x+gx+.9,z-.1,z+.1,Y0+1.6);});B(.08,.08,gz1-gz0,WHITE,gx,1.6,(gz0+gz1)/2,true);
+     const gx=-47.6,gz0=42.3,gz1=44.4;[gz0,gz1].forEach(z=>{B(.08,1.6,.08,WHITE,gx,.8,z,true);const bk=B(.06,1.75,.06,WHITE,gx+.75,.8,z,true);bk.rotation.z=-.45;addCol(TB.x+gx-.1,TB.x+gx+.9,z-.1,z+.1,Y0+1.6);});B(.08,.08,gz1-gz0,WHITE,gx,1.6,(gz0+gz1)/2,true);
      const [nc,nq]=C2(64,64);nq.strokeStyle='rgba(245,245,245,.9)';nq.lineWidth=2;for(let k=0;k<=64;k+=8){nq.beginPath();nq.moveTo(k,0);nq.lineTo(k,64);nq.stroke();nq.beginPath();nq.moveTo(0,k);nq.lineTo(64,k);nq.stroke();}
      const nt=TX(nc,true);nt.repeat.set(4,3);const NM=new T.MeshBasicMaterial({map:nt,transparent:true,alphaTest:.3,side:T.DoubleSide});const bn=mk(new T.PlaneGeometry(gz1-gz0,1.75),NM,gx+.38,Y0+.8,(gz0+gz1)/2,G,false);bn.rotation.y=PI/2;bn.rotation.x=.45;}
    // ---- fence: grey concrete posts with red-brick panels between (east side keeps the gate)
@@ -6417,14 +6417,14 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
      const gx=-45.2,gz0=22.4,gz1=27.2;[gz0,gz1].forEach(z=>{B(.9,2.6,.9,COLR,gx,1.3,z);B(1.1,.2,1.1,STONE,gx,2.7,z);addCol(TB.x+gx-.45,TB.x+gx+.45,z-.45,z+.45,Y0+2.8);});
      B(.15,.2,gz1-gz0,FRAME,gx,.1,(gz0+gz1)/2,true);B(.5,.45,gz1-gz0+1.1,COLR,gx,3.05,(gz0+gz1)/2);sign(gx+.32,Y0+3.05,(gz0+gz1)/2,PI/2,'平等國小',3.4,'#3a2a20','#f3e6c8');
      fence(gx,15.4,gx,gz0-.5);fence(gx,gz1+.5,gx,45.2);fence(gx,45.2,-88,45.2);fence(-88,45.2,-88,15.4);fence(-88,15.4,wx0-.2,15.4);}
-   // bulletin board (公告欄) on the inside of the east fence
-   {const bx0=-46.1,bz=29.6;[-1.3,1.3].forEach(o=>{B(.14,2.4,.14,FRAME,bx0,1.2,bz+o);addCol(TB.x+bx0-.15,TB.x+bx0+.15,bz+o-.15,bz+o+.15,Y0+2.4);});B(.1,1.4,2.6,lam('#3f6b4a'),bx0,1.6,bz);B(.5,.12,2.9,EAVE,bx0,2.42,bz);
-     ['#f7f2e8','#f2c14e','#bfe3f5','#f6b0a0'].forEach((c,k)=>B(.02,.6,.5,lam(c),bx0-.07,1.6+(k%2?.12:-.1),bz-.9+k*.6,true));}
+   // bulletin board (公告欄) in front of the east classrooms
+   {const bx0=-51.4,bz=23.3;[-1.3,1.3].forEach(o=>{B(.14,2.4,.14,FRAME,bx0+o,1.2,bz);addCol(TB.x+bx0+o-.15,TB.x+bx0+o+.15,bz-.15,bz+.15,Y0+2.4);});B(2.6,1.4,.1,lam('#3f6b4a'),bx0,1.6,bz);B(2.9,.12,.5,EAVE,bx0,2.42,bz);
+     ['#f7f2e8','#f2c14e','#bfe3f5','#f6b0a0'].forEach((c,k)=>B(.5,.6,.02,lam(c),bx0-.9+k*.6,1.6+(k%2?.12:-.1),bz+.07,true));}
    sqBatch(G,SG);
    reserve(-62,20,12);reserve(-60,34,14);reserve(-48.5,33,7);reserve(-42,24.8,3.5);
    seed=(SEED0+2714*0x6D2B79F5)|0;   // the old school block drew 2714 random numbers: keep the village (houses, students' homes) laid out exactly as before
    flagAt('school',-37,27);inter(P_(-38,28.5),1.8,'平等國小（地標小故事）',()=>sqStory('school'));
-   inter(P_(-47.4,29.6),1.8,'看平等國小的公告欄',()=>openBoard('news'));}
+   inter(P_(-51.4,24.7),1.8,'看平等國小的公告欄',()=>openBoard('news'));}
   // 獵人步道登山口 (behind the school, west)
   {const x=-73,z=8;[-1.3,1.3].forEach(k=>mk(bx(.3,3,.3),M.woodDark,x,H(x,z+k)+1.5,z+k,G));mk(bx(.4,.4,3.2),M.woodDark,x,H(x,z)+3.1,z,G);
     sign(x+.25,H(x,z)+3.6,z,PI/2,'環山獵人步道',3,'#4a3527','#f3e6c8');post(-70,12.5,1.6);sign(-69.93,H(-70,12.5)+1.5,12.5,PI/2,'解說牌',1.4,'#2f5a3a','#fff','只在入口看，不進入');
@@ -7088,7 +7088,7 @@ function tbLife(dt){const K=TB.truck;if(!K)return;{const px=P.pos.x-TB.x,pz=P.po
   document.body.appendChild(d);d.querySelector('.sh-x').onclick=()=>{d.hidden=true;cv.focus({preventScroll:true});};d.addEventListener('pointerdown',e=>{if(e.target===d){d.hidden=true;}});})();
 function mapLabels(){const L=[];
   if(tbIn()){SQW.forEach(st=>L.push([(W.sqw&&W.sqw[st.id]?'✅ ':'🚩 ')+st.n.replace(/（.*?）/,''),st.p[0],st.p[1]]));
-    L.push(['🐾 動物之家',98,-48],['🏛️ 泰雅文物館',-9,-27],['⛪ 長老教會',60,-34],['⛪ 天主堂',21,-36],['⛪ 真耶穌教會',-3,-17],['🍜 阿來小吃',-3,17],['🛏️ 空野原',-40,-5],['🛏️ 瑪岱夢水月',3,7],['🛏️ 波波家',36,-4],['🏪 環青商店',-14,20],['🏪 青山商行',-27,-20],['🥔 IEMo 馬鈴薯小院',26,-90],['☕ 詩歌謠天空',92,104],['⛺ 露營區',106,78],['🍎 雲頂果園',-29,77],['🌉 四季蘭溪吊橋',-130,-45],['⛰️ 眺望點',-73,34],['🍊 果園',-44,62],['🛣️ 台7甲',118,30],['🏘️ 同學巷',50,-52],['👮 派出所',8,148],['⛩️ 環清宮',-10,158]);
+    L.push(['🏫 五年級教室',CLS_DOOR[0],CLS_DOOR[1]+1.5],['🐟 魚溜滑梯',-50.6,32.6],['🐾 動物之家',98,-48],['🏛️ 泰雅文物館',-9,-27],['⛪ 長老教會',60,-34],['⛪ 天主堂',21,-36],['⛪ 真耶穌教會',-3,-17],['🍜 阿來小吃',-3,17],['🛏️ 空野原',-40,-5],['🛏️ 瑪岱夢水月',3,7],['🛏️ 波波家',36,-4],['🏪 環青商店',-14,20],['🏪 青山商行',-27,-20],['🥔 IEMo 馬鈴薯小院',26,-90],['☕ 詩歌謠天空',92,104],['⛺ 露營區',106,78],['🍎 雲頂果園',-29,77],['🌉 四季蘭溪吊橋',-130,-45],['⛰️ 眺望點',-73,34],['🍊 果園',-44,62],['🛣️ 台7甲',118,30],['🏘️ 同學巷',50,-52],['👮 派出所',8,148],['⛩️ 環清宮',-10,158]);
     const h=TB.houses[tbMySeat()];if(h&&!TS())L.push(['🏠 你的家',h.cx,h.cz,1]);return {L,ox:TB.x,oz:TB.z,cx:-10,cz:20,sx:300,sz:330,t:'Qalang Sqoyaw 環山'};}
   Object.entries(SPOTS).forEach(([k,sp])=>{if(sp.pos&&!['tree','ema','phone','post'].includes(k))L.push(['📍 '+sp.name.replace(/（.*?）/,'').replace(/[（(].*$/,''),sp.pos.x,sp.pos.z]);});
   L.push(['🚉 汐見駅',46,-34],['🏪 便利商店',KONBINI.door.x,KONBINI.door.z],['🏯 挑戰館',CH.door.x,CH.door.z]);
@@ -7381,7 +7381,7 @@ function presArea(){return MZ_IN?'mz':ISL_IN?'isl':CY_IN?'cy':P.pos.x>2300?'trib
 function presMax(){return Math.max(0,+(CFG.presenceMin==null?40:CFG.presenceMin))*60;}
 function presLoad(){const d=todayStr();if(PRES.day!==d){PRES.day=d;let u=0;try{u=+localStorage.getItem('shiomi-pres:'+d)||0;}catch(e){}PRES.used=u;PRES.stop=false;PRES.told=false;}}
 function presOk(){return started&&W.seat&&HOSTED&&CFG.presence!==false&&CLOUD.st!=='fail'&&!document.hidden&&!CUTON&&!PRES.stop;}
-function presData(){const L=W.look||{};return {seat:String(W.seat),name:W.name||'',ch:L.ch&&L.ch!=='custom'?L.ch:LOOK_DEF.ch,fe:L.fe,fn:L.fn,fm:L.fm,x:+P.pos.x.toFixed(2),z:+P.pos.z.toFixed(2),yaw:+P.yaw.toFixed(2),ar:presArea(),in:INDOOR||HOME_IN||R2.on||S2.on?1:0,w:PRES.w||0,wt:PRES.wt||''};}
+function presData(){const L=W.look||{};return {seat:String(W.seat),name:W.name||'',ch:L.ch&&L.ch!=='custom'?L.ch:LOOK_DEF.ch,fe:L.fe,fn:L.fn,fm:L.fm,x:+P.pos.x.toFixed(2),z:+P.pos.z.toFixed(2),yaw:+P.yaw.toFixed(2),ar:presArea(),in:INDOOR||HOME_IN||R2.on||S2.on?1:0,w:PRES.w||0,wt:PRES.wt||'',s:PRES.s||null};}
 async function presWrite(){const d=presData();PRES.me=d;PRES.lastW=Date.now();
   try{const r=await fbReq('/pres/live/'+String(W.seat).replace(/[^0-9A-Za-z-]/g,''),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:{d:{stringValue:JSON.stringify(d)}}})});
     if(r.ok){const j=await r.json();PRES.srvT=Date.parse(j.updateTime)||PRES.srvT;PRES.srvAt=Date.now();}}catch(e){}}
@@ -7393,31 +7393,45 @@ async function presPoll(){let j;try{const r=await fbReq('/pres/live?pageSize=20'
 function presTag(text){const [c,g]=C2(256,64);g.font=`800 30px ${FG}`;const w=Math.min(250,g.measureText(text).width+28);g.fillStyle='rgba(22,18,31,.72)';rrect(g,(256-w)/2,8,w,48,22);g.fill();g.fillStyle='#fff3dd';g.textAlign='center';g.textBaseline='middle';g.fillText(text,128,33);
   const sp=new T.Sprite(new T.SpriteMaterial({map:TX(c),transparent:true,depthWrite:false}));sp.scale.set(1.9,.48,1);sp.renderOrder=8;scene.add(sp);return sp;}
 function presUpsert(d){let o=PRES.others[d.seat];const nm=d.seat==='T'?'老師':`${d.seat} 號 ${d.name||''}`;
-  if(!o){o=PRES.others[d.seat]={seat:d.seat,pos:new T.Vector3(d.x,groundH(d.x,d.z),d.z),tgt:new T.Vector3(),yaw:d.yaw||0,ph:0,amt:0,c:null,ch:null,tag:presTag(nm),nm,lastW:d.w||0,vis:false,hello:false,wave:0};
-    inter(o.pos,2.2,()=>`跟 ${o.nm} 打招呼 👋`,()=>presWave(o),{hide:()=>!o.vis});}
+  if(!o){o=PRES.others[d.seat]={seat:d.seat,pos:new T.Vector3(d.x,groundH(d.x,d.z),d.z),tgt:new T.Vector3(),yaw:d.yaw||0,ph:0,amt:0,c:null,ch:null,tag:presTag(nm),nm,lastW:d.w||0,lastS:d.s?d.s.t:0,bub:null,bubT:0,vis:false,hello:false,wave:0};
+    inter(o.pos,2.2,()=>`跟 ${o.nm} 說話 💬`,()=>presTalk(o),{hide:()=>!o.vis});}
   o.d=d;o.gone=false;o.tgt.set(d.x,groundH(d.x,d.z),d.z);if(o.nm!==nm){o.nm=nm;scene.remove(o.tag);o.tag=presTag(nm);}
   if(o.ch!==d.ch&&SPRITES[d.ch]){if(o.c)dropSpr(o.c);o.c=makeSpr(d.ch,1.62,{e:d.fe,n:d.fn,m:d.fm});o.ch=d.ch;}
-  if((d.w||0)>o.lastW){o.lastW=d.w;o.wave=2.6;if(d.wt===String(W.seat)){SND.pick&&SND.pick();toast(`👋 ${nm} 跟你打招呼！`);}}}
+  if((d.w||0)>o.lastW){o.lastW=d.w;o.wave=2.6;if(d.wt===String(W.seat)){SND.pick&&SND.pick();toast(`👋 ${nm} 跟你打招呼！`);}}
+  if(d.s&&d.s.t>(o.lastS||0)&&typeof d.s.x==='string'){o.lastS=d.s.t;const tx=d.s.x.slice(0,20);if(o.bub)scene.remove(o.bub);o.bub=presBubble(tx);o.bubT=7;if(o.vis||d.s.to===String(W.seat)){SND.pick&&SND.pick();toast(`💬 ${nm}${d.s.to===String(W.seat)?' 對你說':''}：「${tx}」`);}}}
+// quick chat: a few ready-made lines + typing your own (≤20 字, unkind words blocked); shows as a speech bubble over your head on everyone's screen
+const PRES_LINES=['嗨！你好～','一起去投籃！','來我家玩！','跟我來！','好厲害！','掰掰～'];
+function presBubble(text){const [c,g]=C2(512,96);g.font=`800 34px ${FG}`;const w=Math.min(500,g.measureText(text).width+44);g.fillStyle='rgba(255,255,255,.96)';rrect(g,(512-w)/2,6,w,70,26);g.fill();
+  g.beginPath();g.moveTo(244,74);g.lineTo(256,92);g.lineTo(268,74);g.fill();g.strokeStyle='rgba(60,40,30,.25)';g.lineWidth=3;rrect(g,(512-w)/2,6,w,70,26);g.stroke();g.fillStyle='#3a2a20';g.textAlign='center';g.textBaseline='middle';g.fillText(text,256,42);
+  const sp=new T.Sprite(new T.SpriteMaterial({map:TX(c),transparent:true,depthWrite:false,depthTest:false}));sp.scale.set(3.2,.6,1);sp.renderOrder=9;sp.visible=false;scene.add(sp);return sp;}
+function presTalk(o){choose(o.nm,'要跟同學說什麼？',[{label:'👋 打招呼',fn:()=>presWave(o)},...PRES_LINES.map(t=>({label:t,fn:()=>presSay(o,t)})),{label:'✏️ 自己打一句',fn:()=>presType(o)},{label:'算了',fn:null}]);}
+function presType(o){setTimeout(()=>{let t='';try{t=(prompt(`想對 ${o.nm} 說什麼？（最多 20 個字）`)||'').trim();}catch(e){}if(!t)return;t=t.replace(/\s+/g,' ').slice(0,20);
+  if(MSG_BAD.some(w=>t.includes(w))){say(null,['這句話可能會讓同學難過，換個說法吧！'],{noWave:1});return;}presSay(o,t);},60);}
+function presSay(o,t){const now=Date.now();if(now-(PRES.sAt||0)<3000){toast('慢一點，等一下再說喔');return;}PRES.sAt=now;PRES.s={t:now,x:t,to:o.seat};PRES.wNext=0;
+  if(PRES.myBub)scene.remove(PRES.myBub);PRES.myBub=presBubble(t);PRES.myBubT=7;toast(`你對 ${o.nm} 說：「${t}」`);}
 function presWave(o){PRES.w=Date.now();PRES.wt=o.seat;PRES.wNext=0;try{if(!INDOOR)actPlay('wave');}catch(e){}toast(`你向 ${o.nm} 揮揮手 👋`);}
-function presHideAll(){Object.values(PRES.others).forEach(o=>{o.vis=false;if(o.c)sprShow(o.c,false);o.tag.visible=false;});}
+function presHideAll(){Object.values(PRES.others).forEach(o=>{o.vis=false;if(o.c)sprShow(o.c,false);o.tag.visible=false;if(o.bub)o.bub.visible=false;});if(PRES.myBub)PRES.myBub.visible=false;}
 function presTick(dt){presLoad();
   if(!presOk()){presHideAll();return;}
   const me=presData(),now=Date.now();PRES.used+=dt;if(Math.floor(PRES.used)%15===0){try{localStorage.setItem('shiomi-pres:'+PRES.day,String(Math.round(PRES.used)));}catch(e){}}
   if(PRES.used>presMax()){PRES.stop=true;presHideAll();if(!PRES.told){PRES.told=true;toast('今天的「線上看到同學」時間用完了，明天再見！（存檔不受影響）');}fbReq('/pres/live/'+String(W.seat).replace(/[^0-9A-Za-z-]/g,''),{method:'DELETE'}).catch(()=>{});return;}
   // write: when you moved / turned / waved (at most every 2 s), otherwise a heartbeat every 8 s
-  const L=PRES.me,moved=!L||Math.hypot(me.x-L.x,me.z-L.z)>.25||Math.abs(me.yaw-L.yaw)>.35||me.ar!==L.ar||me.in!==L.in||me.w!==L.w;
+  const L=PRES.me,moved=!L||Math.hypot(me.x-L.x,me.z-L.z)>.25||Math.abs(me.yaw-L.yaw)>.35||me.ar!==L.ar||me.in!==L.in||me.w!==L.w||(me.s&&(!L.s||me.s.t!==L.s.t));
   if(!PRES.busy&&now>PRES.wNext&&(moved||now-(PRES.lastW||0)>(me.in?20000:8000))){PRES.busy=true;PRES.wNext=now+2000;presWrite().finally(()=>{PRES.busy=false;});}
   if(now>PRES.pNext){PRES.pNext=now+(me.in?30000:PRES.fresh?4000:15000);presPoll();}
   // draw everyone who is outdoors in the same place as you
   const hereOut=!me.in;
   Object.values(PRES.others).forEach(o=>{const d=o.d;const show=hereOut&&!o.gone&&d&&!d.in&&d.ar===me.ar&&o.c;
-    if(!show){if(o.vis){o.vis=false;if(o.c)sprShow(o.c,false);o.tag.visible=false;}return;}
+    if(o.bubT>0)o.bubT-=dt;
+    if(!show){if(o.vis){o.vis=false;if(o.c)sprShow(o.c,false);o.tag.visible=false;}if(o.bub)o.bub.visible=false;return;}
     if(!o.vis){o.vis=true;o.pos.copy(o.tgt);if(!o.hello){o.hello=true;toast(`👋 ${o.nm} 也在這裡！走過去可以打招呼`);}}
     const dx=o.tgt.x-o.pos.x,dz=o.tgt.z-o.pos.z,dd=Math.hypot(dx,dz);if(dd>12){o.pos.copy(o.tgt);}
     const sp=dd>.05?Math.min(dd,Math.max(1.2,dd*1.6)*dt):0;if(sp>0){o.pos.x+=dx/dd*sp;o.pos.z+=dz/dd*sp;o.yaw=lerpAng(o.yaw,Math.atan2(dx,dz),1-Math.exp(-dt*10));}else o.yaw=lerpAng(o.yaw,d.yaw||0,1-Math.exp(-dt*4));
     o.pos.y=groundH(o.pos.x,o.pos.z);o.amt=lerp(o.amt,clamp(sp/Math.max(dt,1e-3)/3.9,0,1.15),1-Math.exp(-dt*8));o.ph+=o.amt*3.9*dt*2.1;
     sprShow(o.c,true);sprPose(o.c,o.pos,o.yaw,o.ph,o.amt,time);o.tag.visible=true;o.tag.position.set(o.pos.x,o.pos.y+2.15+(o.wave>0?.25*Math.abs(Math.sin(time*8)):0),o.pos.z);
-    if(o.wave>0){o.wave-=dt;o.tag.material.opacity=1;}});}
+    if(o.bub){o.bub.visible=o.bubT>0;if(o.bub.visible)o.bub.position.set(o.pos.x,o.pos.y+2.75,o.pos.z);}
+    if(o.wave>0){o.wave-=dt;o.tag.material.opacity=1;}});
+  if(PRES.myBub){PRES.myBubT-=dt;PRES.myBub.visible=PRES.myBubT>0&&!me.in;if(PRES.myBub.visible)PRES.myBub.position.set(P.pos.x,P.pos.y+2.6,P.pos.z);}}
 addEventListener('pagehide',()=>{if(W.seat&&PRES.me)fbReq('/pres/live/'+String(W.seat).replace(/[^0-9A-Za-z-]/g,''),{method:'DELETE',keepalive:true}).catch(()=>{});});
 function frame(){
   const rawDt=Math.min(.3,clock.getDelta()),dt=Math.min(.1,rawDt);FRAME_RAW=rawDt;time+=dt;   // up to 1/10 s per frame: a slow tablet stays choppy-but-real-speed instead of slow motion
