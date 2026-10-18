@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant" translate="no" class="notranslate"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>汐見町闖關</title><meta name="theme-color" content="#16121f"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#16121f;color:#141413}</style><script>window.SHIOMI_BUILD="1018-2123";(function(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){if(j&&j.v&&j.v!==window.SHIOMI_BUILD&&sessionStorage.getItem("shiomi_rl")!==j.v){sessionStorage.setItem("shiomi_rl",j.v);location.reload();}}).catch(function(){});}catch(e){}})();</script></head><body>
+<!doctype html><html lang="zh-Hant" translate="no" class="notranslate"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>汐見町闖關</title><meta name="theme-color" content="#16121f"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#16121f;color:#141413}</style><script>window.SHIOMI_BUILD="1019-0034";(function(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){if(j&&j.v&&j.v!==window.SHIOMI_BUILD&&sessionStorage.getItem("shiomi_rl")!==j.v){sessionStorage.setItem("shiomi_rl",j.v);location.reload();}}).catch(function(){});}catch(e){}})();</script></head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
@@ -829,6 +829,9 @@ body.touch #quests.closed{background:var(--sh-cream)!important}
 /* art pack v0.2: clean picture — no film grain, a much softer vignette */
 #grain{opacity:0!important;animation:none!important}
 #vignette{background:radial-gradient(ellipse 130% 105% at 50% 46%,transparent 62%,rgba(40,26,14,.16) 100%)!important}
+
+.skyrow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}
+.skyrow .btn.on{background:#2f6fb0!important;color:#fff!important;border-color:#2f6fb0!important}
 </style>
 <script id="loader">/* boot loading screen: dark night sky, title, progress, and the class running along the bottom (video cut-outs) */
 (function(){if(document.getElementById('bootLoad'))return;
@@ -958,10 +961,11 @@ const PRESETS={
     skyTop:'#26376a',skyHorizon:'#f6a06a',skyBottom:'#c98a78',fog:'#d9a892',fogNear:40,fogFar:950,glowCol:'#ffb070',disk:1,glow:1,
     clouds:.85,cloudLit:'#ffbd8a',cloudDark:'#6a5178',stars:.05,lamps:.62,windows:.6,exposure:1.0,motes:1,seaSun:1.2,night:0,dusk:1,day:0,
     seaDeep:'#1a2d4a',seaShallow:'#3c6275',light:.95,sprTint:'#ffe4d0'},
-  night:{jp:'夜',clock:[21,12],sunDir:[-.25,.42,-.87],sunColor:'#86a0da',sunI:.5,hemiSky:'#34467a',hemiGround:'#12131c',hemiI:.58,
-    skyTop:'#040816',skyHorizon:'#1a2748',skyBottom:'#0b1226',fog:'#16213d',fogNear:20,fogFar:640,glowCol:'#c3d0ff',disk:.95,glow:.35,
-    clouds:.32,cloudLit:'#3a4670',cloudDark:'#0a0e1e',stars:1,lamps:1,windows:1,exposure:1.3,motes:0,seaSun:.6,night:1,dusk:0,day:0,
-    seaDeep:'#040914',seaShallow:'#0d1d33',light:.42,sprTint:'#8e9cc8'},
+  // a bright storybook night: strong moonlight and sky fill so roads, houses and trees stay readable, warm street lamps on top
+  night:{jp:'夜',clock:[21,12],sunDir:[-.25,.55,-.8],sunColor:'#a0b4ec',sunI:.8,hemiSky:'#6478b6',hemiGround:'#2e3248',hemiI:.9,
+    skyTop:'#0c1838',skyHorizon:'#34497c',skyBottom:'#1a2850',fog:'#2a3a64',fogNear:40,fogFar:760,glowCol:'#c3d0ff',disk:.95,glow:.45,
+    clouds:.4,cloudLit:'#5a6a98',cloudDark:'#18203a',stars:1,lamps:1,windows:1,exposure:1.4,motes:0,seaSun:.7,night:1,dusk:0,day:0,
+    seaDeep:'#0a1428',seaShallow:'#1a3050',light:.6,sprTint:'#b8c2e6'},
   // art pack v0.2: a clear, sunny late morning — deep blue sky, clean far haze, warm white sun
   day:{jp:'昼下がり',clock:[14,32],sunDir:[.55,.62,-.45],sunColor:'#fff0d6',sunI:2.35,hemiSky:'#cfe4f8',hemiGround:'#6f6a52',hemiI:.9,
     skyTop:'#2a7bd6',skyHorizon:'#a8d2f2',skyBottom:'#9ccbea',fog:'#bcdaf0',fogNear:130,fogFar:1250,glowCol:'#fff6e4',disk:1,glow:.45,
@@ -2106,7 +2110,7 @@ function cutPatch(m){if(!m||m.userData.cutP)return;m.userData.cutP=true;
   m.customProgramCacheKey=()=>(pk?pk():'')+'|cut';m.needsUpdate=true;}
 function camInside(p){const CL=cgQuery(p.x-.4,p.z-.4,p.x+.4,p.z+.4,_rq);for(const c of CL){if(!c.see||p.y>c.y1+1.5||p.y<c.y0)continue;
   if(c.o){const q=c.o,rx=p.x-q.cx,rz=p.z-q.cz;if(Math.abs(rx*q.ux+rz*q.uz)<q.hw+.3&&Math.abs(rx*q.vx+rz*q.vz)<q.hd+.3)return true;}else if(p.x>c.x0-.3&&p.x<c.x1+.3&&p.z>c.z0-.3&&p.z<c.z1+.3)return true;}return false;}
-function rayDist(o,d,maxD,solid){let best=maxD;const sk=CUTU.on&&!solid;const ex=o.x+d.x*maxD,ez=o.z+d.z*maxD;const CL=cgQuery(Math.min(o.x,ex)-.5,Math.min(o.z,ez)-.5,Math.max(o.x,ex)+.5,Math.max(o.z,ez)+.5,_rq);for(const c of CL){if(c.y1<.9||c.nc||(sk&&c.see))continue;
+function rayDist(o,d,maxD,solid){let best=maxD;const sk=CUTU.on&&!solid;const ex=o.x+d.x*maxD,ez=o.z+d.z*maxD;const CL=cgQuery(Math.min(o.x,ex)-.5,Math.min(o.z,ez)-.5,Math.max(o.x,ex)+.5,Math.max(o.z,ez)+.5,_rq);for(const c of CL){if(c.y1<.9||c.nc||(sk&&c.see))continue;if(!c.o&&c.x1-c.x0<.9&&c.z1-c.z0<.9)continue;   // poles, flags, lamp posts never pull the camera in
   let tmin=0,tmax=best;let ax;if(c.o){const q=c.o,rx=o.x-q.cx,rz=o.z-q.cz;ax=[[rx*q.ux+rz*q.uz,d.x*q.ux+d.z*q.uz,-q.hw,q.hw],[o.y,d.y,c.y0,c.y1],[rx*q.vx+rz*q.vz,d.x*q.vx+d.z*q.vz,-q.hd,q.hd]];}else ax=[[o.x,d.x,c.x0,c.x1],[o.y,d.y,c.y0,c.y1],[o.z,d.z,c.z0,c.z1]];let ok=true;
   for(const [oo,dd,a,b] of ax){if(Math.abs(dd)<1e-6){if(oo<a||oo>b){ok=false;break;}}else{let t1=(a-oo)/dd,t2=(b-oo)/dd;if(t1>t2){const t=t1;t1=t2;t2=t;}tmin=Math.max(tmin,t1);tmax=Math.min(tmax,t2);if(tmin>tmax){ok=false;break;}}}
   if(ok&&tmin>0.2&&tmin<best)best=tmin;}return best;}
@@ -2863,7 +2867,12 @@ function renderTP(){const B=$('tpBody');B.innerHTML='';
     const st=el('p',{class:'help'});const upd=()=>{const f=parseForm(ED.formLink);st.textContent=!ED.formLink?'還沒貼上連結。':!f?'這看起來不是 Google 表單的連結，請貼上「預先填入的連結」。':f.count<4?`只讀到 ${f.count} 個欄位，請確認四題都有填 1、2、3、4。`:'✓ 讀到 4 個欄位，可以使用。';};
     const i=inp(ED.formLink,v=>{ED.formLink=v.trim();upd();},{placeholder:'https://docs.google.com/forms/d/e/…/viewform?usp=pp_url&entry…'});B.appendChild(fld('預先填入的連結',i,true));upd();B.appendChild(st);
     const test=el('a',{class:'btn small',target:'_blank',rel:'noopener',text:'用測試資料打開表單'});test.addEventListener('click',e=>{const f=parseForm(ED.formLink);if(!f||!f.count){e.preventDefault();return;}const v={1:'0',2:'測試',3:'答對 0/0',4:'這是老師的測試'};test.href=f.base+'?usp=pp_url&'+Object.entries(f.ids).map(([k,id])=>`entry.${id}=${encodeURIComponent(v[k])}`).join('&');});B.appendChild(test);}
-  else if(tpTab==='ot'){B.appendChild(el('div',{class:'row2'},[fld('每答對一題得到的金幣',inp(ED.coinsPerCorrect,v=>ED.coinsPerCorrect=Math.max(0,parseInt(v,10)||0),{type:'number',min:'0'})),fld('學生一開始有的金幣',inp(ED.startCoins,v=>ED.startCoins=Math.max(0,parseInt(v,10)||0),{type:'number',min:'0'})),fld('每天建議遊玩時間（分鐘，0＝不提醒）',inp(ED.playLimit==null?30:ED.playLimit,v=>ED.playLimit=Math.max(0,parseInt(v,10)||0),{type:'number',min:'0'}))]));
+  else if(tpTab==='ot'){{const cur=classSky();const row=el('div',{class:'skyrow'});
+      ['day','sunset','night','auto'].forEach(k=>{const b=el('button',{type:'button',class:'btn small'+(k===cur?' on':''),text:SKYJP[k]});b.setAttribute('aria-pressed',k===cur);
+        b.onclick=async()=>{row.querySelectorAll('button').forEach(x=>x.disabled=true);await skySet(k);renderTP();};row.appendChild(b);});
+      B.appendChild(el('h3',{text:'天色（全班一起）'}));B.appendChild(row);
+      B.appendChild(el('p',{class:'help',text:'按下去就生效，不用按「儲存並發布」。學生一分鐘內會跟著換。「跟著真實時間」會依台灣日出日落自動變化，晚上就是夜晚。'}));}
+    B.appendChild(el('div',{class:'row2'},[fld('每答對一題得到的金幣',inp(ED.coinsPerCorrect,v=>ED.coinsPerCorrect=Math.max(0,parseInt(v,10)||0),{type:'number',min:'0'})),fld('學生一開始有的金幣',inp(ED.startCoins,v=>ED.startCoins=Math.max(0,parseInt(v,10)||0),{type:'number',min:'0'})),fld('每天建議遊玩時間（分鐘，0＝不提醒）',inp(ED.playLimit==null?30:ED.playLimit,v=>ED.playLimit=Math.max(0,parseInt(v,10)||0),{type:'number',min:'0'}))]));
     B.appendChild(el('div',{class:'row2'},[fld('班級密碼（學生登入時要輸入，空白＝不需要）',inp(ED.classPass||'',v=>ED.classPass=v.trim().slice(0,20),{maxlength:'20'})),el('span'),el('span')]));
     B.appendChild(el('p',{class:'help',text:'班級密碼只是擋住不是本班的人，不是很嚴密的保護。之後換成雲端登入時會再加強。'}));
     {const cb=el('input',{type:'checkbox'});cb.checked=ED.presence!==false;cb.onchange=()=>{ED.presence=cb.checked;dirty();};
@@ -3345,15 +3354,30 @@ const keys={};let started=false,lastInput=0;
 const cam={yaw:0,pitch:.2,dist:innerWidth<innerHeight?8.6:6.4,pos:new T.Vector3(),look:new T.Vector3()};
 // sky follows the real clock (Taiwan sunrise/sunset through the year) so everyone online sees the same time of day;
 // the teacher can still preview other times with T (local only), and pressing it through the cycle returns to 「現在」
-const RTC={auto:true,tk:0};
+const RTC={auto:false,tk:0,local:false,mode:null};
+function classSky(){const m=CFG.sky;return m==='auto'||m==='night'||m==='sunset'?m:'day';}
+const SKYJP={day:'白天',sunset:'傍晚',night:'夜晚',auto:'跟著真實時間'};
 function realSky(){const n=new Date(),h=n.getHours()+n.getMinutes()/60+n.getSeconds()/3600;const d=(Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())-Date.UTC(n.getFullYear(),0,0))/864e5;
   const sr=5.9-.8*Math.cos(2*PI*(d-172)/365),ss=17.95+.9*Math.cos(2*PI*(d-180)/365);let a='night',b='night',t=0;
   if(h>=sr-.7&&h<sr+.3){a='night';b='sunset';t=h-(sr-.7);}else if(h>=sr+.3&&h<sr+1.5){a='sunset';b='day';t=(h-(sr+.3))/1.2;}else if(h>=sr+1.5&&h<ss-1){a=b='day';}
   else if(h>=ss-1&&h<ss){a='day';b='sunset';t=h-(ss-1);}else if(h>=ss&&h<ss+.45){a=b='sunset';}else if(h>=ss+.45&&h<ss+1.3){a='sunset';b='night';t=(h-(ss+.45))/.85;}
   t=clamp(t,0,1);return {a,b,t:t*t*(3-2*t)};}
 function applyRealSky(){const r=realSky();blendState(PS[r.a],PS[r.b],r.t,S);envFrom=envTo=PS[r.t<.5?r.a:r.b];envK=1;todIdx=ORDER.indexOf(r.t<.5?r.a:r.b);const l=$('tBtnLbl');if(l)l.textContent='現在';}
-function realTick(dt){if(!RTC.auto||CUTON)return;RTC.tk-=dt;if(RTC.tk>0)return;RTC.tk=2;applyRealSky();}
-function timeBtn(){if(!TS()){toast('天色跟著真實時間變化喔！');return;}if(RTC.auto){RTC.auto=false;RTC.step=0;setTime(0);return;}RTC.step=(RTC.step||0)+1;if(RTC.step>=3){RTC.auto=true;RTC.tk=0;applyRealSky();toast('回到現在的天色');return;}setTime(RTC.step);}
+function realTick(dt){if(CUTON||RTC.local)return;const m=classSky();
+  if(m==='auto'){if(RTC.mode!=='auto'){RTC.mode='auto';RTC.tk=0;}RTC.auto=true;RTC.tk-=dt;if(RTC.tk>0)return;RTC.tk=2;applyRealSky();return;}
+  RTC.auto=false;if(RTC.mode===m)return;const first=RTC.mode===null;RTC.mode=m;const i=ORDER.indexOf(m);
+  if(first){todIdx=i;blendState(PS[m],PS[m],1,S);envFrom=envTo=PS[m];envK=1;const l=$('tBtnLbl');if(l)l.textContent=PRESETS[m].jp;}
+  else{setTime(i);if(started&&!TS())toast(`老師把天色換成「${SKYJP[m]}」了`);}}
+function skyRestore(){RTC.local=false;RTC.mode=null;RTC.tk=0;}
+// the T key / 時間 button: students see the teacher's choice; the teacher can preview other times on this device only
+function timeBtn(){if(!TS()){toast(`天色由老師設定（現在是「${SKYJP[classSky()]}」）`);return;}
+  if(!RTC.local){RTC.local=true;RTC.auto=false;RTC.step=0;setTime(0);toast('只有你這台在預覽；要全班一起換，請到老師面板 →「其他設定」→「天色」');return;}
+  RTC.step=(RTC.step||0)+1;if(RTC.step>=3){skyRestore();toast(`回到全班的天色：${SKYJP[classSky()]}`);return;}setTime(RTC.step);}
+// students pick up a new class sky without reloading (one small read a minute while playing)
+setInterval(async()=>{if(!started||!W.seat||W.seat==='T'||document.hidden||!HOSTED)return;try{const r=await fbReq('/config');if(!r.ok)return;const j=await r.json();const c=JSON.parse(j.fields.d.stringValue);if(c&&c.sky!==CFG.sky)CFG.sky=c.sky;}catch(e){}},60000);
+async function skySet(m){const prev=CFG.sky;CFG.sky=m;if(typeof ED!=='undefined'&&ED)ED.sky=m;skyRestore();
+  if(!HOSTED){toast(`天色：${SKYJP[m]}（這個頁面沒有連雲端，只改這台）`);return true;}
+  try{const c=JSON.parse(JSON.stringify(CFG));await cfgPut(c);toast(`全班的天色換成「${SKYJP[m]}」，學生一分鐘內會跟著換`);return true;}catch(e){CFG.sky=prev;if(typeof ED!=='undefined'&&ED)ED.sky=prev;skyRestore();toast('連不上雲端，天色還沒換，請確認網路再試');return false;}}
 function setTime(i){todIdx=i;envFrom=blendState(S,S,0,{});envTo=PS[ORDER[i]];envK=0;clockBase=performance.now();$('tBtnLbl').textContent=PRESETS[ORDER[i]].jp;toast(`${PRESETS[ORDER[i]].jp} · ${['傍晚','夜晚','午後'][i]}`);}
 $('cineExit').onclick=()=>toggleCine();
 function toggleCine(){document.body.classList.toggle('cine');$('bCine').setAttribute('aria-pressed',document.body.classList.contains('cine'));}
@@ -7001,6 +7025,31 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
    // scooters & parked trucks along the lanes
    BLD.forEach(c=>{if(rand()>.22)return;const vx=Math.sin(c.ry),vz=Math.cos(c.ry),ux=Math.cos(c.ry),uz=-Math.sin(c.ry);const a=rr(-c.W/2+.6,c.W/2-.6),x=c.x+vx*(c.D/2+.75)+ux*a,z=c.z+vz*(c.D/2+.75)+uz*a;
      if(c.setb<1.1||colHit(x,z)||!laneOK(x,z,-.2))return;const g=new T.Group();g.position.set(x,tribeH(x,z),z);g.rotation.y=c.ry+PI/2;HG.add(g);o_scooter(g,0,0);addCol(TB.x+x-.7,TB.x+x+.7,z-.7,z+.7,tribeH(x,z)+1.3);});
+   // ---- street lamps along every lane and 台7甲 (no rand(): the layout after this point stays the same)
+   {const LP=[],C2=COLS.filter(q=>q.x1>TB.x-230&&q.x0<TB.x+230&&q.y1-q.y0<60);
+    const hit=(x,z)=>{const X=TB.x+x;return C2.some(q=>X>q.x0-.35&&X<q.x1+.35&&z>q.z0-.35&&z<q.z1+.35);},near=(x,z,r)=>LP.some(p=>Math.hypot(p[0]-x,p[1]-z)<r);
+    const lines=SQ_LANES.map((L,i)=>({w:L.w,p:L.p,step:16,side:i%2?1:-1})).concat([{w:8.4,p:SQ_ROAD,step:22,side:1}]);
+    lines.forEach(L=>{let acc=L.step*.4;for(let i=0;i<L.p.length-1;i++){const [x0,z0]=L.p[i],[x1,z1]=L.p[i+1],dx=x1-x0,dz=z1-z0,len=Math.hypot(dx,dz);if(len<.01)continue;
+      const tx=dx/len,tz=dz/len,nx=-tz,nz=tx;let d=acc;
+      for(;d<len;d+=L.step){for(const sd of [L.side,-L.side]){const off=L.w/2+.55,x=x0+tx*d+nx*sd*off,z=z0+tz*d+nz*sd*off;
+          if(!laneOK(x,z,.1)||hit(x,z)||near(x,z,10))continue;if(Math.abs(tribeH(x+1,z)-tribeH(x-1,z))>1.6||Math.abs(tribeH(x,z+1)-tribeH(x,z-1))>1.6)continue;
+          const y=tribeH(x,z),ax=-nx*sd,az=-nz*sd,g=new T.Group();g.position.set(x,y,z);g.rotation.y=Math.atan2(ax,az);HG.add(g);
+          mk(cy(.15,.17,.3,8),M.concrete,0,.15,0,g);mk(cy(.065,.095,5.4,8),M.metal,0,2.7,0,g);mk(bx(.06,.06,1.6),M.metal,0,5.32,.75,g);
+          mk(bx(.26,.11,.56),M.metalDark,0,5.28,1.5,g);mk(bx(.2,.04,.46),M.lampHead,0,5.21,1.5,g,false);
+          addCol(TB.x+x-.2,TB.x+x+.2,z-.2,z+.2,y+6);LP.push([x,z,x+ax*1.5,y+5.1,z+az*1.5]);break;}}
+      acc=d-len;}});
+    TB.lamps=LP.length;TB.lampP=LP;
+    // glow halos: one point cloud; light pools: one mesh that follows the slope
+    {const pos=new Float32Array(LP.length*3);LP.forEach((p,i)=>{pos[i*3]=p[2];pos[i*3+1]=p[3];pos[i*3+2]=p[4];});
+     const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos,3));g.computeBoundingSphere();
+     const m=new T.PointsMaterial({map:glowTex,color:col('#ffe2b0'),size:4.2,sizeAttenuation:true,transparent:true,blending:T.AdditiveBlending,depthWrite:false});GLOWM.push({m,kind:'lamp',base:1});
+     const pts=new T.Points(g,m);pts.frustumCulled=false;pts.renderOrder=2;G.add(pts);}
+    {const N=8,R=4.8,V=(N+1)*(N+1),pos=new Float32Array(LP.length*V*3),uv=new Float32Array(LP.length*V*2),idx=[];
+     LP.forEach((p,k)=>{const cx=p[2],cz=p[4],b=k*V;for(let j=0;j<=N;j++)for(let i=0;i<=N;i++){const u=i/N,v=j/N,x=cx+(u*2-1)*R,z=cz+(v*2-1)*R,o=b+j*(N+1)+i;
+         pos[o*3]=x;pos[o*3+1]=tribeH(x,z)+.08;pos[o*3+2]=z;uv[o*2]=u;uv[o*2+1]=v;}
+       for(let j=0;j<N;j++)for(let i=0;i<N;i++){const a=b+j*(N+1)+i;idx.push(a,a+N+1,a+1,a+1,a+N+1,a+N+2);}});
+     const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos,3));g.setAttribute('uv',new T.BufferAttribute(uv,2));g.setIndex(idx);g.computeBoundingSphere();
+     const pm=new T.Mesh(g,poolMat('#ffdca6','lamp',1));pm.renderOrder=1;pm.userData.nomerge=true;G.add(pm);}}
    // ---- static batching: merge by material + area so the whole village is a few dozen draw calls
    sqBatch(G,HG);
    G.remove(HG);TB.nBld=BLD.length;TB.bld=BLD.map(c=>[c.t,Math.round(c.x),Math.round(c.z)]);}
@@ -7537,6 +7586,9 @@ function updatePlayer(dt){
   pl.head.rotation.y=Math.sin(time*.4)*.12*(1-amt);
   P.stepAcc+=spd*dt;if(P.stepAcc>(run?1.25:.95)){P.stepAcc=0;SND.step(surface());if(P.runK>.6&&!INDOOR)dustPuff(1,.8);}}
 const _cdir=new T.Vector3(),_cw=new T.Vector3();function lerpAng(a,b,t){let d=b-a;while(d>PI)d-=2*PI;while(d<-PI)d+=2*PI;return a+d*t;}
+// first point where the hillside rises above the camera line (so the camera never ends up behind or inside a slope)
+function terrOnly(x,z){return x>2300?(TB.terrH?TB.terrH(x-2600,z):sqBase(x-2600,z)):groundH(x,z);}
+function terrHit(o,dv,d){for(let i=1;i<=10;i++){const t=d*i/10,x=o.x+dv.x*t,z=o.z+dv.z*t,y=o.y+dv.y*t;if(terrOnly(x,z)+.35>y)return Math.max(0,t-d/10);}return d;}
 function updateCamera(dt){
   if(HOME_IN&&HOME.edit){const port=camera.aspect<1;const want=tmpV.set(HX,port?12.5:7.6,HZ+(port?5.4:5.4));const look=new T.Vector3(HX,0,HZ+(port?.2:-.2));
     // keep the whole room visible above (phone) or left of (desktop) the decorating panel
@@ -7582,11 +7634,11 @@ function updateCamera(dt){
   const target=tmpV.set(P.pos.x,P.pos.y+(P.sit?1.0:1.45),P.pos.z);
   const d=!started?9.5:INDOOR?Math.min(cam.dist,3.6):P.sit?4.6:cam.dist;if(P.sit&&cam.pitch>.14)cam.pitch=lerp(cam.pitch,.1,1-Math.exp(-dt*3));
   // when a building blocks the view outdoors, lift the camera over the roofs instead of zooming into the player's back
-  let pb=0;if(started&&!INDOOR&&!CUTON&&!CUTU.on){for(const k of [0,.28,.55,.8]){const pp=Math.min(1.25,cam.pitch+k);const dv=_cdir.set(Math.sin(cam.yaw)*Math.cos(pp),Math.sin(pp),Math.cos(cam.yaw)*Math.cos(pp));if(rayDist(target,dv,d)>=d*.82||k===.8){pb=pp-cam.pitch;break;}}}
-  else if(started&&!INDOOR&&!CUTON&&CUTU.on){for(const k of [0,.2,.4]){const pp=Math.min(1.25,cam.pitch+k);const dv=_cdir.set(Math.sin(cam.yaw)*Math.cos(pp),Math.sin(pp),Math.cos(cam.yaw)*Math.cos(pp));if(!camInside(_cw.copy(target).addScaledVector(dv,d))||k===.4){pb=pp-cam.pitch;break;}}}
+  let pb=0;if(started&&!INDOOR&&!CUTON&&!CUTU.on){for(const k of [0,.28,.55,.8]){const pp=Math.min(1.25,cam.pitch+k);const dv=_cdir.set(Math.sin(cam.yaw)*Math.cos(pp),Math.sin(pp),Math.cos(cam.yaw)*Math.cos(pp));if(rayDist(target,dv,d)>=d*.82&&terrHit(target,dv,d)>=d*.9||k===.8){pb=pp-cam.pitch;break;}}}
+  else if(started&&!INDOOR&&!CUTON&&CUTU.on){for(const k of [0,.2,.4,.6]){const pp=Math.min(1.25,cam.pitch+k);const dv=_cdir.set(Math.sin(cam.yaw)*Math.cos(pp),Math.sin(pp),Math.cos(cam.yaw)*Math.cos(pp));if(!camInside(_cw.copy(target).addScaledVector(dv,d))&&terrHit(target,dv,d)>=d*.9||k===.6){pb=pp-cam.pitch;break;}}}
   cam.pb=lerp(cam.pb||0,pb,1-Math.exp(-dt*(pb>(cam.pb||0)?6:2)));const pE=cam.pitch+cam.pb;
   const dir=new T.Vector3(Math.sin(cam.yaw)*Math.cos(pE),Math.sin(pE),Math.cos(cam.yaw)*Math.cos(pE));
-  let rd=rayDist(target,dir,d);let want=target.clone().addScaledVector(dir,Math.max(1.2,rd-.35));
+  let rd=rayDist(target,dir,d);if(started&&!INDOOR)rd=Math.min(rd,terrHit(target,dir,d)+.2);let want=target.clone().addScaledVector(dir,Math.max(1.2,rd-.35));
   // with the cut-away on, the camera may look THROUGH a building but never sit INSIDE one (you'd see the dark inside of its shell)
   if(CUTU.on&&camInside(want)){rd=rayDist(target,dir,d,true);want=target.clone().addScaledVector(dir,Math.max(1.2,rd-.35));}
   const gy=Math.max(groundH(want.x,want.z),want.z<-44.3?SEA_Y+.5:-10)+.35;if(want.y<gy)want.y=gy;if(INDOOR)want.y=Math.min(want.y,2.85);if(CY_IN){const hh=Math.max(hillH(want.x,want.z),inYard(want.x,want.z)?CY.y:-99)+.8;if(want.y<hh)want.y=hh;}
@@ -7723,7 +7775,7 @@ function updateUI(dt){
   const pr=$('prompt');
   if(P.sit&&!DLG.open){$('promptTxt').textContent='站起來';pr.classList.add('show');actVerb('站起來');}
   else if(nearest){const L_=typeof nearest.label==='function'?nearest.label():nearest.label;$('promptTxt').textContent=L_;pr.classList.add('show');actVerb(L_);}else{pr.classList.remove('show');actVerb(DLG.open?'下一句':'');}
-  if(RTC.auto){const n=new Date();$('clock').textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')} · ${n.getMonth()+1}月${n.getDate()}日`;}
+  if(!RTC.local){const n=new Date();$('clock').textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')} · ${n.getMonth()+1}月${n.getDate()}日`;}
   else{const p=PRESETS[ORDER[todIdx]];const mins=Math.floor((performance.now()-clockBase)/5000);const tm=p.clock[0]*60+p.clock[1]+mins;$('clock').textContent=`${String(Math.floor(tm/60)%24).padStart(2,'0')}:${String(tm%60).padStart(2,'0')} · 預覽`;}}
 // ================= 即時同步：同時上線的同學看得到彼此（Firestore shiomi/pres/live/<seat>，輪詢；每台裝置每天有時間上限，保護免費額度） =================
 const PRES={others:{},wNext:0,pNext:0,last:null,used:0,day:'',stop:false,told:false,me:null,srvT:0,srvAt:0,hb:0,busy:false,polls:0};
