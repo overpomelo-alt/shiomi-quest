@@ -931,6 +931,9 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,IS_TOUCH?1.25:1.75));
 renderer.setSize(innerWidth,innerHeight);
 renderer.outputEncoding=T.sRGBEncoding;
 renderer.toneMapping=T.ACESFilmicToneMapping;
+// art pack v0.2 look: ACES flattens greens and blues toward grey; give the colour back after the curve (+18% saturation, a touch of contrast)
+T.ShaderChunk.tonemapping_pars_fragment=T.ShaderChunk.tonemapping_pars_fragment.replace('color = ACESOutputMat * color;\n\treturn saturate( color );',
+  'color = ACESOutputMat * color;\n\tcolor = saturate( color );\n\tfloat lumG = dot( color, vec3( 0.2126, 0.7152, 0.0722 ) );\n\tcolor = mix( vec3( lumG ), color, 1.14 );\n\tcolor *= vec3( 1.035, 1.0, 0.955 );\n\tcolor = ( color - 0.5 ) * 1.07 + 0.5;\n\treturn saturate( color );');
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=T.PCFSoftShadowMap;
 stage.appendChild(renderer.domElement);renderer.domElement.tabIndex=0;
@@ -959,9 +962,9 @@ const PRESETS={
     clouds:.32,cloudLit:'#3a4670',cloudDark:'#0a0e1e',stars:1,lamps:1,windows:1,exposure:1.3,motes:0,seaSun:.6,night:1,dusk:0,day:0,
     seaDeep:'#040914',seaShallow:'#0d1d33',light:.42,sprTint:'#8e9cc8'},
   // art pack v0.2: a clear, sunny late morning — deep blue sky, clean far haze, warm white sun
-  day:{jp:'昼下がり',clock:[14,32],sunDir:[.5,.78,-.35],sunColor:'#fff3e0',sunI:2.05,hemiSky:'#cfe6fb',hemiGround:'#8c7f66',hemiI:1.04,
-    skyTop:'#2d83d6',skyHorizon:'#c4e4f6',skyBottom:'#a6d3ec',fog:'#cfe7f4',fogNear:90,fogFar:1150,glowCol:'#fff6e4',disk:1,glow:.45,
-    clouds:.78,cloudLit:'#ffffff',cloudDark:'#c3d4e8',stars:0,lamps:0,windows:.04,exposure:1.0,motes:.2,seaSun:.7,night:0,dusk:0,day:1,
+  day:{jp:'昼下がり',clock:[14,32],sunDir:[.55,.62,-.45],sunColor:'#fff0d6',sunI:2.35,hemiSky:'#cfe4f8',hemiGround:'#6f6a52',hemiI:.9,
+    skyTop:'#2a7bd6',skyHorizon:'#a8d2f2',skyBottom:'#9ccbea',fog:'#bcdaf0',fogNear:130,fogFar:1250,glowCol:'#fff6e4',disk:1,glow:.45,
+    clouds:.95,cloudLit:'#ffffff',cloudDark:'#c3d4e8',stars:0,lamps:0,windows:.04,exposure:1.0,motes:.2,seaSun:.7,night:0,dusk:0,day:1,
     seaDeep:'#1a6ea6',seaShallow:'#36b4c6',light:1.08,sprTint:'#ffffff'}
 };
 const CK=['sprTint','sunColor','hemiSky','hemiGround','skyTop','skyHorizon','skyBottom','fog','glowCol','cloudLit','cloudDark','seaDeep','seaShallow'];
@@ -1093,7 +1096,7 @@ const CROWN={a:crownGeo([[1,0,0,0],[.72,.62,-.18,.3],[.7,-.6,-.12,-.2],[.62,.12,
 // far hillside trees (v0.3 G04: distant forest with less detail): one 20-triangle blob, shaded smooth so it still reads as a round crown
 CROWN.blob=(()=>{const g=new T.IcosahedronGeometry(1,0).toNonIndexed();const p=g.attributes.position,n=g.attributes.normal;for(let i=0;i<p.count;i++){const l=Math.hypot(p.getX(i),p.getY(i)*1.2,p.getZ(i));n.setXYZ(i,p.getX(i)/l,p.getY(i)*1.2/l,p.getZ(i)/l);}g.scale(1.25,1,1.2);g.computeBoundingSphere();return g;})();
 // split an instanced forest: instances where near(x,z) keep the detailed crown, the rest move to a cheap far mesh
-function instSplit(I,farGeo,near){const n=I.count,F=new T.InstancedMesh(farGeo,I.material,n);const m=new T.Matrix4(),c=new T.Color();let a=0,b=0;
+function instSplit(I,farGeo,near){const n=I.count,F=new T.InstancedMesh(farGeo,I.material.clone(),Math.max(1,n));const m=new T.Matrix4(),c=new T.Color(1,1,1);let a=0,b=0;if(I.instanceColor)F.setColorAt(0,c);
   for(let i=0;i<n;i++){I.getMatrixAt(i,m);const e=m.elements;if(I.instanceColor)I.getColorAt(i,c);if(near(e[12],e[14])){I.setMatrixAt(a,m);if(I.instanceColor)I.setColorAt(a,c);a++;}else{F.setMatrixAt(b,m);if(I.instanceColor)F.setColorAt(b,c);b++;}}
   I.count=a;F.count=b;I.instanceMatrix.needsUpdate=F.instanceMatrix.needsUpdate=true;if(I.instanceColor)I.instanceColor.needsUpdate=true;if(F.instanceColor)F.instanceColor.needsUpdate=true;
   F.castShadow=I.castShadow;F.receiveShadow=I.receiveShadow;F.frustumCulled=I.frustumCulled;return F;}
@@ -1190,10 +1193,10 @@ const sky=new T.Mesh(new T.SphereGeometry(1400,48,24),new T.ShaderMaterial({unif
       float band=exp(-pow(dot(d,normalize(vec3(.6,.3,-.75))),2.)*18.)*smoothstep(0.,.4,h);c+=vec3(.08,.09,.14)*band*uStars*fbm(d.xz*6.);}
     c+=uGlowCol*(pow(sd,5.)*.26+pow(sd,40.)*.5+pow(sd,300.)*1.1)*uGlow;
     c=mix(c,uGlowCol*2.4,smoothstep(.99935,.9997,sd)*uDisk);
-    if(h>0.){vec2 uv=d.xz/(h+.12);uv*=vec2(.33,.95);uv+=vec2(uTime*.004,uTime*.001);
-      float n=fbm(uv*1.05+3.1);float cl=smoothstep(.5,.8,n)*uClouds*smoothstep(0.,.16,h)*(1.-smoothstep(.55,.95,h));
+    if(h>0.){vec2 uv=d.xz/(h+.22);uv*=vec2(.62,.62);uv+=vec2(uTime*.003,uTime*.0008);
+      float n=fbm(uv*1.1+3.1)+.18*fbm(uv*4.3+9.);float cl=smoothstep(.6,.67,n)*uClouds*smoothstep(.02,.12,h)*(1.-smoothstep(.42,.8,h));
       float lit=pow(max(dot(normalize(vec3(d.x,0.,d.z)),normalize(vec3(uSunDir.x,0.,uSunDir.z))),0.),3.);
-      vec3 cc=mix(uCloudDark,uCloudLit,.22+.78*lit*(1.-smoothstep(.55,.9,n)));
+      vec3 cc=mix(uCloudDark,uCloudLit,.55+.45*smoothstep(.62,.85,n));cc=mix(cc,uCloudLit,.25*lit);
       cc+=uGlowCol*pow(sd,12.)*.5*uGlow*(1.-smoothstep(.6,.85,n));
       c=mix(c,cc,cl*.92);}
     c=mix(uFog,c,smoothstep(-.02,.075,h));
@@ -1264,7 +1267,7 @@ await tick('正在蓋小鎮… 25%');
   const p=g.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,hillH(p.getX(i),p.getZ(i)));
   g=g.toNonIndexed();g.computeVertexNormals();
   const pos=g.attributes.position,nor=g.attributes.normal,cols=new Float32Array(pos.count*3);
-  const grass=col('#6c7b45'),forest=col('#3b5232'),dark=col('#2a3e28'),rock=col('#6e6457'),sand=col('#b3a07c'),c=new T.Color();
+  const grass=col('#86a457'),forest=col('#4f7d4a'),dark=col('#365e50'),rock=col('#6e6457'),sand=col('#b3a07c'),c=new T.Color();
   for(let i=0;i<pos.count;i+=3){
     const x=(pos.getX(i)+pos.getX(i+1)+pos.getX(i+2))/3,y=(pos.getY(i)+pos.getY(i+1)+pos.getY(i+2))/3,z=(pos.getZ(i)+pos.getZ(i+1)+pos.getZ(i+2))/3,ny=nor.getY(i);
     const f=fbm(x*.02,z*.02);c.copy(grass).lerp(forest,smooth(2,14,y)*.8+f*.3).lerp(dark,smooth(.5,.8,f)*.6);
@@ -1286,12 +1289,12 @@ await tick('正在蓋小鎮… 25%');
   const A=[],B=[];
   for(let i=0;i<5200;i++){const x=rr(-620,620),z=rr(-80,520),h=hillH(x,z);if(h<.8)continue;if(Math.abs(x)<116&&z<90)continue;
     const dens=fbm(x*.01+5,z*.01);if(rand()>dens*1.5)continue;const far=1+Math.max(0,Math.hypot(x,z)-160)/260;
-    (dens>.52?A:B).push([x,h-.4,z,rr(2.6,4.6)*far,rand()]);}
+    (dens>.7?A:B).push([x,h-.4,z,rr(2.6,4.6)*far,rand()]);}
   const dm=new T.Object3D();
   const IA=new T.InstancedMesh(cone,new T.MeshLambertMaterial({color:0xffffff}),A.length);
   A.forEach((t,i)=>{dm.position.set(t[0],t[1],t[2]);dm.scale.set(t[3]*.45,t[3]*2.1,t[3]*.45);dm.rotation.set(0,t[4]*6,0);dm.updateMatrix();IA.setMatrixAt(i,dm.matrix);IA.setColorAt(i,col(pick(['#365e50','#3e6656','#31584b','#44695a'])));});
   const IB=new T.InstancedMesh(ball,new T.MeshLambertMaterial({color:0xffffff}),B.length);
-  B.forEach((t,i)=>{dm.position.set(t[0],t[1]+t[3]*.6,t[2]);dm.scale.set(t[3],t[3]*.8,t[3]);dm.rotation.set(t[4],t[4]*5,0);dm.updateMatrix();IB.setMatrixAt(i,dm.matrix);IB.setColorAt(i,col(pick(['#557d4c','#628a52','#4b7348','#6f8f56'])));});
+  B.forEach((t,i)=>{dm.position.set(t[0],t[1]+t[3]*.6,t[2]);dm.scale.set(t[3],t[3]*.8,t[3]);dm.rotation.set(t[4],t[4]*5,0);dm.updateMatrix();IB.setMatrixAt(i,dm.matrix);IB.setColorAt(i,col(pick(['#5f8f4f','#6e9c56','#557f4a','#80a75c'])));});
   [IA,IB].forEach(m=>{m.instanceMatrix.needsUpdate=true;if(m.instanceColor)m.instanceColor.needsUpdate=true;scene.add(m);});
 })();
 
@@ -5733,7 +5736,7 @@ const SURF=(()=>{let d={};try{d=JSON.parse(document.getElementById('tex').textCo
     e.tex.wrapS=e.tex.wrapT=T.RepeatWrapping;e.tex.anisotropy=Math.min(8,MAXANI);o[k]=e;});return o;})();
 // mode 1: walls (texture upright on every face), mode 2: roofs (corrugation runs down the slope)
 // keep: leave the material's own picture (road markings, joints) and lay the painted grain over it; chroma: 0 = only light/dark from the texture, 1 = its colour too
-const SURF_K={wall_plaster:.4,wall_tile:.45,wall_pebble:.4,asphalt:.45,concrete:.5,terrazzo:.55,wood_plank:.55,roof_metal:.55,grass:.55,soil:.55};
+const SURF_K={wall_plaster:.4,wall_tile:.45,wall_pebble:.4,asphalt:.3,concrete:.5,terrazzo:.55,wood_plank:.55,roof_metal:.55,grass:.55,soil:.55};
 function surfSet(m,key,mode,base,str=1,o={}){if(!m||!SURF[key])return;str*=SURF_K[key]||.6;if(m.map&&!o.keep){m.map=null;m.needsUpdate=true;}if(base)m.color.copy(col(base));m.userData.surf={key,mode,str,chroma:o.chroma==null?.6:o.chroma};}
 ['edge','plain','center'].forEach(k=>surfSet(RT[k],'asphalt',1,null,.7,{keep:1,chroma:0}));   // town roads: painted grain over the markings
 const DET_V='vec4 detW4=vec4(transformed,1.0);\n#ifdef USE_INSTANCING\ndetW4=instanceMatrix*detW4;\n#endif\nvDetW=(modelMatrix*detW4).xyz;vDetN=(vec4(transformedNormal,0.)*viewMatrix).xyz;vDetG=aGnd;';
@@ -6309,7 +6312,7 @@ function sqBatch(G,HG){
      const m=new T.Mesh(geo,b.m);m.userData.bld=1;m.castShadow=!b.ni;m.receiveShadow=true;if(b.ni){m.userData.ink=true;if(b.m.isMeshLambertMaterial&&!b.m.transparent)try{inkLambert(b.m);}catch(e){}}G.add(m);});
    G.remove(HG);}
 // where players actually walk in Sqoyaw (village, school, the store in the south): trees here get the detailed crown
-function sqNearPlay(x,z){return Math.hypot((x+5)/78,(z+4)/66)<1||(x>-110&&x<-30&&z>-5&&z<70)||Math.hypot(x+12,z-155)<45;}
+function sqNearPlay(x,z){return Math.hypot((x+15)/185,(z-25)/175)<1||Math.hypot(x+12,z-155)<60;}   // everything a player can see up close; the far ridges get blobs
 function tbMySeat(){const n=parseInt(W.seat,10);return n>0?((n-1)%5)+1:0;}
 function sqSegD(x,z,a,b){const dx=b[0]-a[0],dz=b[1]-a[1],l2=dx*dx+dz*dz||1;const t=clamp(((x-a[0])*dx+(z-a[1])*dz)/l2,0,1);return [Math.hypot(x-a[0]-dx*t,z-a[1]-dz*t),a[0]+dx*t,a[1]+dz*t];}
 function sqNear(x,z,pts){let best=[1e9,0,0];for(let i=0;i<pts.length-1;i++){const r=sqSegD(x,z,pts[i],pts[i+1]);if(r[0]<best[0])best=r;}return best;}
@@ -6380,9 +6383,9 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
   const xs=axis(-186,162,460,1.6),zs=axis(-142,202,460,1.6),nx=xs.length,nz=zs.length;
   const pos=new Float32Array(nx*nz*3),cl=new Float32Array(nx*nz*3),idx=[];
   const colAt=(lx,lz,h)=>{const n=fbm(lx*.12+3,lz*.12);const e=sqE(lx,lz);
-    if(e>1.5){tc.set('#557a4e').lerp(t2.set('#3a6150'),clamp(n*1.3-.2,0,1)*.7);const tr=(1-smooth(40,75,h))*smooth(1.5,8,e);if(tr>0){const st=((h*.55)%1+1)%1;tc.lerp(t2.set('#6a9050').lerp(tc2.set('#93b066'),smooth(.15,.45,st)*smooth(.95,.6,st)),tr*(.12+.08*n));}if(h>120)tc.lerp(t2.set('#748b9b'),smooth(120,220,h));return;}
+    if(e>1.5){const cn=fbm((lx+h*.8)*.22+7,(lz-h*.6)*.22),cb=fbm(lx*.035+2,lz*.035);tc.set('#2c5544').lerp(t2.set('#4f8449'),smooth(.4,.55,cn)).lerp(tc2.set('#7cab58'),smooth(.58,.72,cn)*.85);tc.lerp(t2.set(cb>.55?'#94bb5e':'#284d3e'),Math.abs(cb-.5)*.8);tc.lerp(t2.set('#4a6c55'),.35);const tr=(1-smooth(40,75,h))*smooth(1.5,8,e);if(tr>0){const st=((h*.55)%1+1)%1;tc.lerp(t2.set('#6a9050').lerp(tc2.set('#93b066'),smooth(.15,.45,st)*smooth(.95,.6,st)),tr*(.05+.04*n));}if(h>120)tc.lerp(t2.set('#748b9b'),smooth(120,220,h));return;}
     if(Math.abs(lx-sqRX(lz))<15&&h<-12){tc.set('#8a8676').lerp(t2.set('#6f7470'),n);return;}
-    tc.set('#9fb26e').lerp(t2.set('#86a15e'),n);{const st=((h*.7)%1+1)%1;if(st<.3)tc.lerp(t2.set('#b2c47c'),.3);}tc.lerp(t2.set('#a8956f'),clamp((fbm(lx*.05,lz*.05)-.55)*2.2,0,.45));
+    tc.set('#9cc062').lerp(t2.set('#84ad52'),n);{const st=((h*.7)%1+1)%1;if(st<.3)tc.lerp(t2.set('#b6d074'),.3);}tc.lerp(t2.set('#a8956f'),clamp((fbm(lx*.05,lz*.05)-.55)*2.2,0,.45));
     };
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=xs[i],z=zs[j],h=sqBase(x,z),k=(j*nx+i)*3;pos[k]=x;pos[k+1]=h;pos[k+2]=z;colAt(x,z,h);tc.convertSRGBToLinear();cl[k]=tc.r;cl[k+1]=tc.g;cl[k+2]=tc.b;}
   for(let j=0;j<nz-1;j++)for(let i=0;i<nx-1;i++){const a=j*nx+i,b=a+1,c=a+nx,d=c+1;idx.push(a,c,b,b,c,d);}
@@ -6396,7 +6399,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
    for(let j=0;j<nz;j++){const z=zs[j];for(let i=0;i<nx;i++){const x=xs[i];let dm=1e9;for(const r of RL){if(x<r.x0||x>r.x1||z<r.z0||z>r.z1)continue;const d=sqNear(x,z,r.p)[0]-r.hw;if(d<dm)dm=d;}
      if(dm<2.6)pos[(j*nx+i)*3+1]-=.24*(1-smooth(.5,2.6,dm));}}}
   const tg=new T.BufferGeometry();tg.setAttribute('position',new T.BufferAttribute(pos,3));tg.setAttribute('color',new T.BufferAttribute(cl,3));tg.setIndex(idx);tg.computeVertexNormals();
-  const ter=new T.Mesh(tg,new T.MeshLambertMaterial({vertexColors:true}));surfSet(ter.material,'grass',1,null,.75,{chroma:.25});ter.receiveShadow=true;G.add(ter);
+  const ter=new T.Mesh(tg,new T.MeshLambertMaterial({vertexColors:true}));surfSet(ter.material,'grass',1,null,.18,{chroma:.2});ter.receiveShadow=true;G.add(ter);
   // river (司界蘭溪 / 大甲溪 upstream)
   const wm=new T.MeshLambertMaterial({color:col('#5f9fc2'),transparent:true,opacity:.88,emissive:col('#2a5a78'),emissiveIntensity:.25});
   // ---------- ribbons: lanes + 台7甲
@@ -6453,7 +6456,14 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
       const conifer=h>55?rand()<.8:rand()<.35;if(conifer&&na<N){A.setMatrixAt(na,mm);A.setColorAt(na,tc.set(pick(['#365e50','#31584b','#3f6757'])).convertSRGBToLinear());na++;}
       else if(nb<N){B.setMatrixAt(nb,mm);B.setColorAt(nb,tc.set(pick(['#567f4b','#628a50','#4c744a','#6e9055'])).convertSRGBToLinear());nb++;}}
     A.count=na;B.count=nb;A.castShadow=B.castShadow=false;G.add(A);G.add(B);
-    const fb=CROWN.blob.clone();fb.scale(2.3,1.9,2.3);fb.translate(0,2.9,0);G.add(instSplit(B,fb,sqNearPlay));}
+    // v0.3 G04: pointed conifers no longer dominate — below the high ridges most of them become round broadleaf crowns (deterministic, no rand)
+    {const m=new T.Matrix4(),keep=[],mv=[],hr=(x,z)=>{const v=Math.sin(x*12.9898+z*78.233)*43758.5453;return v-Math.floor(v);};
+     for(let i=0;i<A.count;i++){A.getMatrixAt(i,m);const e=m.elements;(e[13]<95&&hr(e[12],e[14])<.85?mv:keep).push(m.clone());}
+     const CP=['#365e50','#31584b','#3f6757'],BP=['#5f9150','#6e9c56','#527f4a','#7ea75c','#4b7748'];
+     keep.forEach((M,i)=>{A.setMatrixAt(i,M);const e=M.elements;A.setColorAt(i,tc.set(CP[Math.floor(hr(e[14],e[12])*3)]).convertSRGBToLinear());});A.count=keep.length;A.instanceMatrix.needsUpdate=true;if(A.instanceColor)A.instanceColor.needsUpdate=true;
+     const C=new T.InstancedMesh(leafy,B.material.clone(),Math.max(1,mv.length));C.setColorAt(0,tc.set('#5f9150'));mv.forEach((M,i)=>{C.setMatrixAt(i,M);const e=M.elements;C.setColorAt(i,tc.set(BP[Math.floor(hr(e[14]+1,e[12])*5)]).convertSRGBToLinear());});C.count=mv.length;C.castShadow=false;G.add(C);
+     const fc=CROWN.blob.clone();fc.scale(2.4,2,2.4);fc.translate(0,2.9,0);G.add(instSplit(C,fc,sqNearPlay));}
+    const fb=CROWN.blob.clone();fb.scale(2.4,2,2.4);fb.translate(0,2.9,0);G.add(instSplit(B,fb,sqNearPlay));}
   {const [c,g]=C2(256,128);const gr=g.createRadialGradient(128,64,6,128,64,120);gr.addColorStop(0,'rgba(255,255,255,.95)');gr.addColorStop(.55,'rgba(255,255,255,.55)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,256,128);
     const cm=new T.SpriteMaterial({map:TX(c),transparent:true,depthWrite:false,opacity:.8});
     for(let i=0;i<18;i++){const a=i/18*6.28+rr(-.15,.15),r=rr(190,300);const s=new T.Sprite(cm);s.position.set(Math.cos(a)*r,rr(30,64),Math.sin(a)*r);s.scale.set(rr(70,130),rr(20,34),1);G.add(s);}}
