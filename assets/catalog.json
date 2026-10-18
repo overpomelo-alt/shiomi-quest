@@ -1580,6 +1580,126 @@
    "note": ""
   },
   {
+   "file": "assets/rooms/sgate/sgate_landscape_bg.webp",
+   "group": "rooms/sgate",
+   "bytes": 513028,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_landscape_o_fish_slide.webp",
+   "group": "rooms/sgate",
+   "bytes": 26174,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_landscape_o_gate_panel.webp",
+   "group": "rooms/sgate",
+   "bytes": 6816,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_landscape_o_gate_post_left.webp",
+   "group": "rooms/sgate",
+   "bytes": 1416,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_landscape_o_gate_post_right.webp",
+   "group": "rooms/sgate",
+   "bytes": 1056,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_landscape_o_goal.webp",
+   "group": "rooms/sgate",
+   "bytes": 24210,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_landscape_o_hedge.webp",
+   "group": "rooms/sgate",
+   "bytes": 19860,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_landscape_o_juniper.webp",
+   "group": "rooms/sgate",
+   "bytes": 140852,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_landscape_o_platform_front.webp",
+   "group": "rooms/sgate",
+   "bytes": 11676,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_landscape_o_storeroom.webp",
+   "group": "rooms/sgate",
+   "bytes": 25540,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_portrait_bg.webp",
+   "group": "rooms/sgate",
+   "bytes": 501008,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_portrait_o_fish_slide.webp",
+   "group": "rooms/sgate",
+   "bytes": 19506,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_portrait_o_gate_panel.webp",
+   "group": "rooms/sgate",
+   "bytes": 1170,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_portrait_o_gate_post_left.webp",
+   "group": "rooms/sgate",
+   "bytes": 1256,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_portrait_o_gate_post_right.webp",
+   "group": "rooms/sgate",
+   "bytes": 1078,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_portrait_o_goal.webp",
+   "group": "rooms/sgate",
+   "bytes": 14990,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_portrait_o_hedge.webp",
+   "group": "rooms/sgate",
+   "bytes": 8444,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_portrait_o_juniper.webp",
+   "group": "rooms/sgate",
+   "bytes": 217936,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_portrait_o_platform_front.webp",
+   "group": "rooms/sgate",
+   "bytes": 8088,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sgate/sgate_portrait_o_storeroom.webp",
+   "group": "rooms/sgate",
+   "bytes": 22796,
+   "note": ""
+  },
+  {
    "file": "assets/rooms/station/door_closed.webp",
    "group": "rooms/station",
    "bytes": 20996,
