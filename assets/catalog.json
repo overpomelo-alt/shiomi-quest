@@ -1006,325 +1006,313 @@
   {
    "file": "assets/rooms/home/home_landscape_bed_blanket_front.webp",
    "group": "rooms/home",
-   "bytes": 44470,
+   "bytes": 20784,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_bed_head01.webp",
    "group": "rooms/home",
-   "bytes": 11182,
+   "bytes": 5824,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_bed_head02.webp",
    "group": "rooms/home",
-   "bytes": 12512,
+   "bytes": 5684,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_bed_head03.webp",
    "group": "rooms/home",
-   "bytes": 11302,
+   "bytes": 5556,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_bed_head04.webp",
    "group": "rooms/home",
-   "bytes": 11616,
+   "bytes": 6708,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_bed_head05.webp",
    "group": "rooms/home",
-   "bytes": 11232,
+   "bytes": 4648,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_bed_head06.webp",
    "group": "rooms/home",
-   "bytes": 9994,
+   "bytes": 5780,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_bed_pillow_dent.webp",
    "group": "rooms/home",
-   "bytes": 7850,
+   "bytes": 2930,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_bg.webp",
    "group": "rooms/home",
-   "bytes": 195214,
+   "bytes": 190560,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_floor_blue_carpet.webp",
    "group": "rooms/home",
-   "bytes": 22594,
+   "bytes": 137486,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_floor_dark_wood.webp",
    "group": "rooms/home",
-   "bytes": 20484,
+   "bytes": 41540,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_floor_tatami.webp",
    "group": "rooms/home",
-   "bytes": 26418,
+   "bytes": 103294,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_floor_white_tiles.webp",
    "group": "rooms/home",
-   "bytes": 21384,
+   "bytes": 29540,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_o_beanbag.webp",
    "group": "rooms/home",
-   "bytes": 16180,
+   "bytes": 14262,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_o_bed_end.webp",
    "group": "rooms/home",
-   "bytes": 44632,
+   "bytes": 33002,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_landscape_o_bin.webp",
+   "group": "rooms/home",
+   "bytes": 1572,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_o_bookcase_front.webp",
    "group": "rooms/home",
-   "bytes": 18446,
+   "bytes": 21164,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_landscape_o_chair.webp",
+   "group": "rooms/home",
+   "bytes": 6424,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_o_desk_front.webp",
    "group": "rooms/home",
-   "bytes": 12574,
+   "bytes": 12206,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_o_pet_bed.webp",
    "group": "rooms/home",
-   "bytes": 8796,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/home/home_landscape_o_window_seat.webp",
-   "group": "rooms/home",
-   "bytes": 13358,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/home/home_landscape_rest_blanket.webp",
-   "group": "rooms/home",
-   "bytes": 50684,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/home/home_landscape_rest_pillow.webp",
-   "group": "rooms/home",
-   "bytes": 4354,
+   "bytes": 8996,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_wall_blue_stripes.webp",
    "group": "rooms/home",
-   "bytes": 22670,
+   "bytes": 19208,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_wall_green_checks.webp",
    "group": "rooms/home",
-   "bytes": 26216,
+   "bytes": 40026,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_wall_pink_dots.webp",
    "group": "rooms/home",
-   "bytes": 22600,
+   "bytes": 24114,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_wall_starry.webp",
    "group": "rooms/home",
-   "bytes": 25124,
+   "bytes": 25152,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_wall_sunset_orange.webp",
    "group": "rooms/home",
-   "bytes": 23832,
+   "bytes": 27274,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_landscape_wall_wood.webp",
    "group": "rooms/home",
-   "bytes": 29484,
+   "bytes": 30214,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_bed_blanket_front.webp",
    "group": "rooms/home",
-   "bytes": 52676,
+   "bytes": 15520,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_bed_head01.webp",
    "group": "rooms/home",
-   "bytes": 8200,
+   "bytes": 5372,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_bed_head02.webp",
    "group": "rooms/home",
-   "bytes": 8710,
+   "bytes": 5140,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_bed_head03.webp",
    "group": "rooms/home",
-   "bytes": 8062,
+   "bytes": 5168,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_bed_head04.webp",
    "group": "rooms/home",
-   "bytes": 7818,
+   "bytes": 5992,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_bed_head05.webp",
    "group": "rooms/home",
-   "bytes": 7680,
+   "bytes": 4350,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_bed_head06.webp",
    "group": "rooms/home",
-   "bytes": 7030,
+   "bytes": 5340,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_bed_pillow_dent.webp",
    "group": "rooms/home",
-   "bytes": 9046,
+   "bytes": 2528,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_bg.webp",
    "group": "rooms/home",
-   "bytes": 187876,
+   "bytes": 188092,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_floor_blue_carpet.webp",
    "group": "rooms/home",
-   "bytes": 27756,
+   "bytes": 187274,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_floor_dark_wood.webp",
    "group": "rooms/home",
-   "bytes": 23350,
+   "bytes": 53874,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_floor_tatami.webp",
    "group": "rooms/home",
-   "bytes": 30710,
+   "bytes": 137414,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_floor_white_tiles.webp",
    "group": "rooms/home",
-   "bytes": 24242,
+   "bytes": 38924,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_o_beanbag.webp",
    "group": "rooms/home",
-   "bytes": 16194,
+   "bytes": 12212,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_o_bed_end.webp",
    "group": "rooms/home",
-   "bytes": 40918,
+   "bytes": 24400,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_portrait_o_bin.webp",
+   "group": "rooms/home",
+   "bytes": 1308,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_o_bookcase_front.webp",
    "group": "rooms/home",
-   "bytes": 13850,
+   "bytes": 14016,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/home/home_portrait_o_chair.webp",
+   "group": "rooms/home",
+   "bytes": 5384,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_o_desk_front.webp",
    "group": "rooms/home",
-   "bytes": 9644,
+   "bytes": 10432,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_o_pet_bed.webp",
    "group": "rooms/home",
-   "bytes": 10092,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/home/home_portrait_o_window_seat.webp",
-   "group": "rooms/home",
-   "bytes": 9468,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/home/home_portrait_rest_blanket.webp",
-   "group": "rooms/home",
-   "bytes": 46244,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/home/home_portrait_rest_pillow.webp",
-   "group": "rooms/home",
-   "bytes": 2470,
+   "bytes": 7558,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_wall_blue_stripes.webp",
    "group": "rooms/home",
-   "bytes": 17090,
+   "bytes": 14624,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_wall_green_checks.webp",
    "group": "rooms/home",
-   "bytes": 20422,
+   "bytes": 29416,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_wall_pink_dots.webp",
    "group": "rooms/home",
-   "bytes": 17354,
+   "bytes": 18966,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_wall_starry.webp",
    "group": "rooms/home",
-   "bytes": 19122,
+   "bytes": 18284,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_wall_sunset_orange.webp",
    "group": "rooms/home",
-   "bytes": 17250,
+   "bytes": 19690,
    "note": ""
   },
   {
    "file": "assets/rooms/home/home_portrait_wall_wood.webp",
    "group": "rooms/home",
-   "bytes": 21382,
+   "bytes": 21926,
    "note": ""
   },
   {
