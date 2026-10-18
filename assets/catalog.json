@@ -224,6 +224,30 @@
    "note": "blackleopard"
   },
   {
+   "file": "assets/characters/pets/ani_hudie_f0.webp",
+   "group": "characters/pets",
+   "bytes": 93322,
+   "note": "hudie_f0"
+  },
+  {
+   "file": "assets/characters/pets/ani_hudie_f1.webp",
+   "group": "characters/pets",
+   "bytes": 97954,
+   "note": "hudie_f1"
+  },
+  {
+   "file": "assets/characters/pets/ani_hudie_f2.webp",
+   "group": "characters/pets",
+   "bytes": 106204,
+   "note": "hudie_f2"
+  },
+  {
+   "file": "assets/characters/pets/ani_hudie_f3.webp",
+   "group": "characters/pets",
+   "bytes": 115244,
+   "note": "hudie_f3"
+  },
+  {
    "file": "assets/characters/pets/ani_leopardcat.webp",
    "group": "characters/pets",
    "bytes": 167682,
