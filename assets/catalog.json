@@ -1508,6 +1508,18 @@
    "note": ""
   },
   {
+   "file": "assets/rooms/sfield/sfield_landscape_bg.webp",
+   "group": "rooms/sfield",
+   "bytes": 388930,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_o_hoop.webp",
+   "group": "rooms/sfield",
+   "bytes": 12960,
+   "note": ""
+  },
+  {
    "file": "assets/rooms/station/door_closed.webp",
    "group": "rooms/station",
    "bytes": 20996,
