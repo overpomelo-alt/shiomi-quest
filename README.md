@@ -4,4 +4,4 @@
 
 - 老師登入：https://overpomelo-alt.github.io/shiomi-quest/?teacher
 - 學生進度、老師設定存在 Firebase（shiomi-quest）。
-- 這個倉庫只放發布用的檔案，由 Claude 更新。
+- 根目錄是發布用的檔案；程式碼在 `dev/`，原始素材在 `assets/source/`。開發說明請看 `CLAUDE.md`。

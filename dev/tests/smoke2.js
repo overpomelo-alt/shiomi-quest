@@ -1,0 +1,10 @@
+const start=require('./base.js');
+(async()=>{const {b,p,W,cl,errs}=await start({seat:'4'});const out={};
+ await p.evaluate(()=>{window.__qf().arriveTribe('school',true);});await W(3000);await cl();
+ await p.evaluate(()=>{window.__qf().clsEnter();});await W(4000);out.cls=await p.evaluate(()=>window.__qf().CLS());await p.screenshot({path:'s2_cls.png'});
+ await p.evaluate(()=>{window.__qf().clsLeave();});await W(3000);out.clsOut=await p.evaluate(()=>window.__qf().CLS());
+ await p.evaluate(()=>{window.__qf().arriveTribe('animals',true);});await W(3000);await cl();
+ await p.evaluate(()=>{window.__qf().acAdopt();});await W(2500);out.adopt=await p.evaluate(()=>[...document.querySelectorAll('#dialog button')].map(b=>b.textContent.slice(0,12)));await cl();
+ await p.evaluate(()=>{window.__qf().enterStation();});await W(5000);out.station=await p.evaluate(()=>window.__qf().S2().on);await p.screenshot({path:'s2_st.png'});
+ out.local=await p.evaluate(()=>{const q=window.__qf();return [q.saveOk({last:5},10),q.saveOk({last:15},10),q.saveOk({rsv:10,last:1},10),q.saveOk({rsv:5,last:99},10),q.saveOk({last:1},0)];});
+ console.log(JSON.stringify(out));console.log(JSON.stringify(errs.filter(e=>!/reqfail|Failed to load/.test(e)).slice(0,8)));await b.close();})();

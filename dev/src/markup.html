@@ -1,0 +1,164 @@
+<div id="stage"></div>
+<div id="vignette" class="fx"></div>
+<div id="grain" class="fx"></div>
+<div class="lb top"></div><div class="lb bot"></div>
+
+<div id="hud">
+  <div id="place"><span class="jp" id="placeJp">汐見銀座</span><span class="en" id="placeEn">Shiomi Ginza Street</span><span class="clock" id="clock">18:06</span></div>
+  <div id="tools">
+    <button id="bCard" type="button" title="集章卡 (Q)"><i class="ic-stamp"></i><span>集章</span><span class="stampCount" id="stampCount">0/0</span></button>
+    <button id="bMap" type="button" title="地圖"><i class="ic-map"></i><span>地圖</span></button>
+    <button id="bTime" type="button" title="切換時間 (T)"><span class="k">T</span><span id="tBtnLbl">夕暮れ</span></button>
+    <button id="bSound" type="button" aria-pressed="true" title="聲音 (M)"><span class="dot"></span><span class="lbl">聲音</span></button>
+    <button id="bMusic" type="button" aria-pressed="true" title="音樂 (B)"><span class="dot"></span><span class="lbl">音樂</span></button>
+    <button id="bCine" type="button" aria-pressed="false" title="電影模式 (C)"><span class="k">C</span><span class="lbl">電影模式</span></button>
+    <button id="bHelp" type="button" aria-pressed="false" title="操作說明 (H)"><span class="k">H</span><span class="lbl">說明</span></button>
+    <button id="bTeacher" type="button" hidden title="老師模式">老師模式</button>
+    <button id="bPortal" type="button" hidden title="任意門">🚪 任意門</button>
+    <button id="bMenu" type="button" aria-expanded="false" title="選單"><i class="ic-menu"></i><span>選單</span></button>
+  </div>
+  <div id="petBox" hidden><button id="petBtn" type="button" title="照顧寵物 (P)"><span class="pb-ic" id="pbIc">貓</span><span class="pb-txt"><b id="pbName"></b><span id="pbLv"></span></span><span class="pb-bars"><span class="pbar"><i id="pbFull"></i></span><span class="pbar mood"><i id="pbMood"></i></span></span></button></div>
+  <div id="pouch"></div>
+  <aside id="quests" aria-label="任務清單">
+    <button id="qHead" type="button" aria-expanded="true"><span class="qh-t">任務清單</span><span class="qh-n" id="qCount">0/0</span><span class="qh-dot" id="qDot" hidden>新提示</span><span class="qh-car" aria-hidden="true">▾</span></button>
+    <div class="q-next"><span class="q-arrow" id="qArrow" aria-hidden="true">➤</span><span class="q-nt"><b id="qNextT">—</b><span id="qNextD"></span></span></div>
+    <div class="q-tip" id="qTip" hidden><span class="tip-k">提示</span><span id="qTipTxt"></span><button type="button" id="qTipX">知道了</button></div>
+    <ol id="qList"></ol>
+  </aside>
+  <div id="hint"><b>點地面</b> 走過去 · <b>WASD／方向鍵</b> 走路 · <b>Shift</b> 跑步 · <b>拖曳</b> 看四周 · <b>E</b> 互動 · <b>J</b> 跳</div>
+</div>
+<button id="cineExit" type="button">✕ 結束電影模式</button>
+<div id="areaTitle"><div class="rule"></div><div class="jp"></div><div class="en"></div><div class="rule"></div></div>
+<div id="prompt"><span class="key" id="promptKey">E</span><span id="promptTxt"></span></div>
+<div id="dialog" hidden><div class="who"></div><div class="txt"></div><div class="choices"></div><div class="more" hidden>▼</div></div>
+<div id="toast"></div>
+<div id="qTimer" hidden><b>25</b><span><i></i></span></div>
+<div id="fade"></div>
+<div id="help" hidden>
+  <div class="help-h"><h2>操作說明</h2><button type="button" class="x" id="helpClose" aria-label="關閉">×</button></div>
+  <dl class="only-desk">
+    <dt>W A S D</dt><dd>走路（Shift 跑步）</dd>
+    <dt>拖曳 · 滾輪</dt><dd>轉視角 · 拉近拉遠</dd>
+    <dt>E / 空白鍵</dt><dd>互動、下一句</dd>
+    <dt>1 – 9</dt><dd>選答案</dd>
+    <dt>Q · P</dt><dd>集章卡 · 照顧寵物</dd>
+    <dt>T · C</dt><dd>換時間 · 電影模式</dd>
+    <dt>M · B</dt><dd>聲音 · 音樂</dd>
+  </dl>
+  <dl class="only-touch">
+    <dt>左下搖桿</dt><dd>走路（推到底會跑）</dd>
+    <dt>手指滑畫面</dt><dd>轉視角</dd>
+    <dt>E 按鈕</dt><dd>互動、下一句</dd>
+    <dt>章 按鈕</dt><dd>集章卡、繳交成績</dd>
+    <dt>寵物卡</dt><dd>點一下照顧寵物</dd>
+    <dt>任務清單</dt><dd>點任務開始導航</dd>
+  </dl>
+</div>
+
+<div id="card" hidden>
+  <div class="card-in">
+    <div class="card-head">
+      <div><p class="card-kicker">集章卡 · Stamp Card</p><h2 id="cardWho">—</h2></div>
+      <button type="button" class="x" id="cardClose" aria-label="關閉">×</button>
+    </div>
+    <div class="card-sum" id="cardSum"></div>
+    <ol class="stamps" id="stampList"></ol>
+    <div class="card-foot">
+      <a id="submitLink" class="btn primary" href="#" target="_blank" rel="noopener">繳交成績 Submit</a>
+      <button type="button" class="btn ghost" id="cardWrong">📒 錯題本</button>
+      <button type="button" class="btn ghost" id="cardDress">換造型</button>
+      <button type="button" class="btn ghost" id="switchUser">換人 · 登出</button>
+    </div>
+    <p class="card-note" id="submitNote"></p>
+  </div>
+</div>
+
+<div id="dress" hidden>
+  <div class="dr-in">
+    <p class="card-kicker">角色造型 · Your Look</p>
+    <h2>選一個你的樣子</h2>
+    <div id="drRows"></div>
+    <div class="dr-foot"><button type="button" class="btn ghost" id="drRand">隨機一下</button><button type="button" class="btn primary" id="drDone">完成，開始闖關</button></div>
+  </div>
+</div>
+
+
+<div id="homeBar" hidden><button id="bShop" type="button" title="家具型錄"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5C5.5 4.5 8.5 4.5 12 6.5c3.5-2 6.5-2 9-1V19c-2.5-1-5.5-1-9 1-3.5-2-6.5-2-9-1z"/><path d="M12 6.5V20"/></svg><span>型錄</span></button><button id="bDecor" type="button" title="佈置房間"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5"/><path d="M4 11h16v4H4z"/><path d="M6 15v4M18 15v4"/></svg><span>佈置</span></button><button id="bHist" type="button" title="成長冊"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v7l2-1.5L13 10V3"/></svg><span>成長冊</span></button><button id="bLock" type="button" title="門鎖"><span style="font-size:18px;line-height:1">🔒</span><span>門鎖</span></button><button id="bOut" type="button" title="出門"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17"/><path d="M4 21h16"/><circle cx="14.5" cy="12" r="1"/></svg><span>出門</span></button></div>
+<div id="decor" hidden>
+  <div class="dc-in">
+    <div class="dc-head"><div><p class="card-kicker">我的房間 · My Room</p><h2 id="dcTitle">佈置房間</h2></div><button type="button" class="x" id="dcClose" aria-label="關閉">×</button></div>
+    <div class="dc-tabs" id="dcTabs" role="tablist"></div>
+    <p class="dc-hint" id="dcHint"></p>
+    <div class="dc-list" id="dcList"></div>
+    <div class="dc-sel" id="dcSel" hidden></div>
+    <div class="dc-foot"><span class="dc-coins" id="dcCoins"></span><button type="button" class="btn primary" id="dcDone">完成</button></div>
+  </div>
+</div>
+
+<div id="board" hidden>
+  <div class="dc-in">
+    <div class="dc-head"><div><p class="card-kicker">公告板 · Notice Board</p><h2>班級公告板</h2></div><button type="button" class="x" id="nbClose" aria-label="關閉">×</button></div>
+    <div class="dc-tabs" id="nbTabs" role="tablist"></div>
+    <div id="nbBody"></div>
+    <div class="dc-foot"><span class="dc-coins" id="nbCoins"></span><button type="button" class="btn primary" id="nbDone">關閉</button></div>
+  </div>
+</div>
+<div id="cabin" hidden>
+  <div class="dc-in">
+    <div class="dc-head"><div><p class="card-kicker">山上小屋 · Teacher's Office</p><h2>老師的辦公桌</h2></div><button type="button" class="x" id="cbClose" aria-label="關閉">×</button></div>
+    <div class="dc-tabs" id="cbTabs" role="tablist"></div>
+    <div id="cbBody"></div>
+    <div class="dc-foot" id="cbFoot"></div>
+  </div>
+</div>
+<button type="button" id="pomChip" hidden></button>
+<div id="teacher" hidden>
+  <div class="t-panel">
+    <div class="tp-head">
+      <div><p class="card-kicker">老師模式 · Teacher</p><h2>編輯闖關內容</h2></div>
+      <div class="tp-actions"><span id="tpStatus" class="tp-status"></span><button type="button" class="btn primary" id="tpSave">儲存並發布</button><button type="button" class="x" id="tpClose" aria-label="關閉">×</button></div>
+    </div>
+    <div class="tp-tabs" role="tablist">
+      <button type="button" data-tab="st" aria-selected="true">關卡題目</button>
+      <button type="button" data-tab="rs">學生進度</button>
+      <button type="button" data-tab="nw">公告消息</button>
+      <button type="button" data-tab="cd">倒數看板</button>
+      <button type="button" data-tab="wd">海灘單字</button>
+      <button type="button" data-tab="fm">成績表單</button>
+      <button type="button" data-tab="ot">其他設定</button>
+    </div>
+    <div class="tp-body" id="tpBody"></div>
+  </div>
+</div>
+
+<div id="journal" hidden><div class="jn-in" role="dialog" aria-label="旅人手帳">
+  <div class="jn-hd"><div><p class="jn-kick">汐見町</p><h2>旅人手帳</h2></div><button type="button" class="x" id="jnClose" aria-label="關閉">×</button></div>
+  <p class="jn-sub">今天也走一小步。</p>
+  <div class="jn-grid" id="jnGrid"></div>
+  <h3 class="jn-h">設定</h3>
+  <div class="jn-set" id="jnSet"></div>
+  <button type="button" class="btn primary jn-go" id="jnGo">繼續探索</button>
+</div></div>
+<div id="touch" hidden><div id="stick"><div id="knob"></div></div><button id="tRun" type="button" aria-pressed="false"><i class="ic-run"></i><span>跑</span></button><button id="tJump" type="button" aria-label="跳"><i class="ic-jump"></i><span>跳</span></button><button id="tAct" type="button"><span>互動</span></button><button id="tCard" type="button"><i class="ic-stamp"></i><span>章</span></button></div>
+
+<div id="title">
+  <div class="t-inner">
+    <h1 class="t-jp" aria-label="汐見町"><span>汐</span><span>見</span><span>町</span></h1>
+    <div class="t-side">
+      <p class="t-kana">しおみちょう · 闖關地圖</p>
+      <p class="t-en">汐見町大冒險</p>
+      <p class="t-line">海邊小鎮藏著好幾個關卡。和鎮上的人說話、回答問題、收集印章，用金幣去販賣機換獎勵。集滿印章後，記得繳交成績！</p>
+      <form id="loginForm" class="login" autocomplete="off">
+        <label>座號 <small>Seat No.</small><input id="inSeat" inputmode="numeric" maxlength="3" required placeholder="例：7"></label>
+        <label>姓名 <small>Name</small><input id="inName" maxlength="12" required placeholder="你的名字"></label>
+        <label id="passWrap" hidden>班級密碼 <small>Class code</small><input id="inPass" maxlength="20" placeholder="老師給的密碼" autocomplete="off"></label>
+        <button id="startBtn" type="submit" disabled>正在蓋小鎮…</button>
+      </form>
+      <p class="t-err" id="loginErr" hidden></p>
+      <p class="cloud-note" id="cloudNote">☁ 正在連線雲端存檔…</p>
+      <button type="button" id="teacherLogin" class="t-teach" hidden>👩‍🏫 老師登入</button>
+      <div id="tpWrap" class="t-tpw" hidden><input id="inTPass" type="password" placeholder="老師密碼" autocomplete="current-password"><button type="button" id="tpGo" class="btn small">進入</button></div>
+      <p class="t-keys">點地面就會走過去 · WASD／方向鍵走路 · Shift 跑步 · 拖曳看四周 · E 互動 · Q 集章卡</p>
+    </div>
+  </div>
+</div>

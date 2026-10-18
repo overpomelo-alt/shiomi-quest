@@ -1,0 +1,22 @@
+const start=require('./base.js');const land=process.argv[2]==='l',tag=land?'L':'P';
+(async()=>{const {b,p,W,cl,errs}=await start({land,seat:'3'});
+ const shot=n=>p.screenshot({path:`gt_${tag}_${n}.jpg`,quality:75});
+ const st=()=>p.evaluate(()=>{const q=window.__qf(),R=q.R2();return [R.room,R.on,Math.round(R.x),Math.round(R.y)];});
+ await p.evaluate(()=>window.__qf().arriveTribe('home',true));await W(2500);await cl();
+ await p.evaluate(()=>window.__qf().gateEnter('map'));await W(4500);await cl();
+ const info=await p.evaluate(()=>{const q=window.__qf(),R=q.R2();return {room:R.room,x:Math.round(R.x),y:Math.round(R.y),spots:q.r2Spots().map(s=>[s.label,q.r2Walk(s.def[1],s.def[2])])};});console.log(JSON.stringify(info));
+ await shot('1in');
+ const go=(x,y)=>p.evaluate(([x,y])=>{const R=window.__qf().R2();R.x=x;R.y=y;R.cx=null;R.view=2;},[x,y]);
+ const D=await p.evaluate(()=>{const q=window.__qf(),R=q.R2();return q.r2Spots().map(s=>[s.def[0],s.def[1],s.def[2]]);});
+ const at=k=>D.find(d=>d[0]===k);
+ let s=at('魚肚洞');await go(s[1],s[2]);await W(1200);await shot('2tunnel');
+ s=at('球門');await go(s[1],s[2]);await W(1200);await shot('3goal');
+ await go(land?600:420,land?740:1140);await W(1200);await shot('4juniper');
+ // walk into the field exit
+ const e=await p.evaluate(()=>{const q=window.__qf(),R=q.R2();const D=q.R2().room&&q.r2Spots();return null;});
+ await p.evaluate(()=>{const q=window.__qf(),R=q.R2();const s=q.r2Spots().find(s=>s.def[0]==='往操場');R.x=s.def[1]+90;R.y=s.def[2];R.exitArm=true;R.tgt=[s.def[1],s.def[2]];R.pend=null;});await W(4500);
+ const a1=await st();
+ await p.evaluate(()=>window.__qf().fieldLeave());await W(4000);const a2=await st();
+ await p.evaluate(()=>{const q=window.__qf(),R=q.R2();const s=q.r2Spots().find(s=>s.def[0]==='離開學校');R.tgt=[s.def[1],s.def[2]];R.pend=null;});await W(6000);
+ const a3=await p.evaluate(()=>{const q=window.__qf();return [q.R2().on,Math.round(q.P.pos.x-2600),Math.round(q.P.pos.z)];});
+ console.log(JSON.stringify({a1,a2,a3}),errs.filter(e=>!/reqfail|Failed to load|TUNNEL/.test(e)));await b.close();})();

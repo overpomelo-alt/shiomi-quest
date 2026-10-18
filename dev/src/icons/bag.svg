@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+<style>text{font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}</style>
+<rect x="4.0" y="6.0" width="16.0" height="16.0" rx="4.0" fill="none" stroke="#4E3B2B"/>
+<rect x="8.0" y="2.0" width="8.0" height="5.0" rx="2.0" fill="none" stroke="#4E3B2B"/>
+<rect x="7.0" y="14.0" width="10.0" height="5.0" rx="2.0" fill="none" stroke="#4E3B2B"/>
+<line x1="8.0" y1="10.0" x2="16.0" y2="10.0" stroke="#4E3B2B" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

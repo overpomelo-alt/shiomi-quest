@@ -1,0 +1,9 @@
+# build outputs (dev/build.py writes these; the published copy lives at the repo root)
+dev/dist/
+dev/web/
+__pycache__/
+node_modules/
+# test screenshots
+dev/tests/*.png
+dev/tests/*.jpg
+dev/tests/*.log

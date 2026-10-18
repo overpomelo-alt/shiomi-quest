@@ -1,0 +1,22 @@
+const start=require('./base.js');const land=process.argv[2]==='l',tag=land?'L':'P';
+(async()=>{const {b,p,W,cl,errs}=await start({land,seat:'3'});
+ const info=()=>p.evaluate(()=>{const q=window.__qf(),R=q.R2(),C=q.r2Spots();return {room:R.room,sk:R.sk,on:R.on,x:Math.round(R.x),y:Math.round(R.y),spots:C.map(s=>[s.label,Math.round(s.def[1]),Math.round(s.def[2]),q.r2Walk(s.def[1],s.def[2])])};});
+ const shot=n=>p.screenshot({path:`rm3_${tag}_${n}.jpg`,quality:72});
+ const goto=(lbl)=>p.evaluate(l=>{const q=window.__qf(),R=q.R2();const s=q.r2Spots().find(s=>s.def[0]===l||String(s.label).includes(l));if(!s)return 'nospot '+l;R.x=s.def[1];R.y=s.def[2];R.cx=null;return 'ok';},lbl);
+ await p.evaluate(()=>window.__qf().arriveTribe('home',true));await W(2500);await cl();
+ await p.evaluate(()=>window.__qf().enterCabinDirect());await W(4000);await cl();
+ console.log('CABIN',JSON.stringify(await info()));await shot('1cabin');
+ console.log(await goto('辦公桌'));await W(900);await shot('2desk');
+ console.log(await goto('床'));await W(500);await p.evaluate(()=>window.__qf().r2Rest(true));await W(2500);await shot('3rest');
+ await p.evaluate(()=>window.__qf().r2Rest(false));await W(1500);
+ console.log(await goto('鏡子'));await W(900);await shot('4mirror');
+ // mart
+ await p.evaluate(()=>window.__qf().arriveTribe('home',true));await W(2500);await cl();
+ await p.evaluate(()=>window.__qf().enterMart('tribe'));await W(4000);await cl();
+ console.log('MART',JSON.stringify(await info()));await shot('5mart');
+ console.log(await goto('counter'));await W(900);await shot('6counter');
+ await p.evaluate(()=>{const q=window.__qf();const s=q.r2Spots().find(s=>s.def[0]==='counter');s.act();});await W(1200);await shot('7shop');
+ await p.evaluate(()=>{const b=document.querySelector('#shop .sh-x');b&&b.click();});await W(500);
+ await p.evaluate(()=>window.__qf().exitMart());await W(3000);
+ console.log('AFTER',JSON.stringify(await p.evaluate(()=>{const q=window.__qf();return [q.R2().on,q.MART_INf(),q.INDf(),Math.round(q.P.pos.x),Math.round(q.P.pos.z)];})));
+ console.log(errs.filter(e=>!/reqfail|Failed to load|TUNNEL/.test(e)));await b.close();})();

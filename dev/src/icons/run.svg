@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+<style>text{font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}</style>
+<circle cx="15.0" cy="4.0" r="2.0" fill="none" stroke="#4E3B2B"/>
+<line x1="12.0" y1="8.0" x2="17.0" y2="12.0" stroke="#4E3B2B" stroke-width="1.8" stroke-linecap="round"/>
+<line x1="12.0" y1="8.0" x2="8.0" y2="14.0" stroke="#4E3B2B" stroke-width="1.8" stroke-linecap="round"/>
+<line x1="8.0" y1="14.0" x2="14.0" y2="17.0" stroke="#4E3B2B" stroke-width="1.8" stroke-linecap="round"/>
+<line x1="14.0" y1="17.0" x2="16.0" y2="22.0" stroke="#4E3B2B" stroke-width="1.8" stroke-linecap="round"/>
+<line x1="8.0" y1="14.0" x2="3.0" y2="20.0" stroke="#4E3B2B" stroke-width="1.8" stroke-linecap="round"/>
+<line x1="10.0" y1="9.0" x2="5.0" y2="8.0" stroke="#4E3B2B" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

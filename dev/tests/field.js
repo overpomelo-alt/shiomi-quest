@@ -1,0 +1,16 @@
+const start=require('./base.js');const land=process.argv[2]==='l',tag=land?'L':'P';
+(async()=>{const {b,p,W,cl,errs}=await start({land,seat:'3'});
+ const day=()=>p.evaluate(()=>{const q=window.__qf();q.RTC.auto=false;const D=q.PS.day,S=q.S;for(const k in D){if(D[k]&&D[k].isColor)S[k].copy(D[k]);else if(D[k]&&D[k].isVector3)S[k].copy(D[k]);else S[k]=D[k];}});
+ const shot=n=>p.screenshot({path:`fd_${tag}_${n}.jpg`,quality:75});
+ await p.evaluate(()=>window.__qf().arriveTribe('home',true));await W(2500);await cl();await day();
+ await p.evaluate(()=>window.__qf().fieldEnter());await W(4000);await cl();
+ const info=await p.evaluate(()=>{const q=window.__qf(),R=q.R2();return {room:R.room,spots:q.r2Spots().map(s=>[s.label,q.r2Walk(s.def[1],s.def[2])])};});console.log(JSON.stringify(info));
+ await shot('1in');
+ await p.evaluate(()=>{const R=window.__qf().R2();R.x=1085;R.y=700;R.cx=null;R.view=2;});await W(1200);await shot('2behindhoop');
+ await p.evaluate(()=>{const R=window.__qf().R2();R.x=1000;R.y=780;R.cx=null;});await W(1200);await shot('3hoop');
+ await p.evaluate(()=>{const R=window.__qf().R2();R.x=196;R.y=655;R.cx=null;});await W(1200);await shot('4door');
+ await p.evaluate(()=>{const q=window.__qf();const s=q.r2Spots().find(s=>s.def[0]==='教室門');s.act();});await W(3500);
+ const c1=await p.evaluate(()=>window.__qf().R2().room);
+ await p.evaluate(()=>window.__qf().clsLeave());await W(3500);const c2=await p.evaluate(()=>{const R=window.__qf().R2();return [R.room,R.on,Math.round(R.x),Math.round(R.y)];});
+ await p.evaluate(()=>window.__qf().fieldLeave());await W(3000);const c3=await p.evaluate(()=>{const q=window.__qf();return [q.R2().on,Math.round(q.P.pos.x-2600),Math.round(q.P.pos.z)];});
+ console.log(JSON.stringify({c1,c2,c3}),errs.filter(e=>!/reqfail|Failed to load|TUNNEL/.test(e)));await b.close();})();
