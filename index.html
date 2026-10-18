@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant" translate="no" class="notranslate"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>汐見町闖關</title><meta name="theme-color" content="#16121f"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#16121f;color:#141413}</style></head><body>
+<!doctype html><html lang="zh-Hant" translate="no" class="notranslate"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>汐見町闖關</title><meta name="theme-color" content="#16121f"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#16121f;color:#141413}</style><script>window.SHIOMI_BUILD="1018-1834";(function(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){if(j&&j.v&&j.v!==window.SHIOMI_BUILD&&sessionStorage.getItem("shiomi_rl")!==j.v){sessionStorage.setItem("shiomi_rl",j.v);location.reload();}}).catch(function(){});}catch(e){}})();</script></head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1092,7 +1092,7 @@ function facadeBox(w,h,d){const g=new T.BoxGeometry(w,h,d);const uv=g.attributes
 function quad(a,b,c,d){return [...a,...b,...c,...a,...c,...d];}
 const CROWN={a:crownGeo([[1,0,0,0],[.72,.62,-.18,.3],[.7,-.6,-.12,-.2],[.62,.12,.42,-.48],[.6,-.2,.5,.45]]),b:crownGeo([[1,0,0,0],[.75,-.66,-.2,.2],[.66,.6,.1,-.3],[.58,0,.58,.1]]),
   lo:crownGeo([[1,0,0,0],[.74,-.62,-.18,.22],[.68,.58,.06,-.28]],5,.8,3),   // trees near the paths: 3×20 triangles
-  mid:crownGeo([[1,0,0,0],[.72,.62,-.18,.3],[.7,-.6,-.12,-.2],[.62,.12,.42,-.48],[.6,-.2,.5,.45]],6,.7,4)};   // town street trees: 5×36
+  mid:crownGeo([[1,0,0,0],[.72,.62,-.18,.3],[.7,-.6,-.12,-.2],[.62,.12,.42,-.48],[.6,-.2,.5,.45]],8,.7,5)};   // town street trees: 5×64
 // far hillside trees (v0.3 G04: distant forest with less detail): one 20-triangle blob, shaded smooth so it still reads as a round crown
 CROWN.blob=(()=>{const g=new T.IcosahedronGeometry(1,0).toNonIndexed();const p=g.attributes.position,n=g.attributes.normal;for(let i=0;i<p.count;i++){const l=Math.hypot(p.getX(i),p.getY(i)*1.2,p.getZ(i));n.setXYZ(i,p.getX(i)/l,p.getY(i)*1.2/l,p.getZ(i)/l);}g.scale(1.25,1,1.2);g.computeBoundingSphere();return g;})();
 // split an instanced forest: instances where near(x,z) keep the detailed crown, the rest move to a cheap far mesh
@@ -3376,7 +3376,7 @@ function openJournal(){if(!started)return;const J=$('journal'),grid=$('jnGrid'),
   const on=id=>$(id).getAttribute('aria-pressed')==='true';
   const rows=[['音效',()=>on('bSound')?'開啟':'關閉',()=>{$('bSound').click();openJournal();}],['背景音樂',()=>on('bMusic')?'開啟':'關閉',()=>{$('bMusic').click();openJournal();}],
     ['時間',()=>$('tBtnLbl').textContent,()=>{$('bTime').click();setTimeout(openJournal,40);}],['電影模式',()=>'看風景、拍照用',go(()=>$('bCine').click())],
-    ['畫面',()=>GFX.lite?'省電（比較順）':'標準',()=>{gfxToggle();openJournal();}],['操作說明',()=>'',go(()=>$('bHelp').click())],['換人・登出',()=>W.seat?`${W.seat==='T'?'老師':W.seat+' 號'}`:'',go(()=>$('switchUser').click())]];
+    ['版本',()=>typeof SHIOMI_BUILD!=='undefined'?SHIOMI_BUILD:'測試',()=>toast('目前版本：'+(typeof SHIOMI_BUILD!=='undefined'?SHIOMI_BUILD:'測試'))],['畫面',()=>GFX.lite?'省電（比較順）':'標準',()=>{gfxToggle();openJournal();}],['操作說明',()=>'',go(()=>$('bHelp').click())],['換人・登出',()=>W.seat?`${W.seat==='T'?'老師':W.seat+' 號'}`:'',go(()=>$('switchUser').click())]];
   set.innerHTML='';rows.forEach(([t,v,fn])=>{const b=document.createElement('button');b.type='button';b.className='jn-row';b.innerHTML=`<b>${t}</b><span>${v()}</span>`+ICON('arrow');b.onclick=fn;set.appendChild(b);});
   J.hidden=false;$('bMenu').setAttribute('aria-expanded','true');}
 document.querySelectorAll('i[class^="ic-"]').forEach(el=>{el.outerHTML=ICON(el.className.slice(3));});
@@ -3983,7 +3983,7 @@ function setWall(id){const t=wallTexOf(id);const m=HOME.wallMat;if(m.map)m.map.d
 function setFloor(id){const t=floorTexOf(id);const m=HOME.floorMat;if(m.map)m.map.dispose();m.map=t;m.emissiveMap=t;m.needsUpdate=true;}
 /* ---- illustrated look for rooms: soft cel shading + ink outlines (matches the hand-drawn characters) ---- */
 const INK={grad:(()=>{const t=new T.DataTexture(new Uint8Array([105,105,105,255,178,178,178,255,255,255,255,255]),3,1,T.RGBAFormat);t.minFilter=t.magFilter=T.NearestFilter;t.generateMipmaps=false;t.needsUpdate=true;return t;})(),
-  line:new T.MeshBasicMaterial({color:col('#6a4a34'),side:T.BackSide,toneMapped:false}),paper:col('#f3e6cf'),cache:new Map()};
+  line:new T.MeshBasicMaterial({color:col('#80644e'),side:T.BackSide,toneMapped:false}),paper:col('#f3e6cf'),cache:new Map()};
 const INK_GEO=new Set(['BoxGeometry','CylinderGeometry','SphereGeometry','IcosahedronGeometry','ConeGeometry','TorusGeometry','OctahedronGeometry','CapsuleGeometry']);
 function inkMat(m){if(INK.cache.has(m))return INK.cache.get(m);const c=m.color.clone().lerp(INK.paper,.12);
   const t=new T.MeshToonMaterial({color:c,map:m.map||null,gradientMap:INK.grad,emissive:m.emissive?m.emissive.clone():new T.Color(0),emissiveMap:m.emissiveMap||null,emissiveIntensity:m.emissiveIntensity==null?1:m.emissiveIntensity,side:m.side});
@@ -5143,6 +5143,9 @@ if(TROOM&&TROOM.mart)['landscape','portrait'].forEach(sk=>{const D=TROOM.mart[sk
     ['離開便利商店',D.exit.center[0],D.exit.center[1],R2BB(D.exit.polygon),'離開便利商店',()=>exitMart()]]};});
 const MART_SIGN={sign_rice:'飯糰・便當',sign_bread:'麵包・甜點',sign_snack:'零食',sign_noodle:'泡麵',sign_stationery:'文具',sign_pet:'寵物',sign_drink:'飲料',sign_ice:'冰品',sign_gacha:'扭蛋'};
 const MSC={};
+const MCLERK={img:null,ld:false,pos:{landscape:[1772,598],portrait:[1046,812]}};
+function martClerk(g){const M=SPRITES.clerk;if(!M)return;if(!MCLERK.ld){MCLERK.ld=true;loadImg(M.src).then(im=>MCLERK.img=im).catch(()=>{});}const im=MCLERK.img;if(!im)return;
+  const [x,y]=MCLERK.pos[R2.sk],H=r2H(y),dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch,br=1+Math.sin(R2.t*2.1)*.008;g.save();g.translate(x,y);g.scale(1,br);const [sx,sy]=fxy(M,0);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+3/M.ch*dh,dw,dh);g.restore();}
 function martSign(g,k){const D=TROOM.mart[R2.sk],r=D.slots[k];if(!r)return;const txt=k==='sign_counter'?(MART.from==='tribe'?'7-ELEVEN 環山門市':'ひだまりマート'):MART_SIGN[k];if(!txt)return;
   const q=D.quads[k],key=R2.sk+k+txt;let c=MSC[key];
   if(!c){const [,,w,h]=r,S=4,vert=h>w*1.2;c=document.createElement('canvas');c.width=Math.max(8,Math.round(w*S));c.height=Math.max(8,Math.round(h*S));const x=c.getContext('2d');
@@ -5445,7 +5448,7 @@ function r2Draw(dt){R2.t+=dt;cdogTick(dt);const cv=R2.cv,g=R2.g;const dpr=Math.m
   g.setTransform(1,0,0,1,0,0);g.fillStyle='#2a1a10';g.fillRect(0,0,cw,ch);g.setTransform(s,0,0,s,-R2.cx*s,-R2.cy*s);g.imageSmoothingQuality='medium';
   const bg=R2.img[(BATH?'bath_':HOMER?'home_':CLS?'class_':R2.room==='mart'?'mart_':'')+R2.sk+'_bg'];if(bg&&bg.complete)g.drawImage(bg,0,0,Wi,Hi);
   if(HOMER)hrBack(g,C);else if(R2.room==='mart')martSign(g,'sign_counter');else if(!BATH&&!CLS)r2Slots(g);
-  const L=[];if(HOMER)hrItems(g,L);const RS=R2.rest&&R2.room==='cabin'&&TROOM.rest?TROOM.rest[R2.sk]:null;if(RS){const ob=C.occ.find(o=>o.id==='bed');L.push([(ob?r2Sort(ob,R2.x):R2.y)+.5,()=>r2RestDraw(g,RS)]);}const HRS=R2.rest&&R2.room==='home';if(HRS){const sb=(C.occ.find(o=>o.id==='bed_end')||{sort:R2.y}).sort;L.push([sb+.5,()=>hrRestDraw(g)]);}
+  const L=[];if(HOMER)hrItems(g,L);if(R2.room==='mart')L.push([MCLERK.pos[R2.sk][1],()=>martClerk(g)]);const RS=R2.rest&&R2.room==='cabin'&&TROOM.rest?TROOM.rest[R2.sk]:null;if(RS){const ob=C.occ.find(o=>o.id==='bed');L.push([(ob?r2Sort(ob,R2.x):R2.y)+.5,()=>r2RestDraw(g,RS)]);}const HRS=R2.rest&&R2.room==='home';if(HRS){const sb=(C.occ.find(o=>o.id==='bed_end')||{sort:R2.y}).sort;L.push([sb+.5,()=>hrRestDraw(g)]);}
   C.occ.forEach(o=>{const im0=R2.img[o.file];const side=!CLS&&!(RS&&o.id==='bed')&&!o.line&&im0&&im0.width&&(R2.x<o.x+im0.width*.12||R2.x>o.x+im0.width*.88);L.push([side?-1e9:r2Sort(o,R2.x),()=>{const im=R2.img[o.file];if(im&&im.complete)g.drawImage(im,o.x,o.y);const ow=C.own&&C.own[o.id];if(ow)ow.forEach(k=>r2SlotOwned(g,k));}]);});
   if(R2.room==='cabin'&&CDOG.img&&!CDOG.hide)L.push([CDOG.y,()=>cdogDraw(g)]);if(!RS&&!HRS)L.push([R2.act&&R2.act.over!=null?R2.act.over:R2.y,()=>r2Human(g)]);if(PETOBJ)L.push([R2.pet.y,()=>r2Pet(g)]);L.sort((a,b)=>a[0]-b[0]).forEach(e=>e[1]());
   const nt=R2.room==='mart'?0:(S.night||0);if(nt>.02){g.save();g.globalCompositeOperation='multiply';g.fillStyle=`rgba(120,110,170,${nt*.35})`;g.fillRect(0,0,Wi,Hi);g.restore();}
@@ -5715,7 +5718,7 @@ function cutEnd(){if(!CUTON||CUT.ended)return;CUT.ended=true;const first=!CUT.re
 /* ---- town ink style: cel-stepped light on Lambert materials (in place) + brown outline shells ---- */
 const INKU={max:{value:new T.Color(1,1,1)}};
 // outline hull: back faces pushed out along normals, width kept roughly constant on screen
-INK.lineOut=new T.ShaderMaterial({uniforms:T.UniformsUtils.merge([T.UniformsLib.fog,{uCol:{value:col('#6a4a34')},uPx:{value:.0022}}]),side:T.BackSide,fog:true,
+INK.lineOut=new T.ShaderMaterial({uniforms:T.UniformsUtils.merge([T.UniformsLib.fog,{uCol:{value:col('#80644e')},uPx:{value:.0017}}]),side:T.BackSide,fog:true,
   vertexShader:`uniform float uPx;attribute vec3 inkN;varying vec3 vCutW;
 #include <fog_pars_vertex>
 void main(){vCutW=(modelMatrix*vec4(position,1.)).xyz;vec4 mvPosition=modelViewMatrix*vec4(position,1.);vec3 n=normalize(normalMatrix*inkN);mvPosition.xyz+=n*uPx*max(1.5,-mvPosition.z);gl_Position=projectionMatrix*mvPosition;
@@ -6413,7 +6416,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
   const colAt=(lx,lz,h)=>{const n=fbm(lx*.12+3,lz*.12);const e=sqE(lx,lz);
     if(e>1.5){const cn=fbm((lx+h*.8)*.22+7,(lz-h*.6)*.22),cb=fbm(lx*.035+2,lz*.035);tc.set('#2c5544').lerp(t2.set('#4f8449'),smooth(.4,.55,cn)).lerp(tc2.set('#7cab58'),smooth(.58,.72,cn)*.85);tc.lerp(t2.set(cb>.55?'#94bb5e':'#284d3e'),Math.abs(cb-.5)*.8);tc.lerp(t2.set('#4a6c55'),.35);const tr=(1-smooth(40,75,h))*smooth(1.5,8,e);if(tr>0){const st=((h*.55)%1+1)%1;tc.lerp(t2.set('#6a9050').lerp(tc2.set('#93b066'),smooth(.15,.45,st)*smooth(.95,.6,st)),tr*(.05+.04*n));}if(h>120)tc.lerp(t2.set('#748b9b'),smooth(120,220,h));return;}
     if(Math.abs(lx-sqRX(lz))<15&&h<-12){tc.set('#8a8676').lerp(t2.set('#6f7470'),n);return;}
-    tc.set('#9cc062').lerp(t2.set('#84ad52'),n);{const st=((h*.7)%1+1)%1;if(st<.3)tc.lerp(t2.set('#b6d074'),.3);}tc.lerp(t2.set('#a8956f'),clamp((fbm(lx*.05,lz*.05)-.55)*2.2,0,.45));
+    tc.set('#9cc062').lerp(t2.set('#84ad52'),n);{const st=((h*.7)%1+1)%1;if(st<.3)tc.lerp(t2.set('#b6d074'),.3);}tc.lerp(t2.set('#b0a070'),clamp((fbm(lx*.05,lz*.05)-.6)*1.6,0,.22));
     };
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=xs[i],z=zs[j],h=sqBase(x,z),k=(j*nx+i)*3;pos[k]=x;pos[k+1]=h;pos[k+2]=z;colAt(x,z,h);tc.convertSRGBToLinear();cl[k]=tc.r;cl[k+1]=tc.g;cl[k+2]=tc.b;}
   for(let j=0;j<nz-1;j++)for(let i=0;i<nx-1;i++){const a=j*nx+i,b=a+1,c=a+nx,d=c+1;idx.push(a,c,b,b,c,d);}
@@ -6514,7 +6517,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
   {const SEED0=seed;const SG=new T.Group();G.add(SG);const Y0=H(-61,30);
    const B=(w,h,d,m,x,y,z,ni)=>{const o=mk(bx(w,h,d),m,x,Y0+y,z,SG,!ni);if(ni)o.userData.noInk=1;return o;};
    const L_=(c,s)=>{const m=lam(c,{});if(s)surfSet(m,s[0],s[1],null,s[2],{chroma:s[3]});return m;};
-   const WALL=L_('#e3d2b1',['wall_tile',1,.85,.35]),COLR=L_('#ead9bb',['wall_tile',1,.7,.35]),PLINTH=L_('#b5aa96',['wall_pebble',1,.8,.3]),
+   const WALL=L_('#ecdcbc',['wall_tile',1,.4,.2]),COLR=L_('#f1e2c4',['wall_tile',1,.35,.2]),PLINTH=L_('#b5aa96',['wall_pebble',1,.8,.3]),
      PARA=L_('#8f8c87',['wall_pebble',1,.9,0]),SLAB=L_('#cfc9bd',['terrazzo',1,.9,.4]),ROOF=L_('#5d4c43',['roof_metal',2,.8,.3]),EAVE=lam('#4f3a2f'),
      PINK=L_('#e6c1b0',['wall_plaster',1,.8,.3]),REDR=L_('#b0473a',['roof_metal',2,.8,.5]),STONE=L_('#a19c92',['wall_pebble',1,.8,.2]),
      WOOD=L_('#a8774b',['wood_plank',1,1,.6]),FPOST=L_('#aaa69f',['concrete',1,.8,.2]),
@@ -6527,7 +6530,10 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
    const rail=(xa,za,xb,zb2,y,h=1)=>{const l=Math.hypot(xb-xa,zb2-za);if(l<.2)return;const ry=Math.atan2(-(zb2-za),xb-xa),mx=(xa+xb)/2,mz=(za+zb2)/2;
      [h,.1].forEach(yy=>{const r=B(l,.06,.06,RAIL,mx,y+yy,mz,true);r.rotation.y=ry;});const n=Math.max(2,Math.round(l/.17));for(let k=1;k<n;k++){const t=k/n;B(.035,h,.035,RAIL,xa+(xb-xa)*t,y+h/2,za+(zb2-za)*t,true);}};
    const gableTri=(half,rh,mat,x,y,z,ry)=>{const sh=new T.Shape();sh.moveTo(-half,0);sh.lineTo(half,0);sh.lineTo(0,rh);sh.closePath();const e=mk(new T.ExtrudeGeometry(sh,{depth:.1,bevelEnabled:false}),mat,x,Y0+y,z,SG);e.rotation.y=ry;return e;};
-   const win=(x,y,z,w,h,ax,n=1)=>{if(ax==='z'){B(w,h,.06,FRAME,x,y,z,true);B(w-.12,h-.12,.07,GLASS,x,y,z+.02*n,true);}else{B(.06,h,w,FRAME,x,y,z,true);B(.07,h-.12,w-.12,GLASS,x+.02*n,y,z,true);}};
+   const SILL=lam('#d8cdbd'),WSHD=lam('#6f6458');
+   const win=(x,y,z,w,h,ax,n=1)=>{const P=(a,b,c,dw,dh,dd,m,ni)=>ax==='z'?B(dw,dh,dd,m,x+a,y+b,z+c*n,ni):B(dd,dh,dw,m,x+c*n,y+b,z+a,ni);
+     P(0,0,-.005,w-.12,h-.12,.03,GLASS,true);P(0,h/2-.13,.02,w-.14,.07,.01,WSHD,true);P(0,0,.02,.04,h-.12,.03,FRAME,true);
+     P(0,h/2-.03,.06,w+.04,.1,.14,FRAME);P(0,-h/2-.02,.1,w+.22,.08,.22,SILL);[-1,1].forEach(k=>P(k*(w/2-.02),0,.06,.09,h,.14,FRAME,true));};
    const x0=-74,x1=-50,L=x1-x0,cx=(x0+x1)/2,zb=15.6,zc=20,zf=22,fh=3.4,NF=2,HT=NF*fh,nb=8,bw=L/nb;   // CLS_DOOR sits on bay 3's door (x0+3*bw+.95)
    // ---- main classroom block (faces the field) + its open corridors
    B(L-3,HT,zc-zb,WALL,cx-1.5,HT/2,(zb+zc)/2);B(3,HT,zc-zb,PINK,x1-1.5,HT/2,(zb+zc)/2);B(L+.08,.55,zc-zb+.08,PLINTH,cx,.27,(zb+zc)/2);   // the east bay is the pink, red-roofed end of the photos
@@ -6666,7 +6672,7 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
      inter(P_(fxc+2.6,fzc),2,'溜魚滑梯',()=>say(null,['咻——從大魚的背上溜下來！','這隻藍色的大魚，是平等國小的招牌溜滑梯。'],{noWave:1}));
      B(.8,.9,7.4,HEDGE,-47.2,.45,fzc);addCol(TB.x-47.6,TB.x-46.8,fzc-3.7,fzc+3.7,Y0+1);}
    [[-82.2,16.9,.95],[-86.5,26.6,.95],[-85.7,30.6,1.1],[-80.9,34.2,.85],[-81.2,44.1,.8],[-86.9,44.2,.85],[-84.6,39.4,1],[-86.6,35.6,.9],[-50.8,44,.8],[-54.4,35,.8]].forEach(([x,z,s])=>juniper(x,z,s));
-   broad(-53.6,26.4,.9);broad(-77.6,43.3,.85);
+   broad(-53.6,26.4,.9);broad(-77.6,43.3,.85);broad(-70.5,46.6,1.05);broad(-61.5,46.8,.95);   // big shade trees just outside the south fence, leaning over it (art pack 05)
    [[-80.8,37.2],[-54.6,30.2]].forEach(([x,z])=>{mk(cy(.06,.08,5,8),DARK,x,Y0+2.5,z,SG);mk(bx(.5,.16,.24),DARK,x+.2,Y0+5,z,SG,false);addCol(TB.x+x-.12,TB.x+x+.12,z-.12,z+.12,Y0+5);});
    // ---- storeroom by the east curve of the track (two white doors) + a small goal
    {const rx0=-49.3,rx1=-45.9,rz0=37.6,rz1=41.8,rxm=(rx0+rx1)/2,rzm=(rz0+rz1)/2;B(rx1-rx0,2.8,rz1-rz0,WALL,rxm,1.4,rzm);B(rx1-rx0+.06,.4,rz1-rz0+.06,PLINTH,rxm,.2,rzm);
