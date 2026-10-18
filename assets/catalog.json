@@ -454,115 +454,91 @@
   {
    "file": "assets/rooms/cabin/landscape_bg.webp",
    "group": "rooms/cabin",
-   "bytes": 190998,
+   "bytes": 191682,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/landscape_o_bed.webp",
    "group": "rooms/cabin",
-   "bytes": 11852,
+   "bytes": 12966,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/landscape_o_bookcase.webp",
    "group": "rooms/cabin",
-   "bytes": 18828,
+   "bytes": 10636,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/landscape_o_desk.webp",
    "group": "rooms/cabin",
-   "bytes": 10916,
+   "bytes": 12546,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/landscape_o_desk_chair.webp",
    "group": "rooms/cabin",
-   "bytes": 5032,
+   "bytes": 4960,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/landscape_o_dining_chair_back.webp",
+   "file": "assets/rooms/cabin/landscape_o_dumbbells.webp",
    "group": "rooms/cabin",
-   "bytes": 4840,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/cabin/landscape_o_dining_chair_front.webp",
-   "group": "rooms/cabin",
-   "bytes": 7456,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/cabin/landscape_o_dining_table.webp",
-   "group": "rooms/cabin",
-   "bytes": 4194,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/cabin/landscape_o_dumbbell_1.webp",
-   "group": "rooms/cabin",
-   "bytes": 1484,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/cabin/landscape_o_dumbbell_2.webp",
-   "group": "rooms/cabin",
-   "bytes": 1424,
+   "bytes": 2512,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/landscape_o_floor_lamp.webp",
    "group": "rooms/cabin",
-   "bytes": 1958,
+   "bytes": 5602,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/landscape_o_kitchen_counter.webp",
+   "file": "assets/rooms/cabin/landscape_o_foreground_plant_left.webp",
    "group": "rooms/cabin",
-   "bytes": 14240,
+   "bytes": 6074,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/landscape_o_mini_fridge.webp",
+   "file": "assets/rooms/cabin/landscape_o_foreground_plant_right.webp",
    "group": "rooms/cabin",
-   "bytes": 3110,
+   "bytes": 4426,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/landscape_o_partition_left.webp",
+   "file": "assets/rooms/cabin/landscape_o_kitchen.webp",
    "group": "rooms/cabin",
-   "bytes": 8030,
+   "bytes": 12330,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/landscape_o_partition_left_post.webp",
+   "file": "assets/rooms/cabin/landscape_o_mirror.webp",
    "group": "rooms/cabin",
-   "bytes": 2210,
+   "bytes": 10542,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/landscape_o_partition_right.webp",
+   "file": "assets/rooms/cabin/landscape_o_pet_bed.webp",
    "group": "rooms/cabin",
-   "bytes": 7638,
+   "bytes": 5890,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/landscape_o_partition_right_post.webp",
+   "file": "assets/rooms/cabin/landscape_o_plant_left.webp",
    "group": "rooms/cabin",
-   "bytes": 2184,
+   "bytes": 7458,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/landscape_o_sofa.webp",
    "group": "rooms/cabin",
-   "bytes": 8324,
+   "bytes": 26544,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/landscape_o_yoga_mat.webp",
+   "file": "assets/rooms/cabin/landscape_winmask.webp",
    "group": "rooms/cabin",
-   "bytes": 2924,
+   "bytes": 506,
    "note": ""
   },
   {
@@ -580,103 +556,79 @@
   {
    "file": "assets/rooms/cabin/portrait_bg.webp",
    "group": "rooms/cabin",
-   "bytes": 183154,
+   "bytes": 201346,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_bed.webp",
    "group": "rooms/cabin",
-   "bytes": 10960,
+   "bytes": 10432,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_bookcase.webp",
    "group": "rooms/cabin",
-   "bytes": 8670,
+   "bytes": 10076,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_desk.webp",
    "group": "rooms/cabin",
-   "bytes": 9722,
+   "bytes": 10670,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_desk_chair.webp",
    "group": "rooms/cabin",
-   "bytes": 4496,
+   "bytes": 4396,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/portrait_o_dining_chair_back.webp",
+   "file": "assets/rooms/cabin/portrait_o_dumbbells.webp",
    "group": "rooms/cabin",
-   "bytes": 2486,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/cabin/portrait_o_dining_chair_front.webp",
-   "group": "rooms/cabin",
-   "bytes": 6278,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/cabin/portrait_o_dining_table.webp",
-   "group": "rooms/cabin",
-   "bytes": 7074,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/cabin/portrait_o_dumbbell_1.webp",
-   "group": "rooms/cabin",
-   "bytes": 1278,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/cabin/portrait_o_dumbbell_2.webp",
-   "group": "rooms/cabin",
-   "bytes": 1456,
+   "bytes": 2780,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_floor_lamp.webp",
    "group": "rooms/cabin",
-   "bytes": 3050,
+   "bytes": 4796,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/portrait_o_kitchen_counter.webp",
+   "file": "assets/rooms/cabin/portrait_o_kitchen.webp",
    "group": "rooms/cabin",
-   "bytes": 11656,
+   "bytes": 9140,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/portrait_o_mini_fridge.webp",
+   "file": "assets/rooms/cabin/portrait_o_mirror.webp",
    "group": "rooms/cabin",
-   "bytes": 2352,
+   "bytes": 8804,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/portrait_o_partition_left.webp",
+   "file": "assets/rooms/cabin/portrait_o_pet_bed.webp",
    "group": "rooms/cabin",
-   "bytes": 11516,
+   "bytes": 5888,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/portrait_o_partition_right.webp",
+   "file": "assets/rooms/cabin/portrait_o_plant_left.webp",
    "group": "rooms/cabin",
-   "bytes": 7108,
+   "bytes": 5358,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_sofa.webp",
    "group": "rooms/cabin",
-   "bytes": 9030,
+   "bytes": 25698,
    "note": ""
   },
   {
-   "file": "assets/rooms/cabin/portrait_o_yoga_mat.webp",
+   "file": "assets/rooms/cabin/portrait_winmask.webp",
    "group": "rooms/cabin",
-   "bytes": 2420,
+   "bytes": 324,
    "note": ""
   },
   {
@@ -1316,99 +1268,243 @@
    "note": ""
   },
   {
+   "file": "assets/rooms/mart/mart_landscape_bg.webp",
+   "group": "rooms/mart",
+   "bytes": 231646,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_coffee.webp",
+   "group": "rooms/mart",
+   "bytes": 7086,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_counter.webp",
+   "group": "rooms/mart",
+   "bytes": 38014,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_drink_fridge.webp",
+   "group": "rooms/mart",
+   "bytes": 25890,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_gacha.webp",
+   "group": "rooms/mart",
+   "bytes": 10958,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_ice_freezer.webp",
+   "group": "rooms/mart",
+   "bytes": 7642,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_shelf_bread.webp",
+   "group": "rooms/mart",
+   "bytes": 12542,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_shelf_noodle.webp",
+   "group": "rooms/mart",
+   "bytes": 19760,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_shelf_pet.webp",
+   "group": "rooms/mart",
+   "bytes": 11524,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_shelf_rice.webp",
+   "group": "rooms/mart",
+   "bytes": 15450,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_shelf_snack.webp",
+   "group": "rooms/mart",
+   "bytes": 17934,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_landscape_o_shelf_stationery.webp",
+   "group": "rooms/mart",
+   "bytes": 9214,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_bg.webp",
+   "group": "rooms/mart",
+   "bytes": 212974,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_coffee.webp",
+   "group": "rooms/mart",
+   "bytes": 8068,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_counter.webp",
+   "group": "rooms/mart",
+   "bytes": 30398,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_drink_fridge.webp",
+   "group": "rooms/mart",
+   "bytes": 26888,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_gacha.webp",
+   "group": "rooms/mart",
+   "bytes": 9496,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_ice_freezer.webp",
+   "group": "rooms/mart",
+   "bytes": 9324,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_shelf_bread.webp",
+   "group": "rooms/mart",
+   "bytes": 14780,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_shelf_noodle.webp",
+   "group": "rooms/mart",
+   "bytes": 16530,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_shelf_pet.webp",
+   "group": "rooms/mart",
+   "bytes": 11486,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_shelf_rice.webp",
+   "group": "rooms/mart",
+   "bytes": 15248,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_shelf_snack.webp",
+   "group": "rooms/mart",
+   "bytes": 15256,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/mart/mart_portrait_o_shelf_stationery.webp",
+   "group": "rooms/mart",
+   "bytes": 15672,
+   "note": ""
+  },
+  {
    "file": "assets/rooms/rest/rest_landscape_blanket_front.webp",
    "group": "rooms/rest",
-   "bytes": 7880,
+   "bytes": 10482,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_landscape_head01.webp",
    "group": "rooms/rest",
-   "bytes": 8200,
+   "bytes": 4084,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_landscape_head02.webp",
    "group": "rooms/rest",
-   "bytes": 7590,
+   "bytes": 3920,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_landscape_head03.webp",
    "group": "rooms/rest",
-   "bytes": 8246,
+   "bytes": 3838,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_landscape_head04.webp",
    "group": "rooms/rest",
-   "bytes": 7782,
+   "bytes": 4346,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_landscape_head05.webp",
    "group": "rooms/rest",
-   "bytes": 5294,
+   "bytes": 3246,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_landscape_head06.webp",
    "group": "rooms/rest",
-   "bytes": 6100,
+   "bytes": 4082,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_landscape_pillow_dent.webp",
    "group": "rooms/rest",
-   "bytes": 2976,
+   "bytes": 2800,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_blanket_front.webp",
    "group": "rooms/rest",
-   "bytes": 8568,
+   "bytes": 6472,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head01.webp",
    "group": "rooms/rest",
-   "bytes": 7142,
+   "bytes": 3810,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head02.webp",
    "group": "rooms/rest",
-   "bytes": 6546,
+   "bytes": 3580,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head03.webp",
    "group": "rooms/rest",
-   "bytes": 7194,
+   "bytes": 3584,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head04.webp",
    "group": "rooms/rest",
-   "bytes": 6812,
+   "bytes": 4106,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head05.webp",
    "group": "rooms/rest",
-   "bytes": 4596,
+   "bytes": 3042,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head06.webp",
    "group": "rooms/rest",
-   "bytes": 5304,
+   "bytes": 3832,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_pillow_dent.webp",
    "group": "rooms/rest",
-   "bytes": 2312,
+   "bytes": 1956,
    "note": ""
   },
   {
