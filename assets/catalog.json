@@ -2,6 +2,66 @@
  "built_from": "shiomi/src",
  "files": [
   {
+   "file": "assets/art/school-v1/bush_hedge.webp",
+   "group": "art",
+   "bytes": 22572,
+   "note": "school art sample v1"
+  },
+  {
+   "file": "assets/art/school-v1/grass_a.webp",
+   "group": "art",
+   "bytes": 45606,
+   "note": "school art sample v1"
+  },
+  {
+   "file": "assets/art/school-v1/grass_b.webp",
+   "group": "art",
+   "bytes": 73738,
+   "note": "school art sample v1"
+  },
+  {
+   "file": "assets/art/school-v1/leaf_broad_dark.webp",
+   "group": "art",
+   "bytes": 37056,
+   "note": "school art sample v1"
+  },
+  {
+   "file": "assets/art/school-v1/leaf_broad_light.webp",
+   "group": "art",
+   "bytes": 41090,
+   "note": "school art sample v1"
+  },
+  {
+   "file": "assets/art/school-v1/leaf_broad_mid.webp",
+   "group": "art",
+   "bytes": 40870,
+   "note": "school art sample v1"
+  },
+  {
+   "file": "assets/art/school-v1/leaf_conifer.webp",
+   "group": "art",
+   "bytes": 56392,
+   "note": "school art sample v1"
+  },
+  {
+   "file": "assets/art/school-v1/leaf_juniper.webp",
+   "group": "art",
+   "bytes": 58942,
+   "note": "school art sample v1"
+  },
+  {
+   "file": "assets/art/school-v1/leaf_orchard.webp",
+   "group": "art",
+   "bytes": 48244,
+   "note": "school art sample v1"
+  },
+  {
+   "file": "assets/art/school-v1/trunk_bark.webp",
+   "group": "art",
+   "bytes": 4458,
+   "note": "school art sample v1"
+  },
+  {
    "file": "assets/characters/actions/act01.webp",
    "group": "characters/actions",
    "bytes": 156966,
