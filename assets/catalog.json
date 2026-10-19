@@ -412,61 +412,61 @@
   {
    "file": "assets/characters/residents/res01.webp",
    "group": "characters/residents",
-   "bytes": 261498,
+   "bytes": 221956,
    "note": "樹叔"
   },
   {
    "file": "assets/characters/residents/res02.webp",
    "group": "characters/residents",
-   "bytes": 253568,
+   "bytes": 210654,
    "note": "梅姨"
   },
   {
    "file": "assets/characters/residents/res03.webp",
    "group": "characters/residents",
-   "bytes": 226910,
+   "bytes": 151732,
    "note": "采玲"
   },
   {
    "file": "assets/characters/residents/res04.webp",
    "group": "characters/residents",
-   "bytes": 196078,
+   "bytes": 160388,
    "note": "米米"
   },
   {
    "file": "assets/characters/residents/res05.webp",
    "group": "characters/residents",
-   "bytes": 233438,
+   "bytes": 194946,
    "note": "阿滿奶奶"
   },
   {
    "file": "assets/characters/residents/res06.webp",
    "group": "characters/residents",
-   "bytes": 142456,
+   "bytes": 119254,
    "note": "阿豆"
   },
   {
    "file": "assets/characters/residents/res07.webp",
    "group": "characters/residents",
-   "bytes": 236788,
+   "bytes": 162990,
    "note": "阿澈"
   },
   {
    "file": "assets/characters/residents/res08.webp",
    "group": "characters/residents",
-   "bytes": 266372,
+   "bytes": 217496,
    "note": "阿晴"
   },
   {
    "file": "assets/characters/residents/res09.webp",
    "group": "characters/residents",
-   "bytes": 275070,
+   "bytes": 227704,
    "note": "阿朗"
   },
   {
    "file": "assets/characters/residents/res10.webp",
    "group": "characters/residents",
-   "bytes": 236074,
+   "bytes": 197470,
    "note": "小岑"
   },
   {
@@ -640,79 +640,67 @@
   {
    "file": "assets/rooms/cabin/portrait_bg.webp",
    "group": "rooms/cabin",
-   "bytes": 201346,
+   "bytes": 212812,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_bed.webp",
    "group": "rooms/cabin",
-   "bytes": 10432,
+   "bytes": 14484,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_bookcase.webp",
    "group": "rooms/cabin",
-   "bytes": 10076,
+   "bytes": 11478,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_desk.webp",
    "group": "rooms/cabin",
-   "bytes": 10670,
+   "bytes": 14514,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_desk_chair.webp",
    "group": "rooms/cabin",
-   "bytes": 4396,
+   "bytes": 5852,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_dumbbells.webp",
    "group": "rooms/cabin",
-   "bytes": 2780,
+   "bytes": 3666,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_floor_lamp.webp",
    "group": "rooms/cabin",
-   "bytes": 4796,
+   "bytes": 3190,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_kitchen.webp",
    "group": "rooms/cabin",
-   "bytes": 9140,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/cabin/portrait_o_mirror.webp",
-   "group": "rooms/cabin",
-   "bytes": 8804,
+   "bytes": 9048,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_pet_bed.webp",
    "group": "rooms/cabin",
-   "bytes": 5888,
-   "note": ""
-  },
-  {
-   "file": "assets/rooms/cabin/portrait_o_plant_left.webp",
-   "group": "rooms/cabin",
-   "bytes": 5358,
+   "bytes": 9100,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_o_sofa.webp",
    "group": "rooms/cabin",
-   "bytes": 25698,
+   "bytes": 16192,
    "note": ""
   },
   {
    "file": "assets/rooms/cabin/portrait_winmask.webp",
    "group": "rooms/cabin",
-   "bytes": 324,
+   "bytes": 486,
    "note": ""
   },
   {
@@ -1546,49 +1534,49 @@
   {
    "file": "assets/rooms/rest/rest_portrait_blanket_front.webp",
    "group": "rooms/rest",
-   "bytes": 6472,
+   "bytes": 6592,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head01.webp",
    "group": "rooms/rest",
-   "bytes": 3810,
+   "bytes": 5046,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head02.webp",
    "group": "rooms/rest",
-   "bytes": 3580,
+   "bytes": 4776,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head03.webp",
    "group": "rooms/rest",
-   "bytes": 3584,
+   "bytes": 4974,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head04.webp",
    "group": "rooms/rest",
-   "bytes": 4106,
+   "bytes": 5626,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head05.webp",
    "group": "rooms/rest",
-   "bytes": 3042,
+   "bytes": 4094,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_head06.webp",
    "group": "rooms/rest",
-   "bytes": 3832,
+   "bytes": 5120,
    "note": ""
   },
   {
    "file": "assets/rooms/rest/rest_portrait_pillow_dent.webp",
    "group": "rooms/rest",
-   "bytes": 1956,
+   "bytes": 2632,
    "note": ""
   },
   {
@@ -2024,21 +2012,27 @@
    "note": "surface texture"
   },
   {
+   "file": "assets/tex/grass_t.webp",
+   "group": "tex",
+   "bytes": 23432,
+   "note": "surface texture"
+  },
+  {
    "file": "assets/tex/metal_blue.webp",
    "group": "tex",
-   "bytes": 12668,
+   "bytes": 6100,
    "note": "surface texture"
   },
   {
    "file": "assets/tex/metal_green.webp",
    "group": "tex",
-   "bytes": 14184,
+   "bytes": 5234,
    "note": "surface texture"
   },
   {
    "file": "assets/tex/metal_red.webp",
    "group": "tex",
-   "bytes": 12236,
+   "bytes": 4816,
    "note": "surface texture"
   },
   {
@@ -2062,7 +2056,7 @@
   {
    "file": "assets/tex/wall_brick_red.webp",
    "group": "tex",
-   "bytes": 20546,
+   "bytes": 32476,
    "note": "surface texture"
   },
   {
@@ -2086,7 +2080,7 @@
   {
    "file": "assets/tex/wall_wood.webp",
    "group": "tex",
-   "bytes": 38234,
+   "bytes": 18986,
    "note": "surface texture"
   },
   {

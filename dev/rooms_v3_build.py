@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Teacher room v3 (../assets/source/rooms/teacher_room/teacher_room_v3) -> the cabin room: src/troom/<sk>_*.webp, room.json[sk], room.json['rest'][sk]
+"""Teacher room v3 rev4 (../assets/source/rooms/teacher_room/teacher_room_v3_rev4) -> the cabin room: src/troom/<sk>_*.webp, room.json[sk], room.json['rest'][sk]
    Mart (../assets/source/rooms/mart/mart_v3)                    -> src/troom/mart_<sk>_*.webp, room.json['mart'][sk]"""
 import json, os, glob
 from PIL import Image
@@ -31,13 +31,18 @@ def base(pk, L, pre, sk):
         (x, y), (w, h) = crop_save(pk, o['file'], name, 88)
         sl = o.get('sort_line')
         occ.append({'id': o['id'], 'file': name, 'x': x, 'y': y, 'sort': r(o['sort_y']),
-                    'line': [[sl[0], sl[1]], [sl[2], sl[3]]] if sl else None, 'b': [x, y, w, h]})
+                    'line': (sl if isinstance(sl[0], list) else [[sl[0], sl[1]], [sl[2], sl[3]]]) if sl else None, 'b': [x, y, w, h]})
     D['occ'] = occ
     e = L['exit']
     D['exit'] = {'polygon': [pt(p) for p in e['polygon']], 'center': pt(e['center']), 'spawn': pt(e['spawn']), 'facing': e.get('facing', 'back')}
     D['acc'] = {k: pt(v) for k, v in L['acc'].items()}
-    pp = L['preview_character_perspective']; ch = L['preview_character_height_px']
-    D['hh'] = [r(pp['back_y']), r(pp['front_y']), r(ch * pp['back_scale']), ch]
+    cs_ = L.get('character_scale')
+    if cs_:   # rev4+: calibrated visible height of a 145 cm student at the far / near foot line
+        D['hh'] = [r(cs_['far']['foot_y']), r(cs_['near']['foot_y']), r(cs_['far']['height_px']), r(cs_['near']['height_px'])]
+    else:
+        pp = L['preview_character_perspective']; ch = L['preview_character_height_px']
+        D['hh'] = [r(pp['back_y']), r(pp['front_y']), r(ch * pp['back_scale']), ch]
+    if L.get('acc_targets'): D['tgt'] = {k: pt(v) for k, v in L['acc_targets'].items()}
     cs = L.get('content_slots', {})
     D['slots'] = {k: [r(x) for x in v] for k, v in cs.items() if isinstance(v, list)}
     D['quads'] = {k: [pt(p) for p in v] for k, v in L.get('content_slot_quads', {}).items()}
@@ -49,7 +54,7 @@ def base(pk, L, pre, sk):
 
 
 # ---------- teacher room -> cabin
-pk = os.path.join(ROOT, '../assets/source/rooms/teacher_room/teacher_room_v3')
+pk = os.path.join(ROOT, '../assets/source/rooms/teacher_room/teacher_room_v3_rev4')   # 第十四批: revision 4 (bathroom approach, new portrait layout, calibrated scale)
 M = json.load(open(os.path.join(pk, 'manifest.json')))
 for f in glob.glob(os.path.join(OUT, 'landscape_*.webp')) + glob.glob(os.path.join(OUT, 'portrait_*.webp')) + glob.glob(os.path.join(OUT, 'rest_*.webp')):
     os.remove(f)

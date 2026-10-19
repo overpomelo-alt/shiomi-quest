@@ -124,7 +124,9 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
   - 地形：`tribeH`（含房子地基）、`sqBase`、`TB.terrH`（純地形）。
   - 合併繪製：`sqBatch`。房子在 `BLD` 迴圈裡產生，之後是路燈。
 - 手繪樹叢貼片：`FOLI`、`foliMat`、`foliBuild`、`SCARDS`。
-- **3D 樣板（第十三批）**：材質加 `userData.paint=1` 就會用「手繪明暗」（柔和兩段、暗面偏冷、不全黑），寫在 `inkLambert`；學校（`SG`）、學校草地、球場、跑道、Sqoyaw 地形已經用上。`sqPaintTrees` 把學校周圍 `SQPT_R` 公尺內的山坡樹、果園樹換成手繪葉團貼片。葉團貼片離鏡頭 3.2 公尺內會整張隱藏（之前用的網點淡出會在畫面上留下雜點，不要再用）。
+- **房間人物大小**：搜尋 `ROOM_HH`（學生房、便利商店、教室；老師房用 room.json 的 hh）。
+- **降飽和**：材質加 `userData.desat=0～1` 會把顏色往灰拉（第十四批，Sqoyaw 地面、學校草地）。
+- **3D 樣板（第十三批）**：材質加 `userData.paint=1` 就會用「手繪明暗」（柔和兩段、暗面偏冷、不全黑），寫在 `inkLambert`；學校（`SG`）、學校草地、球場、跑道、Sqoyaw 地形已經用上。`sqPaintTrees` 把山坡樹、果園樹換成手繪葉團貼片（第十四批起 `SQPT_R` 是整個 Sqoyaw），山坡另外鋪一整片葉團樹冠（`TB.canopy`）。葉團貼片離鏡頭 3.2 公尺內會整張隱藏（之前用的網點淡出會在畫面上留下雜點，不要再用）。
 - `GFX`：省電模式（lite）。
 - `Main loop`：主迴圈和 `applyEnv`（把天色套到燈光、霧、窗戶、路燈光暈）、`updateCamera`。
 - `即時同步`：`PRES`、`presTick`，同時上線時看得到同學。
@@ -133,7 +135,7 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 | 腳本 | 從哪裡 → 轉成什麼 |
 |---|---|
 | `build.py` | src → dist（本機版）和 web（網路版） |
-| `rooms_v3_build.py` | 老師房 v3 → cabin 房間和躺床圖層；便利商店 v3 → mart |
+| `rooms_v3_build.py` | 老師房 v3 第 4 版（`teacher_room_v3_rev4`）→ cabin 房間和躺床圖層；便利商店 v3 → mart |
 | `studentroom_v3_build.py` | 學生房 v3 → home |
 | `bedrest_build.py` | 學生房躺床圖 |
 | `classroom_build.py` | 五年級教室 → class |
@@ -141,8 +143,9 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 | `env_build.py` | 遠山包 → src/env |
 | `gate_build.py` | 校門口 gate-v1 包 → gate |
 | `station_v4.py` | 車站剪票口 v4 → sroom |
-| `tex_build.py` | 材質包＋第二批貼圖（`assets/source/batches/batch2/game-ready/assets/tex`）→ src/tex |
+| `tex_build.py` | 材質包＋第二批貼圖＋正式 shiomi-tiles（`assets/source/textures/shiomi-tiles`，藍／紅／綠鐵皮、紅磚、木板、Sqoyaw 地面 grass_t）→ src/tex |
 | `pack_actions.py` | 動作包（坐、揮手、跑步等）→ act0N 圖集 |
+| `residents_q_build.py` | 居民 Q 版（`characters/packs/residents_chibi_v2`）→ res01～res10 圖集、對話頭像。輸入是 `characters/sprites_orig/res_before_q/`（Q 版前的圖集），可以重跑。**之後若重跑 `pack_actions.py`，要把新輸出的 res 圖集複製到 res_before_q 再跑這支** |
 | `pack_animals.py`、`hudie_build.py`、`add_pet_backs.py` | 動物、蝴蝶（老師的狗，背面走路取自 back-walk 補圖包）、寵物背面 |
 | `pack_all.py`、`sprite_pack.py`、`add_walks.py`、`bake_stride.py`、`side_prep.py` | 角色站姿、走路圖集 |
 | `face_prep.py`、`faces_build.py`、`face_test.py` | 換臉（五官零件）資料 |
@@ -159,7 +162,7 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 | `characters/packs/` | ChatGPT 角色包 pack3～pack7（人物、寵物、換臉工作室） |
 | `characters/actions/` | 動作包（student-daily／interactions／sports／run、resident-walk、pet-transitions）、跑步、走路修正 |
 | `characters/pets/` | 貓動作、老師的狗（蝴蝶，含 `shiomi-teacher-dog-back-walk` 背面走路補圖）、保育動物（石虎、黑豹、狼犬、馬爾濟斯、貴賓、黑熊） |
-| `characters/sprites_orig/` | 動作包轉換前的原始圖集（pack_actions.py 每次都從這裡開始處理） |
+| `characters/sprites_orig/` | 動作包轉換前的原始圖集（pack_actions.py 每次都從這裡開始處理）；`res_before_q/` 是居民換 Q 版前的圖集（residents_q_build.py 的輸入） |
 | `rooms/station/` | 車站大廳和剪票口（v3、v4） |
 | `rooms/teacher_room/` | 老師房（舊版、v2、v3） |
 | `rooms/student_room/` | 學生房 v3、躺床圖、參考圖、重畫規格 |
@@ -201,17 +204,20 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 
 ---
 
-## 5. 目前進度（最後一版見 `version.json`；第十二批）
+## 5. 目前進度（最後一版見 `version.json`；第十四批）
 
 **已完成並上線**
-- **室內 2D 手繪場景**（可以走動，人物會被家具擋住，直式橫式各一套）：學生房 v3、老師房 v3（含浴室、躺床、照片牆、窗戶夜色）、便利商店（含店員）、五年級教室、車站大廳。
+- **室內 2D 手繪場景**（可以走動，人物會被家具擋住，直式橫式各一套）：學生房 v3、老師房 v3 第 4 版（直式新配置、浴室門前通道，含浴室、躺床、照片牆、窗戶夜色）、便利商店（含店員）、五年級教室、車站大廳。
+- **房間人物大小（第十四批）**：老師房用包裡的校準值；學生房、教室、便利商店照門、桌椅、冰箱、櫃台的高度逐間量（`ROOM_HH`，以 145 公分學生計）。學生房的家具擺設尺寸維持舊比例（`hh0`），學生排好的房間不會變。
+- **居民 Q 版（第十四批）**：10 位居民換正式 Q 版三視圖；采玲、阿澈重畫，走路時暫用同方向立姿（新的走路動畫還沒畫）；其他 8 位沿用舊走路格、縮成和新立姿一樣高。對話頭像也換新。
 - **學校**：
   - 校門口用正式手繪包，可以溜魚滑梯、鑽魚肚子、進器材倉庫、踢球。
   - 操場換成正式手繪包（橫式、直式各一套）：出口用走的就會觸發——右邊跑道回校門口、白門進五年級教室、左邊跑道到 3D 的單槓草地（手繪草地還沒來）。互動：投籃、中圈遊戲、旗桿、司令台（看全校公告）、木平台。
   - 3D 校園裡的樹換成手繪葉團貼片，草地換成手繪草地。
 - **夜晚**：調亮，夜色偏藍但看得清楚。
 - **遠山**：Sqoyaw、汐見町都換成手繪遠山環景（第二批）。
-- **Sqoyaw 房子貼圖**：屋頂改成藍／紅／綠鐵皮，部分牆面改紅磚、藍綠鐵皮、直向木板（只換材質，房子位置不變）。
+- **Sqoyaw 房子貼圖**：屋頂改成藍／紅／綠鐵皮，部分牆面改紅磚、藍綠鐵皮、直向木板（只換材質，房子位置不變）；第十四批改用正式 shiomi-tiles 的圖。
+- **Sqoyaw 3D（第十四批）**：山坡的條紋改成整片手繪葉團樹冠（`TB.canopy` 張），全村的山坡樹、果園樹都換成葉團貼片；地面鋪 shiomi-tiles 的 grass_b；草地、球場、跑道降低亮度和飽和度。
 - **蝴蝶（老師的狗）**：往遠處走時用真正的背面圖（3D 和 2D 場景都是）。
 - **Sqoyaw 路燈**：69 支，燈頭會亮、有光暈，地上有光圈。
 - **天色由老師設定**：老師面板 →「其他設定」→「天色（全班一起）」，可選白天、傍晚、夜晚、跟著真實時間。預設是白天，學生每分鐘自動同步一次。
@@ -284,14 +290,15 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 - 戶外只用 3D，不要再用手繪固定畫面切換。房間（學生房、老師房、便利商店、教室）保留手繪，進門才切換。
 - 先做一小段 3D 樣板給她看實際截圖和繞圈影片，她認可之後，再照同一個標準改整座學校和 Sqoyaw。
 - 手繪的校門口、操場、單槓草地先維持現狀，等她決定。
-- 已收到但還沒接的素材：老師房第 4 版、居民 Q 版、單槓草地、shiomi-tiles（12 張）。房間人物要用門、桌椅的高度逐間校正，不能全部直接放大一倍。
+- 第十四批已接：老師房第 4 版、居民 Q 版、shiomi-tiles（Sqoyaw 用到 6 張）、房間人物大小逐間校正。單槓草地（school_lawn_v1）因為戶外只用 3D，不做成 2D 場景，留作參考。
+- shiomi-tiles 還沒用到的：grass_a、dirt_path、asphalt、paving、wall_school_tile、wall_plaster（可以再用在汐見町小鎮或學校）。
 
 
 **等 ChatGPT 的圖**
 1～3. 單槓草地、Q 版居民、老師房浴室改版都已經收到（見上一段），目前沒有在等的圖。
 
 **不用等圖就能做**
-4. 用學校那批手繪樹叢和草地，把 Sqoyaw 全村的樹（山上、果園、巷子）換掉，草地換成 grass_b。已經向使用者提議，還在等她確認。
+4. 第十四批已把 Sqoyaw 山坡、果園的樹換成葉團貼片、地面換 grass_b；汐見町小鎮的樹還沒換。
 5. 確認「漏畫」是哪一種並修好；處理高樓牆邊鏡頭拉近的問題。
 6. 請使用者用真手機確認夜晚亮度、路燈、天色同步，以及第十二批遠山的清晰度（不清楚的話可以改用 8K 原圖或只在近處加 3D 樹）。
 7. 視情況讓 2D 場景跟著天色調亮度（見 6-A 第 2 點）。
