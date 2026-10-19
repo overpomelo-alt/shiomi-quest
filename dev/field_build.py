@@ -1,48 +1,39 @@
 #!/usr/bin/env python3
-"""平等國小操場 (art pack v0.2 image 05) -> a walkable 2D scene: src/troom/sfield_*.webp + room.json['field'].
-   One landscape painting; portrait phones pan across the same picture. Only the basketball stand can stand in front
-   of the player (everything else is behind the walkable ground), so it is the one occluder, cut out by colour."""
-import json, os
-import numpy as np
-from PIL import Image, ImageFilter
+"""平等國小正式操場 (../assets/source/school/school_field_v1, ChatGPT field-v1 pack) -> src/troom/sfield_<sk>_*.webp + room.json['field']
+   Same pack format as the gate (gate_build.py): full-canvas occluder PNGs are cropped to their alpha box and placed at (x, y).
+   Exits: to_gate (right track) -> 校門口, classroom_door (white door + mat) -> 五年級教室, to_lawn (left track) -> 3D 單槓草地 until the painted lawn arrives.
+   (The old temporary field made from the art-pack picture is field_build_v02_old.py.)"""
+import json, os, glob
+from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+PK = os.path.join(ROOT, '../assets/source/school/school_field_v1/shiomi-school-outdoor')
 OUT = os.path.join(ROOT, 'src/troom')
-src = Image.open(os.path.join(ROOT, '../assets/source/art_direction/artpack_v02/images/05_school_courtyard.png')).convert('RGB')
-W, H = src.size
-src.save(os.path.join(OUT, 'sfield_landscape_bg.webp'), 'WEBP', quality=90, method=6)
-
-a = np.asarray(src).astype(int); r, g, b = a[..., 0], a[..., 1], a[..., 2]
-m = np.zeros((H, W), bool)
-yy, xx = np.mgrid[0:H, 0:W]
-# blue pole, padding and frame
-box = (xx >= 955) & (xx <= 1106) & (yy >= 405) & (yy <= 716)
-m |= box & (b > r + 35) & (b > g + 5) & (b > 90)
-# backboard (white panel with red square) as a quad
-from PIL import ImageDraw
-q = Image.new('L', (W, H), 0); ImageDraw.Draw(q).polygon([(940, 434), (1023, 428), (1025, 514), (942, 518)], fill=255)
-m |= np.asarray(q) > 0
-# white net under the rim
-net = (xx >= 932) & (xx <= 982) & (yy >= 490) & (yy <= 536)
-m |= net & (r > 190) & (g > 190) & (b > 190)
-# orange rim
-rim = (xx >= 930) & (xx <= 985) & (yy >= 486) & (yy <= 500)
-m |= rim & (r > 170) & (g < 150) & (b < 110)
-mk = Image.fromarray((m * 255).astype('uint8')).filter(ImageFilter.MaxFilter(3)).filter(ImageFilter.GaussianBlur(.6))
-occ = src.copy(); occ.putalpha(mk)
-bb = mk.getbbox(); occ = occ.crop(bb)
-occ.save(os.path.join(OUT, 'sfield_o_hoop.webp'), 'WEBP', quality=92, method=6)
-
-# walkable ground: the paved strip in front of the building, the grass, the court and the track
-outer = [[0, 664], [120, 662], [130, 646], [262, 646], [270, 662], [1536, 668], [1536, 1018], [0, 1018]]
-holes = [[[1060, 688], [1110, 688], [1112, 718], [1058, 718]],       # basketball stand base
-         [[300, 640], [760, 640], [760, 652], [300, 652]]]          # planters and deck front
-D = {'w': W, 'h': H, 'walk': [{'outer': outer, 'holes': holes}],
-     'occ': [{'id': 'hoop', 'file': 'sfield_o_hoop', 'x': bb[0], 'y': bb[1], 'sort': 716, 'line': None, 'b': [bb[0], bb[1], bb[2] - bb[0], bb[3] - bb[1]]}],
-     'exit': {'polygon': [[600, 968], [930, 968], [940, 1018], [590, 1018]], 'center': [765, 995], 'spawn': [765, 930], 'facing': 'back'},
-     'acc': {'classroom': [196, 652], 'hoop': [1010, 760], 'deck': [624, 668], 'board': [1334, 676], 'storeroom': [1222, 672], 'track': [300, 960]},
-     'hh': [650, 1018, 78, 236], 'bgkey': 'sfield_landscape_bg', 'own': {}}
+M = json.load(open(os.path.join(PK, 'manifest.json')))
 RJ = os.path.join(OUT, 'room.json'); R = json.load(open(RJ))
-R['field'] = {'landscape': D, 'portrait': D}
+for f in glob.glob(os.path.join(OUT, 'sfield_*.webp')): os.remove(f)
+pt = lambda p: [round(p[0]), round(p[1])]
+R['field'] = {}
+for sk in ('landscape', 'portrait'):
+    L = M['scenes']['field'][sk]
+    Image.open(os.path.join(PK, L['background'])).convert('RGB').save(os.path.join(OUT, f'sfield_{sk}_bg.webp'), 'WEBP', quality=88, method=6)
+    occ = []
+    for o in L['occluders']:
+        im = Image.open(os.path.join(PK, o['file'])).convert('RGBA'); bb = im.split()[3].getbbox(); c = im.crop(bb)
+        name = f'sfield_{sk}_o_{o["id"]}'; c.save(os.path.join(OUT, name + '.webp'), 'WEBP', quality=88, method=6)
+        sl = o.get('sort_line')
+        occ.append({'id': o['id'], 'file': name, 'x': bb[0], 'y': bb[1], 'sort': round(o['sort_y']), 'line': [pt(sl[0]), pt(sl[1])] if sl else None,
+                    'b': [bb[0], bb[1], bb[2] - bb[0], bb[3] - bb[1]]})
+    cs = L['character_scale']
+    D = {'w': L['canvas']['width'], 'h': L['canvas']['height'], 'bgkey': f'sfield_{sk}_bg',
+         'walk': [{'outer': [pt(p) for p in L['walk']['outer']], 'holes': [[pt(p) for p in h] for h in L['walk']['holes']]}],
+         'occ': occ, 'acc': {k: pt(v) for k, v in L['acc'].items()}, 'tgt': {k: pt(v) for k, v in L.get('acc_targets', {}).items()},
+         'exits': {k: {'polygon': [pt(p) for p in e['polygon']], 'center': pt(e['center']), 'spawn': pt(e['spawn']), 'facing': e.get('facing', 'front')} for k, e in L['exits'].items()},
+         'hh': [cs['far']['foot_y'], cs['near']['foot_y'], cs['far']['height_px'], cs['near']['height_px']],
+         'spawn': pt(L['preview_spawn']) if 'preview_spawn' in L else None,
+         'sign': L.get('content_slots', {}).get('classroom_sign'),
+         'own': {}, 'rev': M.get('revision')}
+    D['exit'] = D['exits']['to_gate']   # the engine's default door
+    R['field'][sk] = D
+    print('field', sk, len(occ), 'occ', D['hh'], sorted(D['acc']), 'spawn', D['spawn'])
 json.dump(R, open(RJ, 'w'), ensure_ascii=False, separators=(',', ':'))
-print('field', W, H, 'hoop occluder', bb)

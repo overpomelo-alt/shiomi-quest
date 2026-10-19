@@ -83,6 +83,7 @@ sroom['img'] = {f[:-5]: put(S + 'sroom/' + f, 'rooms/station/' + f, 'rooms/stati
 tex = json.load(open(S + 'tex/tex.json'))
 for k in tex: tex[k]['url'] = put(S + 'tex/' + k + '.webp', 'tex/' + k + '.webp', 'tex', 'surface texture')
 art = {f[:-5]: put(S + 'art/' + f, 'art/school-v1/' + f, 'art', 'school art sample v1') for f in sorted(os.listdir(S + 'art')) if f.endswith('.webp')}
+env = {f[:-5]: put(S + 'env/' + f, 'env/' + f, 'env', 'distant mountain panorama') for f in sorted(os.listdir(S + 'env')) if f.endswith('.webp')}
 tphotos = [put(S + 'cabin/photo%d.webp' % i, 'rooms/cabin/photo%d.webp' % i, 'rooms/cabin', 'teacher photo') for i in (1, 2)]
 
 out = ('<title>汐見町闖關</title>\n' + fonts + '\n<style id="css">' + css + '</style>\n'
@@ -97,6 +98,7 @@ out = ('<title>汐見町闖關</title>\n' + fonts + '\n<style id="css">' + css +
        '<script type="application/json" id="sroom">' + json.dumps(sroom, ensure_ascii=False) + '</script>\n'
        '<script type="application/json" id="tex">' + json.dumps(tex) + '</script>\n'
        '<script type="application/json" id="art">' + json.dumps(art) + '</script>\n'
+       '<script type="application/json" id="env">' + json.dumps(env) + '</script>\n'
        '<script id="engine">' + engine + '</script>\n'
        '<script id="game">const MARKUP=' + json.dumps(markup, ensure_ascii=False) + ';\n' + game + '</script>\n')
 open(D + 'index.html', 'w').write(out)

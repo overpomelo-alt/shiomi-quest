@@ -69,11 +69,11 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 │  ├─ src/              ← 遊戲原始碼和處理過的素材（build 的輸入）
 │  ├─ tests/            ← 自動測試和截圖腳本
 │  └─ .webcache/        ← 網路版圖片壓縮快取（保留，可以讓 build 快很多）
-├─ docs/待修清單.md      ← 每一批改了什麼的完整紀錄（第一批到第十一批）
+├─ docs/待修清單.md      ← 每一批改了什麼的完整紀錄（第一批到第十二批）
 ├─ docs/raw_map.json    ← 舊 raw/ 資料夾對應到 assets/source/ 的哪裡
 └─ CLAUDE.md
 ```
-注意：`assets/source/` 大約 625 MB。GitHub Pages 整個網站的上限是 1 GB，目前加起來大約 670 MB，素材再多下去要考慮搬到另一個 repo 或改用 Git LFS。
+注意：`assets/source/` 大約 690 MB。GitHub Pages 整個網站的上限是 1 GB，目前加起來大約 735 MB，素材再多下去要考慮搬到另一個 repo 或改用 Git LFS。
 
 ---
 
@@ -94,7 +94,8 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 | `troom/` | 所有 **2D 手繪場景**的圖和 `room.json`（可走區域、遮擋物、互動點、遠近身高）。檔名前綴對應場景，見第 4 節 |
 | `sroom/` | 車站大廳 2D 場景、任意門地點圖 |
 | `hroom/` | 學生房間裝飾家具的圖示 |
-| `tex/` | 3D 地面、牆面貼圖（`tex.json`） |
+| `tex/` | 3D 地面、牆面貼圖（`tex.json`）。第二批加了紅磚、藍／紅／綠鐵皮、直向木板牆 |
+| `env/` | 遠山環景圖（Sqoyaw、汐見町各一張，含 `_2k` 省電版），由 `env_build.py` 產生 |
 | `art/` | 學校樣板的手繪樹叢葉團、樹皮、草地（3D 用）。當初用一次性指令轉出，沒有留腳本 |
 | `cabin/` | 老師小屋的照片（只在本機版，網路版不放） |
 | `icons/` | UI 圖示 |
@@ -104,6 +105,10 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 - `Renderer / scene`：渲染器、ACES 色調和之後的自訂調色（`tonemapping_pars_fragment`）、陰影。
 - `Time of day`：`PRESETS`（sunset／night／day 三組數值）、`blendState`。天色由老師設定：`classSky()`、`realTick()`、`skySet()`、`timeBtn()`。
 - 汐見町小鎮：`World layout`、`Sky`、`Sea`、`Town ground`、`Rail line`、`Houses & shops`、`Konbini`、`Shrine`、`Coast`、`Streetlife`（電線桿、路燈）等。
+- **遠山**：搜尋 `RIDGE`、`ridgeTick`。兩個內面貼圖的圓柱，固定在世界座標（不跟著鏡頭轉）：
+  - Sqoyaw：中心 (TB.x-10, 30)、半徑 212，整圈；圖的下方 35% 大樹帶裁掉不用（`vcrop`），後面多一圈「天空色的牆」（用天空同一支 shader），把半徑外更高的 3D 山壁藏起來。
+  - 汐見町：中心 (0, 40)、半徑 600，只有陸地那一側 200°，兩端淡出，海和夕陽不被擋；舊的條紋遠山 `FAR_RIDGE` 會自動隱藏。
+  - 不受光、不吃霧；白天原色，傍晚偏暖變暗，夜晚變深藍（`_rgD/_rgS/_rgN`）。省電模式用 `_2k` 圖。
 - `Collision`：`COLS` 碰撞盒、`addCol`／`addColO`、`rayDist`（鏡頭碰撞）、`camInside`、`CUTU`（穿透視角）。
 - `Quest config & student state`：`CFG`、雲端存檔、`cfgPut`（老師設定寫回 Firestore 的 `shiomi/config`）。
 - 學習相關：`Teacher mode`（老師面板 `renderTP`）、`挑戰館`、`Stamp card`、`公告板`。
@@ -129,12 +134,13 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 | `studentroom_v3_build.py` | 學生房 v3 → home |
 | `bedrest_build.py` | 學生房躺床圖 |
 | `classroom_build.py` | 五年級教室 → class |
-| `field_build.py` | 美術包 v0.2 第 05 張設計圖 → 操場 field（**暫時版**） |
+| `field_build.py` | 正式操場 field-v1 包 → 操場 field（舊的暫時版改名 `field_build_v02_old.py`） |
+| `env_build.py` | 遠山包 → src/env |
 | `gate_build.py` | 校門口 gate-v1 包 → gate |
 | `station_v4.py` | 車站剪票口 v4 → sroom |
-| `tex_build.py` | 材質包 → src/tex |
+| `tex_build.py` | 材質包＋第二批貼圖（`assets/source/batches/batch2/game-ready/assets/tex`）→ src/tex |
 | `pack_actions.py` | 動作包（坐、揮手、跑步等）→ act0N 圖集 |
-| `pack_animals.py`、`hudie_build.py`、`add_pet_backs.py` | 動物、蝴蝶（老師的狗）、寵物背面 |
+| `pack_animals.py`、`hudie_build.py`、`add_pet_backs.py` | 動物、蝴蝶（老師的狗，背面走路取自 back-walk 補圖包）、寵物背面 |
 | `pack_all.py`、`sprite_pack.py`、`add_walks.py`、`bake_stride.py`、`side_prep.py` | 角色站姿、走路圖集 |
 | `face_prep.py`、`faces_build.py`、`face_test.py` | 換臉（五官零件）資料 |
 | `ui_icons.py` | 圖示 |
@@ -149,13 +155,15 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 | `characters/sheets/` | 6 位學生造型的原圖和修過的圖（hero1 草帽、sailor、hoodie 粉帽 T、sporty 黃 T、green 綠帽 T、redcap 紅帽），`face_*`／`sface_*`／`piece_*` 換臉零件，`prev*_*` 各版預覽，`bak_*` 備份 |
 | `characters/packs/` | ChatGPT 角色包 pack3～pack7（人物、寵物、換臉工作室） |
 | `characters/actions/` | 動作包（student-daily／interactions／sports／run、resident-walk、pet-transitions）、跑步、走路修正 |
-| `characters/pets/` | 貓動作、老師的狗（蝴蝶）、保育動物（石虎、黑豹、狼犬、馬爾濟斯、貴賓、黑熊） |
+| `characters/pets/` | 貓動作、老師的狗（蝴蝶，含 `shiomi-teacher-dog-back-walk` 背面走路補圖）、保育動物（石虎、黑豹、狼犬、馬爾濟斯、貴賓、黑熊） |
 | `characters/sprites_orig/` | 動作包轉換前的原始圖集（pack_actions.py 每次都從這裡開始處理） |
 | `rooms/station/` | 車站大廳和剪票口（v3、v4） |
 | `rooms/teacher_room/` | 老師房（舊版、v2、v3） |
 | `rooms/student_room/` | 學生房 v3、躺床圖、參考圖、重畫規格 |
 | `rooms/mart/`、`rooms/classroom/` | 便利商店 v3、五年級教室 |
-| `school/` | 校門口 gate-v1、學校樣板（樹叢、草地）、學校戶外規格、學校實景照片、給 ChatGPT 的規格 zip |
+| `school/` | 校門口 gate-v1、正式操場 `school_field_v1`、學校樣板（樹叢、草地）、學校戶外規格、學校實景照片、給 ChatGPT 的規格 zip |
+| `env/` | 遠山包 `shiomi-mountains`（原始 PNG、預覽、檢查表） |
+| `batches/batch2/` | 第二批素材的接入說明、給 ChatGPT 的下一批需求、別的對話轉好的 game-ready 檔（新貼圖的來源就在這裡） |
 | `art_direction/artpack_v02/` | 全遊戲美術設計初稿 v0.2（設計圖、色票、交接說明） |
 | `textures/` | 舊材質包 |
 | `specs/` | 給 ChatGPT 的各種規格書（.md） |
@@ -190,15 +198,18 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 
 ---
 
-## 5. 目前進度（最後一版 1019-0050）
+## 5. 目前進度（最後一版見 `version.json`；第十二批）
 
 **已完成並上線**
 - **室內 2D 手繪場景**（可以走動，人物會被家具擋住，直式橫式各一套）：學生房 v3、老師房 v3（含浴室、躺床、照片牆、窗戶夜色）、便利商店（含店員）、五年級教室、車站大廳。
 - **學校**：
   - 校門口用正式手繪包，可以溜魚滑梯、鑽魚肚子、進器材倉庫、踢球。
-  - 操場是用設計圖做的暫時版，可以從操場走到教室。
+  - 操場換成正式手繪包（橫式、直式各一套）：出口用走的就會觸發——右邊跑道回校門口、白門進五年級教室、左邊跑道到 3D 的單槓草地（手繪草地還沒來）。互動：投籃、中圈遊戲、旗桿、司令台（看全校公告）、木平台。
   - 3D 校園裡的樹換成手繪葉團貼片，草地換成手繪草地。
 - **夜晚**：調亮，夜色偏藍但看得清楚。
+- **遠山**：Sqoyaw、汐見町都換成手繪遠山環景（第二批）。
+- **Sqoyaw 房子貼圖**：屋頂改成藍／紅／綠鐵皮，部分牆面改紅磚、藍綠鐵皮、直向木板（只換材質，房子位置不變）。
+- **蝴蝶（老師的狗）**：往遠處走時用真正的背面圖（3D 和 2D 場景都是）。
 - **Sqoyaw 路燈**：69 支，燈頭會亮、有光暈，地上有光圈。
 - **天色由老師設定**：老師面板 →「其他設定」→「天色（全班一起）」，可選白天、傍晚、夜晚、跟著真實時間。預設是白天，學生每分鐘自動同步一次。
 - **鏡頭**：被山坡擋住會自己抬高；電線桿、旗子、路燈不會再把鏡頭拉到臉前。
@@ -207,8 +218,8 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 - **其他已有功能**：闖關題目、挑戰館、集章卡、寵物和保育動物（動物之家）、扭蛋、換裝、開場動畫、Sqoyaw 8 個打卡點。
 
 **驗證狀態**
-- 村子配置相同，巡檢 429 段全通，smoke 正常。
-- **還沒在真手機上確認 1019 版**（夜晚亮度、路燈、天色同步）。
+- 第十二批：村子配置相同（bld_dump）、巡檢、smoke、操場三個出口都測過。
+- **還沒在真手機上確認**：1019 版的夜晚亮度、路燈、天色同步；第十二批的遠山在手機上的清晰度。
 
 ---
 
@@ -248,19 +259,18 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 
 ### C. 3D 很醜（素材問題，不是程式設定）
 - Sqoyaw 和汐見町的牆、屋頂、路面還是程式做的色塊。
-- 遠山是有條紋的綠色山坡，是現在最醜的地方。
-- 需要 ChatGPT 依 `assets/source/specs/汐見町_戶外手繪風3D素材規格.md` 交第 2 包（牆面、屋頂、路面貼圖）和第 3 包（遠山）。
+- 遠山已換成手繪環景（第十二批）。Sqoyaw 半徑 212 以內的 3D 山坡還是程式做的條紋色塊。
+- 屋頂和部分牆面已換第二批貼圖；汐見町小鎮的房子還沒換。
 
 ### D. 其他
-- 操場目前是用設計圖做的暫時版，等正式包。
 - `game.js` 是一個 900 KB 的大檔，搜尋和修改都慢。之後可以考慮拆成多個模組，但要注意亂數規則。
-- 素材資料夾接近 GitHub Pages 1 GB 的上限。
+- 素材資料夾接近 GitHub Pages 1 GB 的上限（第十二批後 `assets/source/` 約 690 MB）。
 
 ### 寫程式的地雷
 - **亂數規則**：Sqoyaw 房子的位置由 `rand()` 的呼叫順序決定。在房子產生之前**不能增加或減少任何 rand() 呼叫**，後處理一律用固定的雜湊。改完要用 `bld_dump.js` 比對確認。
 - 顏色一律用 `col('#hex')`，它會把 sRGB 轉成線性。
 - three r128 的 InstancedMesh 預設 `frustumCulled=false`，大量實例不用擔心被裁掉。
-- 2D 場景的出口只有 gate 是「走進去就觸發」，其他場景都要按互動鍵。
+- 2D 場景的出口只有 gate 和 field 是「走進去就觸發」（進場後要先走出出口範圍才會再觸發），其他場景都要按互動鍵。
 - 「站在旁邊就畫到後面」的舊遮擋規則只用在 home 和 cabin。
 
 ---
@@ -268,14 +278,13 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 ## 7. 待辦清單
 
 **等 ChatGPT 的圖**
-1. 學校操場 `field` 和單槓草地 `lawn` 的正式包。來了之後學校就全部完成。
-2. 戶外第 2 包：柏油路、人行道、土路、粉刷牆、磁磚牆、木板牆、藍紅綠三種鐵皮屋頂、紅磚圍牆。
-3. 戶外第 3 包：遠山背景，Sqoyaw 一張、汐見町一張。建議第一個做。
-4. 戶外第 4 包：Q 版居民，例如 res07，改成大頭短身的比例。
-5. 零星的：蝴蝶（老師的狗）背面走路 8 張（對方說交了但沒收到）；老師房浴室的直式新配置。
+（需求單在 `assets/source/batches/batch2/給ChatGPT_下一批需求.md`）
+1. 單槓草地 `lawn` 正式包。來了之後把操場左邊出口 `to_lawn` 改接 2D 草地（現在是 `fieldLawn()` 送到 3D 單槓）。
+2. Q 版居民 4 位（格式同 res01，264×480、15 格）。
+3. 老師房浴室改版（完整資料包）。
 
 **不用等圖就能做**
-6. 用學校那批手繪樹叢和草地，把 Sqoyaw 全村的樹（山上、果園、巷子）換掉，草地換成 grass_b。已經向使用者提議，還在等她確認。
-7. 確認「漏畫」是哪一種並修好；處理高樓牆邊鏡頭拉近的問題。
-8. 請使用者用真手機確認 1019 版的夜晚亮度、路燈、天色同步。
-9. 視情況讓 2D 場景跟著天色調亮度（見 6-A 第 2 點）。
+4. 用學校那批手繪樹叢和草地，把 Sqoyaw 全村的樹（山上、果園、巷子）換掉，草地換成 grass_b。已經向使用者提議，還在等她確認。
+5. 確認「漏畫」是哪一種並修好；處理高樓牆邊鏡頭拉近的問題。
+6. 請使用者用真手機確認夜晚亮度、路燈、天色同步，以及第十二批遠山的清晰度（不清楚的話可以改用 8K 原圖或只在近處加 3D 樹）。
+7. 視情況讓 2D 場景跟著天色調亮度（見 6-A 第 2 點）。

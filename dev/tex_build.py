@@ -1,11 +1,14 @@
 """ChatGPT surface textures (../assets/source/textures/textures) -> src/tex/<name>.webp + src/tex/tex.json (linear average colour, tile size in metres).
+Batch 2 (第二批, ../assets/source/batches/batch2/game-ready/assets/tex): red brick, blue / red / green corrugated metal, vertical wood boards — already 512 seamless webp.
 wall_tile v2 came as one non-tiling 1254 px picture: cut it on the brick grid (12 bricks x 48 rows) so it repeats seamlessly."""
 import json, os
 from PIL import Image
 import numpy as np
 R = '../assets/source/textures/textures/'; S = 'src/tex/'
 SIZE = {'wall_tile': (2.0, 2.0 * 590 / 512), 'wall_plaster': (2.0, 2.0), 'wall_pebble': (1.0, 1.0), 'roof_metal': (2.0, 2.0),
-        'asphalt': (4.0, 4.0), 'concrete': (2.0, 2.0), 'grass': (4.0, 4.0), 'wood_plank': (2.0, 2.0), 'terrazzo': (1.0, 1.0), 'soil': (4.0, 4.0)}
+        'asphalt': (4.0, 4.0), 'concrete': (2.0, 2.0), 'grass': (4.0, 4.0), 'wood_plank': (2.0, 2.0), 'terrazzo': (1.0, 1.0), 'soil': (4.0, 4.0),
+        'wall_brick_red': (1.3, 1.3), 'metal_blue': (2.0, 2.0), 'metal_red': (2.0, 2.0), 'metal_green': (2.0, 2.0), 'wall_wood': (1.4, 1.4)}
+R2 = '../assets/source/batches/batch2/game-ready/assets/tex/'
 out = {}
 for name, (mw, mh) in SIZE.items():
     if name == 'wall_tile' and os.path.exists(R + 'wall_tile_v2_source.png'):
@@ -14,6 +17,8 @@ for name, (mw, mh) in SIZE.items():
         im = Image.open(R + name + '.png').convert('RGB').resize((512, 512), Image.LANCZOS)
         if name == 'concrete':   # drop the painted joint on the tile edge: lanes run every which way, the game draws its own joints along the lane
             arr = np.asarray(im).copy(); arr[:6] = arr[8:14]; arr[-6:] = arr[-14:-8]; im = Image.fromarray(arr)
+    elif os.path.exists(R2 + name + '.webp'):
+        im = Image.open(R2 + name + '.webp').convert('RGB').resize((512, 512), Image.LANCZOS)
     else:
         continue
     im.save(S + name + '.webp', 'WEBP', quality=86, method=6)

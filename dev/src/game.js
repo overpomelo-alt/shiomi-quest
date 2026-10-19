@@ -374,6 +374,7 @@ await tick('正在蓋小鎮… 25%');
   g.setAttribute('color',new T.Float32BufferAttribute(cols,3));g.computeVertexNormals();
   const m=mk(g,new T.MeshLambertMaterial({vertexColors:true}),0,0,0,scene,false);m.userData.nomerge=true;
 })();
+let FAR_RIDGE=null;   // the old striped far-ridge slope behind the town; hidden once the painted 遠山 panorama is in
 (function terrain(){
   let g=new T.PlaneGeometry(1300,620,160,78);g.rotateX(-PI/2);g.translate(0,0,220);
   const p=g.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,hillH(p.getX(i),p.getZ(i)));
@@ -391,7 +392,7 @@ await tick('正在蓋小鎮… 25%');
   let r=new T.PlaneGeometry(3400,900,70,18);r.rotateX(-PI/2);r.translate(0,0,980);
   const rp=r.attributes.position;for(let i=0;i<rp.count;i++){const x=rp.getX(i),z=rp.getZ(i);rp.setY(i,-10+smooth(560,800,z)*(90+fbm(x*.003,z*.004)*280));}
   r=r.toNonIndexed();r.computeVertexNormals();
-  const rm=mk(r,lam('#34453c'),0,0,0,scene,false);rm.userData.nomerge=true;
+  const rm=mk(r,lam('#34453c'),0,0,0,scene,false);rm.userData.nomerge=true;FAR_RIDGE=rm;
   // islands
   [[-330,-430,70,34,46],[190,-680,110,30,60],[-620,-900,160,55,90]].forEach(([x,z,sx,sy,sz])=>{
     let ig=new T.IcosahedronGeometry(1,3);const ip=ig.attributes.position;for(let i=0;i<ip.count;i++){const v=new T.Vector3().fromBufferAttribute(ip,i);const k=.8+fbm(v.x*2+x,v.z*2)*.5;ip.setXYZ(i,v.x*k,Math.max(v.y,-.1)*k,v.z*k);}
@@ -4275,7 +4276,7 @@ if(TROOM&&TROOM.gate)['landscape','portrait'].forEach(sk=>{const D=TROOM.gate[sk
     ['倉庫',A.storeroom[0],A.storeroom[1],ob('storeroom')||around(A.storeroom),'體育器材倉庫',()=>say(null,['倉庫裡放著籃球、跳繩、呼拉圈和接力棒。','上體育課前，值日生會來這裡搬器材。'],{noWave:1})],
     ['球門',A.goal[0],A.goal[1],ob('goal')||around(A.goal),'踢一球',()=>{const ok=Math.random()<.6;SND.pick&&SND.pick();say(null,[ok?'你助跑、起腳——「咚！」球飛進網子裡，進球了！':'你用力一踢——球擦過門柱，滾到草地上了。再來一次！'],{noWave:1});}],
     ['離開學校',E.to_map.center[0],E.to_map.center[1],R2BB(E.to_map.polygon),'走出校門（回部落）',()=>gateLeave()],
-    ['往操場',E.to_field.center[0],E.to_field.center[1],R2BB(E.to_field.polygon),'沿著跑道走到操場',()=>{gateOff();fieldEnter();}]]};});
+    ['往操場',E.to_field.center[0],E.to_field.center[1],R2BB(E.to_field.polygon),'沿著跑道走到操場',()=>{gateOff();fieldEnter('gate');}]]};});
 function gateOff(){GATE_IN=false;}
 function gateEnter(from){if(!TROOM||!TROOM.gate||!R2.img.sgate_landscape_bg||!spr2d()){fieldEnter();return;}hurry(/rooms\/sgate\//);
   fadeTo(()=>{GATE_IN=true;FIELD_IN=false;INDOOR=true;P.sit=null;P.pos.set(TB.x-48,tribeH(-48,26),26);P.vel.set(0,0,0);curArea=null;areaCool=0;R2.act=null;R2.rest=null;if(S2.on)s2Off();
@@ -4284,21 +4285,34 @@ function gateEnter(from){if(!TROOM||!TROOM.gate||!R2.img.sgate_landscape_bg||!sp
     const Q=R2.pet;[Q.x,Q.y]=r2Near(R2.x+r2H(R2.y)*.4,R2.y+4);Q.idle=0;Q.mv=false;Q.flip=-1;R2.cv.hidden=false;toast('🏫 平等國小・校門口');});}
 function gateLeave(){fadeTo(()=>{r2Off();GATE_IN=false;INDOOR=false;warpTown(TB.x-42.6,TB.z+24.8,-PI/2);});}
 let FIELD_IN=false,CLS_FROM=null;R2CFG.field={};
-if(TROOM&&TROOM.field)['landscape','portrait'].forEach(sk=>{const D=TROOM.field[sk],A=D.acc,H=D.hh[3];const box=(a,w=.7,h=1.05)=>[a[0]-H*w/2,a[1]-H*h,H*w,H*h];
-  R2CFG.field[sk]={hA:D.hh,zoom:sk==='portrait'?1.0:1.08,spots:[
-    ['教室門',A.classroom[0],A.classroom[1],[120,520,150,130],'走進五年級教室',()=>{CLS_FROM='field';clsEnter();}],
-    ['籃框',A.hoop[0],A.hoop[1],[930,400,180,320],'投籃',()=>fieldShoot()],
-    ['木平台',A.deck[0],A.deck[1],[490,480,270,170],'坐在木平台上',()=>say(null,['木平台被太陽曬得暖暖的。','下課的時候，大家常在這裡畫畫、寫學習單。'],{noWave:1})],
-    ['公告欄',A.board[0],A.board[1],[1300,592,70,70],'看平等國小的公告欄',()=>openBoard('news')],
-    ['倉庫',A.storeroom[0],A.storeroom[1],[1100,470,230,180],'體育器材倉庫',()=>say(null,['倉庫裡放著籃球、跳繩、呼拉圈和接力棒。','上體育課前，值日生會來這裡搬器材。'],{noWave:1})],
-    ['跑道',A.track[0],A.track[1],box(A.track,1.2,.5),'在紅跑道上跑一圈',()=>say(null,['你沿著紅色跑道跑了一圈，風從山那邊吹過來。','（呼——呼——）好累，可是好舒服！'],{noWave:1})],
-    ['離開操場',D.exit.center[0],D.exit.center[1],R2BB(D.exit.polygon),'離開操場（往校門口）',()=>fieldLeave()]]};});
+// 平等國小操場 (field-v1 pack): exits are walked into — right track -> 校門口, white door -> 五年級教室, left track -> 3D 單槓草地 (painted lawn not drawn yet)
+if(TROOM&&TROOM.field)['landscape','portrait'].forEach(sk=>{const D=TROOM.field[sk],A=D.acc,T_=D.tgt||{},H=D.hh[3],E=D.exits;
+  const ob=id=>(D.occ.find(o=>o.id===id)||{}).b,around=(p,w=.5,h=.7)=>[p[0]-H*w/2,p[1]-H*h,H*w,H*h];
+  R2CFG.field[sk]={hA:D.hh,zoom:1.0,spots:[
+    ['教室門',A.classroom_door[0],A.classroom_door[1],R2BB(E.classroom_door.polygon.concat([[A.classroom_door[0]-30,T_.classroom_door[1]-40],[A.classroom_door[0]+30,A.classroom_door[1]]])),'走進五年級教室',()=>{CLS_FROM='field';clsEnter();}],
+    ['籃框',A.hoop[0],A.hoop[1],ob('hoop')||around(A.hoop),'投籃',()=>fieldShoot()],
+    ['中圈',A.center_circle[0],A.center_circle[1],around(A.center_circle,1.2,.45),'在球場中圈玩遊戲',()=>fieldCircle()],
+    ['旗桿',A.flag[0],A.flag[1],ob('flagpole')||around(A.flag),'看看國旗和旗桿',()=>say(null,['每天早上，值日生會在這裡升旗。','風一吹，國旗就在山谷裡啪啦啪啦地飄。'],{noWave:1})],
+    ['司令台',A.stage[0],A.stage[1],ob('stage_front')?[ob('stage_front')[0],ob('stage_front')[1]-H*.9,ob('stage_front')[2],H*.9+ob('stage_front')[3]]:around(A.stage),'司令台（看全校公告）',()=>choose('司令台','要做什麼呢？',[{label:'📣 看全校公告',fn:()=>openBoard('news')},{label:'🎤 站上去練習說話',fn:()=>say(null,['你站上司令台，整個操場都看得清清楚楚。','（深呼吸——）「各位同學早安！」'],{noWave:1})},{label:'算了',fn:null}])],
+    ['木平台',A.deck[0],A.deck[1],around(T_.deck||A.deck,.9,.6),'坐在木平台上',()=>say(null,['木平台被太陽曬得暖暖的。','下課的時候，大家常在這裡畫畫、寫學習單。'],{noWave:1})],
+    ['往校門口',E.to_gate.center[0],E.to_gate.center[1],R2BB(E.to_gate.polygon),'沿著跑道走到校門口',()=>fieldLeave()],
+    ['往單槓草地',E.to_lawn.center[0],E.to_lawn.center[1],R2BB(E.to_lawn.polygon),'沿著跑道走到單槓草地',()=>fieldLawn()]]};});
 function fieldShoot(){const ok=Math.random()<.55;SND.pick&&SND.pick();say(null,[ok?'你瞄準籃框，出手——「唰！」空心進球！':'你出手——球在籃框上轉了兩圈……彈出來了！再試一次！'],{noWave:1});}
-function fieldEnter(){if(!TROOM||!TROOM.field||!R2.img.sfield_landscape_bg||!spr2d()){toast('操場還在準備中，等一下再試試');return;}hurry(/rooms\/sfield\//);
+function fieldCircle(){const g=pick([['大家圍成一個圓，玩「老師說」。','老師說：摸摸頭！——老師說：單腳站！……咦，你剛剛有沒有偷動？'],['你在中圈練習運球，咚、咚、咚。','運了二十下都沒有掉球，越來越穩了！'],['你們在中圈跳大繩，一個接一個跑進去。','一、二、三……全部的人都跳過了！']]);say(null,g,{noWave:1});}
+// the painted lawn is not drawn yet: the left track leads to the 3D lawn with the pull-up bars, west of the school
+function fieldLawn(){fadeTo(()=>{r2Off();FIELD_IN=false;INDOOR=false;warpTown(TB.x-79.4,31.4,-PI/2);toast('🌳 單槓草地（手繪版還在畫，先來這裡拉單槓）');});}
+function fieldEnter(from){if(!TROOM||!TROOM.field||!R2.img.sfield_landscape_bg||!spr2d()){toast('操場還在準備中，等一下再試試');return;}hurry(/rooms\/sfield\//);
   fadeTo(()=>{FIELD_IN=true;GATE_IN=false;INDOOR=true;P.sit=null;P.pos.set(TB.x-48,tribeH(-48,26),26);P.vel.set(0,0,0);curArea=null;areaCool=0;R2.act=null;R2.rest=null;if(S2.on)s2Off();R2.on=true;R2.room='field';R2.sk=r2Scene();const D=TROOM.field[R2.sk];
-    [R2.x,R2.y]=r2Near(D.exit.spawn[0],D.exit.spawn[1]);R2.vx=R2.vy=0;R2.view=2;R2.flip=1;R2.tgt=R2.pend=null;R2.cx=R2.cy=null;
+    const e=from==='gate'?D.exits.to_gate:from==='class'?D.exits.classroom_door:null,sp=e?e.spawn:(D.spawn||D.exit.spawn);
+    [R2.x,R2.y]=r2Near(sp[0],sp[1]);R2.vx=R2.vy=0;R2.view=e?(e.facing==='left'||e.facing==='right'?1:e.facing==='back'?2:0):2;R2.flip=e&&e.facing==='left'?-1:1;R2.tgt=R2.pend=null;R2.cx=R2.cy=null;R2.exitArm=false;
     const Q=R2.pet;[Q.x,Q.y]=r2Near(R2.x+r2H(R2.y)*.4,R2.y+4);Q.idle=0;Q.mv=false;Q.flip=-1;R2.cv.hidden=false;toast('🏫 平等國小・操場');});}
 function fieldLeave(){if(TROOM&&TROOM.gate){FIELD_IN=false;gateEnter('field');return;}fadeTo(()=>{r2Off();FIELD_IN=false;INDOOR=false;warpTown(TB.x-46.4,TB.z+24.8,PI/2);});}
+// the little blank name plate above the classroom door
+const FSIGN={};
+function fieldSign(g){const D=TROOM.field[R2.sk],r=D&&D.sign;if(!r)return;let c=FSIGN[R2.sk];
+  if(!c){const S=8;c=document.createElement('canvas');c.width=Math.round(r[2]*S);c.height=Math.round(r[3]*S);const x=c.getContext('2d');x.fillStyle='#2f4a3e';x.textAlign='center';x.textBaseline='middle';
+    let fs=c.height*.78;x.font=`900 ${fs}px ${FG}`;const tw=x.measureText('五年級').width;if(tw>c.width*.92){fs*=c.width*.92/tw;x.font=`900 ${fs}px ${FG}`;}x.fillText('五年級',c.width/2,c.height*.55);FSIGN[R2.sk]=c;}
+  g.drawImage(c,r[0],r[1],r[2],r[3]);}
 let MART_IN=false;R2CFG.mart={};
 if(TROOM&&TROOM.mart)['landscape','portrait'].forEach(sk=>{const D=TROOM.mart[sk],A=D.acc,H=D.hh[3];
   const box=k=>{const o=D.occ.find(o=>o.id===k);if(o)return o.b;const a=A[k];return [a[0]-H*.35,a[1]-H*1.05,H*.7,H*1.05];};
@@ -4342,7 +4356,7 @@ function clsEnter(){if(!TROOM||!TROOM.class||!r2Ok()){toast('教室還在準備�
 function martEnter2(){hurry(/rooms\/mart\//);fadeTo(()=>{INDOOR=true;MART_IN=true;P.sit=null;P.pos.set(IX+4,0,IZ+3.4);P.vel.set(0,0,0);R2.act=null;R2.rest=null;if(S2.on)s2Off();R2.on=true;R2.room='mart';R2.sk=r2Scene();const D=TROOM.mart[R2.sk];
     [R2.x,R2.y]=r2Near(D.exit.spawn[0],D.exit.spawn[1]);R2.vx=R2.vy=0;R2.view=2;R2.flip=1;R2.tgt=R2.pend=null;R2.cx=R2.cy=null;
     const Q=R2.pet;[Q.x,Q.y]=r2Near(R2.x+r2H(R2.y)*.4,R2.y+4);Q.idle=0;Q.mv=false;Q.flip=-1;R2.cv.hidden=false;SND.chime&&SND.chime();updateBasket();curArea=null;areaCool=0;});}
-function clsLeave(){if(CLS_FROM==='field'&&TROOM&&TROOM.field){CLS_FROM=null;CLS_IN=false;fieldEnter();setTimeout(()=>{if(R2.room==='field'){const a=TROOM.field[R2.sk].acc.classroom;[R2.x,R2.y]=r2Near(a[0],a[1]+18);R2.view=0;}},450);return;}
+function clsLeave(){if(CLS_FROM==='field'&&TROOM&&TROOM.field){CLS_FROM=null;CLS_IN=false;fieldEnter('class');return;}
   fadeTo(()=>{r2Off();CLS_IN=false;INDOOR=false;warpTown(TB.x+CLS_DOOR[0],TB.z+CLS_DOOR[1]+1.6,0);});}
 {const c=document.createElement('canvas');c.id='room2d';c.hidden=true;c.tabIndex=-1;$('stage').appendChild(c);R2.cv=c;R2.g=c.getContext('2d');
   c.addEventListener('pointerdown',e=>{if(R2.on&&started&&R2.room==='home'&&HOME.edit){e.preventDefault();const r=c.getBoundingClientRect(),V=R2.view_;hrClick(V.ox+(e.clientX-r.left)/V.s,V.oy+(e.clientY-r.top)/V.s);return;}
@@ -4395,7 +4409,7 @@ function r2Move(dt){let ix=0,iy=0;const free=!DLG.open&&started&&!uiOpen();
   const nx=R2.x+R2.vx*dt,ny=R2.y+R2.vy*dt,ox=R2.x,oy=R2.y;
   if(r2Walk(nx,ny)){R2.x=nx;R2.y=ny;}else if(r2Walk(nx,R2.y)){R2.x=nx;R2.vy*=.5;}else if(r2Walk(R2.x,ny)){R2.y=ny;R2.vx*=.5;}else{R2.vx*=.3;R2.vy*=.3;}
   const moved=Math.hypot(R2.x-ox,R2.y-oy);if(R2.tgt&&moved<spW*dt*.05)R2.stuck=(R2.stuck||0)+dt;else R2.stuck=0;
-  {const D_=r2D();if(D_&&D_.exits&&R2.room==='gate'){let inside=null;for(const k in D_.exits)if(r2Pip(R2.x,R2.y,D_.exits[k].polygon))inside=k;if(!inside)R2.exitArm=true;else if(R2.exitArm&&moved>0){R2.exitArm=false;R2.tgt=R2.pend=null;if(inside==='to_map')gateLeave();else{gateOff();fieldEnter();}}}}
+  {const D_=r2D();if(D_&&D_.exits&&(R2.room==='gate'||R2.room==='field')){let inside=null;for(const k in D_.exits)if(r2Pip(R2.x,R2.y,D_.exits[k].polygon))inside=k;if(!inside)R2.exitArm=true;else if(R2.exitArm&&moved>0){R2.exitArm=false;R2.tgt=R2.pend=null;if(R2.room==='field'){if(inside==='to_gate')fieldLeave();else if(inside==='classroom_door'){CLS_FROM='field';clsEnter();}else if(inside==='to_lawn')fieldLawn();}else if(inside==='to_map')gateLeave();else{gateOff();fieldEnter('gate');}}}}
   const spd=moved/Math.max(dt,1e-4);R2.spd=spd/spW;P.moving=R2.spd*3.9;
   if(spd>spW*.12){const ax=Math.abs(R2.vx),ay=Math.abs(R2.vy)/.78;
     if(R2.view===1?ax>ay*.6:ax>ay*1.25){R2.view=1;R2.flip=R2.vx<0?-1:1;}else R2.view=R2.vy<0?2:0;}
@@ -4404,7 +4418,7 @@ function r2Move(dt){let ix=0,iy=0;const free=!DLG.open&&started&&!uiOpen();
   const Q=R2.pet;if(PETOBJ&&PETOBJ.spr){const side=R2.view===1?-R2.flip:(Q.x<R2.x?-1:1);const gx=R2.x+side*H*.42,gy=R2.y-8;
     const dx=gx-Q.x,dy=gy-Q.y,d=Math.hypot(dx,dy),busy=PETOBJ.trick||PETOBJ.anim;
     if(!busy&&(d>H*.5||(Q.mv&&d>H*.12))){const ps=Math.max(spd*1.05,H*1.2),st=Math.min(ps*dt,d);let px=Q.x+dx/d*st,py=Q.y+dy/d*st;
-      if(!r2Walk(px,py)){if(r2Walk(px,Q.y))py=Q.y;else if(r2Walk(Q.x,py))px=Q.x;else{px=Q.x;py=Q.y;}}Q.x=px;Q.y=py;Q.mv=true;Q.idle=0;if(Math.abs(dx)>4)Q.flip=dx<0?-1:1;Q.ph+=dt*10;}
+      if(!r2Walk(px,py)){if(r2Walk(px,Q.y))py=Q.y;else if(r2Walk(Q.x,py))px=Q.x;else{px=Q.x;py=Q.y;}}Q.x=px;Q.y=py;Q.mv=true;Q.idle=0;if(Math.abs(dx)>4)Q.flip=dx<0?-1:1;Q.back=Q.back?(dy<0&&-dy/.78>Math.abs(dx)*.8):(dy<0&&-dy/.78>Math.abs(dx)*1.25);Q.ph+=dt*10;}
     else{Q.mv=false;Q.idle+=dt;}
     if(Q.wag>0)Q.wag-=dt;else if(!Q.mv&&Q.idle>2&&Q.idle<7&&Math.random()<dt*.25)Q.wag=1.2;}}
 function r2Nearest(){if(R2.rest){R2.near=null;return null;}let best=null,bd=1e9;const H=r2H(R2.y);
@@ -4580,6 +4594,7 @@ function r2Pet(g){const o=PETOBJ;if(!o||!o.spr||!o.spr.ready||!o.spr.mat.map)ret
   const dtp=o._r2t!=null?Math.min(.1,Math.max(0,R2.t-o._r2t)):0;o._r2t=R2.t;
   if(o.anim&&o.anim.type==='seq'&&M.anims&&M.anims[o.anim.name]){o.anim.t+=dtp;const S_=M.anims[o.anim.name];if(o.anim.t>o.anim.dur){o.anim=null;}else{let t=o.anim.t,i=0;while(i<S_.f.length-1&&t>S_.d[i]){t-=S_.d[i];i++;}f=S_.f[i];}}
   else if(o.trick||o.anim){f=c.frame;rz=c.pivot.rotation.z;flip=Math.sign(c.m.scale.x)||1;}
+  else if(Q.mv&&Q.back&&M.bw){f=Math.sin(Q.ph)>0?M.bw[0]:M.bw[1];}   // walking up the picture = away from the viewer: back frames
   else if(Q.mv){f=A_.run_1!=null?A_['run_'+(Math.floor(Q.ph%4)+1)]:(Math.sin(Q.ph)>0?1:2);flip=Q.flip;}
   else if(Q.idle>16&&A_.sleep!=null)f=A_.sleep;else if(Q.idle>8&&A_.lie!=null)f=A_.lie;else if(Q.wag>0&&A_.wag_A!=null)f=Math.floor(Q.wag*6)%2?A_.wag_B:A_.wag_A;
   g.save();g.translate(Q.x,Q.y);g.fillStyle='rgba(40,20,10,.24)';g.beginPath();g.ellipse(0,0,dw*.28,dw*.07,0,0,7);g.fill();
@@ -4618,7 +4633,7 @@ function r2Draw(dt){R2.t+=dt;cdogTick(dt);const cv=R2.cv,g=R2.g;const dpr=Math.m
   R2.view_={s:s/dpr,ox:R2.cx,oy:R2.cy};
   g.setTransform(1,0,0,1,0,0);g.fillStyle='#2a1a10';g.fillRect(0,0,cw,ch);g.setTransform(s,0,0,s,-R2.cx*s,-R2.cy*s);g.imageSmoothingQuality='medium';
   const bg=R2.img[C.bgkey||((BATH?'bath_':HOMER?'home_':CLS?'class_':R2.room==='mart'?'mart_':'')+R2.sk+'_bg')];if(bg&&bg.complete)g.drawImage(bg,0,0,Wi,Hi);
-  if(HOMER)hrBack(g,C);else if(R2.room==='mart')martSign(g,'sign_counter');else if(!BATH&&!CLS&&R2.room!=='field'&&R2.room!=='gate')r2Slots(g);
+  if(HOMER)hrBack(g,C);else if(R2.room==='mart')martSign(g,'sign_counter');else if(R2.room==='field')fieldSign(g);else if(!BATH&&!CLS&&R2.room!=='field'&&R2.room!=='gate')r2Slots(g);
   const L=[];if(HOMER)hrItems(g,L);if(R2.room==='mart')L.push([MCLERK.pos[R2.sk][1],()=>martClerk(g)]);const RS=R2.rest&&R2.room==='cabin'&&TROOM.rest?TROOM.rest[R2.sk]:null;if(RS){const ob=C.occ.find(o=>o.id==='bed');L.push([(ob?r2Sort(ob,R2.x):R2.y)+.5,()=>r2RestDraw(g,RS)]);}const HRS=R2.rest&&R2.room==='home';if(HRS){const sb=(C.occ.find(o=>o.id==='bed_end')||{sort:R2.y}).sort;L.push([sb+.5,()=>hrRestDraw(g)]);}
   C.occ.forEach(o=>{const im0=R2.img[o.file];const side=(R2.room==='home'||R2.room==='cabin')&&!(RS&&o.id==='bed')&&!o.line&&im0&&im0.width&&(R2.x<o.x+im0.width*.12||R2.x>o.x+im0.width*.88);L.push([side?-1e9:r2Sort(o,R2.x),()=>{const im=R2.img[o.file];if(im&&im.complete)g.drawImage(im,o.x,o.y);const ow=C.own&&C.own[o.id];if(ow)ow.forEach(k=>r2SlotOwned(g,k));}]);});
   if(R2.room==='cabin'&&CDOG.img&&!CDOG.hide)L.push([CDOG.y,()=>cdogDraw(g)]);if(!RS&&!HRS)L.push([R2.act&&R2.act.over!=null?R2.act.over:R2.y,()=>r2Human(g)]);if(PETOBJ)L.push([R2.pet.y,()=>r2Pet(g)]);L.sort((a,b)=>a[0]-b[0]).forEach(e=>e[1]());
@@ -4939,6 +4954,41 @@ const SURF=(()=>{let d={};try{d=JSON.parse(document.getElementById('tex').textCo
 // art pack school-art-sample-v1 (ChatGPT): painted foliage cards, bark and grass — first used on the school sample
 const ART=(()=>{let d={};try{d=JSON.parse(document.getElementById('art').textContent)||{};}catch(e){}const L=new T.TextureLoader(),o={};
   Object.keys(d).forEach(k=>{const t=L.load(d[k]);t.encoding=T.sRGBEncoding;t.anisotropy=Math.min(4,MAXANI);o[k]=t;});return o;})();
+// 遠山 (第二批 shiomi-mountains): painted 360° ridge panoramas, sky transparent, on the inside of a big open cylinder.
+// Fixed in the world (no turning toward the camera), unlit, no fog / shadow / collision; the 3D slopes in front hide its lower edge.
+// Sqoyaw: full circle just outside the valley the students can walk in (it covers the far 3D valley walls).
+// 汐見町: only the land side (west - north - east); the ends fade out over the coast so the sea and the sunset stay open.
+const RIDGE=(()=>{let d={};try{d=JSON.parse(document.getElementById('env').textContent)||{};}catch(e){}const L=new T.TextureLoader(),o={list:[]};
+  const CFG_={sq:{key:'ridge_sqoyaw',x:2590,z:30,R:212,y0:-70,y1:180,arc:PI*2,th0:0,fade:0,mask:2600,vcrop:.35},
+              sm:{key:'ridge_shiomi',x:0,z:40,R:600,y0:-30,y1:300,arc:PI*200/180,th0:-PI*100/180,fade:.09}};
+  for(const k in CFG_){const c=CFG_[k],url=(GFX.lite&&d[c.key+'_2k'])||d[c.key]||d[c.key+'_2k'];if(!url)continue;
+    const t=L.load(url);t.encoding=T.sRGBEncoding;t.wrapS=T.RepeatWrapping;t.wrapT=T.ClampToEdgeWrapping;t.anisotropy=Math.min(4,MAXANI);
+    if(c.vcrop){t.repeat.set(1,1-c.vcrop);t.offset.set(0,c.vcrop);}   // Sqoyaw: leave out the painting's big foreground tree band (it sits too close in this narrow valley)
+    const g=new T.CylinderGeometry(c.R,c.R,c.y1-c.y0,c.arc>6?128:72,1,true,c.th0,c.arc);
+    // seen from inside: flip u so the picture reads left-to-right; keep the arc position for the end fade
+    const uv=g.attributes.uv,arcA=new Float32Array(uv.count);for(let i=0;i<uv.count;i++){arcA[i]=uv.getX(i);uv.setX(i,1-uv.getX(i));}g.setAttribute('aArc',new T.BufferAttribute(arcA,1));
+    const m=new T.MeshBasicMaterial({map:t,transparent:true,alphaTest:.02,side:T.BackSide,depthWrite:false,fog:false,toneMapped:false});
+    const F={value:c.fade};m.onBeforeCompile=sh=>{sh.uniforms.uFade=F;
+      sh.vertexShader='attribute float aArc;varying float vArc;\n'+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvArc=aArc;');
+      sh.fragmentShader='uniform float uFade;varying float vArc;\n'+sh.fragmentShader.replace('#include <map_fragment>','#include <map_fragment>\nif(uFade>0.)diffuseColor.a*=smoothstep(0.,uFade,vArc)*smoothstep(0.,uFade,1.-vArc);');};
+    m.customProgramCacheKey=()=>'ridgePano';
+    const mesh=new T.Mesh(g,m);mesh.position.set(c.x,(c.y0+c.y1)/2,c.z);mesh.renderOrder=-5;mesh.frustumCulled=false;mesh.castShadow=mesh.receiveShadow=false;
+    mesh.userData.noInk=1;mesh.userData.nomerge=true;mesh.userData.dyn=true;mesh.visible=false;scene.add(mesh);o[k]=mesh;o.list.push(mesh);
+    // Sqoyaw: the real valley walls behind the panorama climb higher than the painted ridge line, so a sky-coloured wall (same sky shader,
+    // drawn at the panorama's radius) hides every 3D slope farther away; nearer slopes still stand in front of the painting.
+    if(c.mask){const mg=new T.CylinderGeometry(c.R+.5,c.R+.5,c.mask,128,1,true);mg.translate(0,c.mask/2+c.y0+(c.y1-c.y0)*.5,0);
+      const mm=new T.ShaderMaterial({uniforms:skyU,side:T.BackSide,fog:false,depthWrite:true,
+        vertexShader:`varying vec3 vDir;void main(){vec4 wp=modelMatrix*vec4(position,1.);vDir=wp.xyz-cameraPosition;gl_Position=projectionMatrix*viewMatrix*wp;}`,
+        fragmentShader:sky.material.fragmentShader});
+      const mk_=new T.Mesh(mg,mm);mk_.position.set(c.x,0,c.z);mk_.frustumCulled=false;mk_.renderOrder=-9;mk_.userData.noInk=1;mk_.userData.nomerge=true;mk_.userData.dyn=true;mk_.visible=false;scene.add(mk_);mesh.userData.mask=mk_;}}
+  if(o.sm&&FAR_RIDGE)FAR_RIDGE.visible=false;
+  return o;})();
+// day colours as painted; dusk a little warm and dim, night dark blue (the painting itself is a daytime picture)
+const _rgD=new T.Color(1,1,1),_rgS=new T.Color(.86,.72,.68),_rgN=new T.Color(.2,.24,.4),_rgC=new T.Color();
+function ridgeTick(){if(!RIDGE.list.length)return;const out=!INDOOR&&!MZ_IN&&!CH_IN&&!ST_IN&&!(typeof CUTON!=='undefined'&&CUTON);
+  const inSq=out&&P.pos.x>2300,inSm=out&&P.pos.x<1500&&P.pos.x>-1500;if(RIDGE.sq){RIDGE.sq.visible=inSq;if(RIDGE.sq.userData.mask)RIDGE.sq.userData.mask.visible=inSq;}if(RIDGE.sm)RIDGE.sm.visible=inSm;
+  if(!inSq&&!inSm)return;const n=S.night||0,du=(S.dusk||0)*(1-n),dy=Math.max(0,1-n-du);
+  _rgC.setRGB(_rgD.r*dy+_rgS.r*du+_rgN.r*n,_rgD.g*dy+_rgS.g*du+_rgN.g*n,_rgD.b*dy+_rgS.b*du+_rgN.b*n);RIDGE.list.forEach(m=>m.material.color.copy(_rgC));}
 const FOLI={mats:{},list:[]};
 // a leaf cluster card always turns to face the camera; its centre and size stay fixed in the world (one draw call per picture)
 function foliMat(k){if(FOLI.mats[k])return FOLI.mats[k];const t=ART[k];if(!t)return null;t.wrapS=t.wrapT=T.ClampToEdgeWrapping;
@@ -4960,7 +5010,8 @@ function foliBuild(parent,cards){const by={};cards.forEach(c=>(by[c[0]]=by[c[0]]
 const SHADOW_ONLY=new T.MeshBasicMaterial({colorWrite:false,depthWrite:false});
 // mode 1: walls (texture upright on every face), mode 2: roofs (corrugation runs down the slope)
 // keep: leave the material's own picture (road markings, joints) and lay the painted grain over it; chroma: 0 = only light/dark from the texture, 1 = its colour too
-const SURF_K={wall_plaster:.4,wall_tile:.45,wall_pebble:.4,asphalt:.3,concrete:.5,terrazzo:.55,wood_plank:.55,roof_metal:.55,grass:.55,soil:.55};
+const SURF_K={wall_plaster:.4,wall_tile:.45,wall_pebble:.4,asphalt:.3,concrete:.5,terrazzo:.55,wood_plank:.55,roof_metal:.55,grass:.55,soil:.55,
+  wall_brick_red:.85,metal_blue:.8,metal_red:.8,metal_green:.8,wall_wood:.8};   // 第二批 coloured textures show their own colour (chroma 1, base = their average)
 function surfSet(m,key,mode,base,str=1,o={}){if(!m||!SURF[key])return;str*=SURF_K[key]||.6;if(m.map&&!o.keep){m.map=null;m.needsUpdate=true;}if(base)m.color.copy(col(base));m.userData.surf={key,mode,str,chroma:o.chroma==null?.6:o.chroma};}
 ['edge','plain','center'].forEach(k=>surfSet(RT[k],'asphalt',1,null,.7,{keep:1,chroma:0}));   // town roads: painted grain over the markings
 const DET_V='vec4 detW4=vec4(transformed,1.0);\n#ifdef USE_INSTANCING\ndetW4=instanceMatrix*detW4;\n#endif\nvDetW=(modelMatrix*detW4).xyz;vDetN=(vec4(transformedNormal,0.)*viewMatrix).xyz;vDetG=aGnd;';
@@ -5381,7 +5432,7 @@ function s2Move(dt){let ix=0,iy=0;const free=!DLG.open&&started&&!uiOpen();
   const Q=S2.pet;if(PETOBJ&&PETOBJ.spr){const side=S2.view===1?-S2.flip:(Q.x<S2.x?-1:1);const gx=S2.x+side*H*.42,gy=S2.y-8;
     const dx=gx-Q.x,dy=gy-Q.y,d=Math.hypot(dx,dy),busy=PETOBJ.trick||PETOBJ.anim;
     if(!busy&&(d>H*.5||(Q.mv&&d>H*.12))){const ps=Math.max(spd*1.05,H*1.2),st=Math.min(ps*dt,d);let px=Q.x+dx/d*st,py=Q.y+dy/d*st;
-      if(!s2Walk(px,py)){if(s2Walk(px,Q.y))py=Q.y;else if(s2Walk(Q.x,py))px=Q.x;else{px=Q.x;py=Q.y;}}Q.x=px;Q.y=py;Q.mv=true;Q.idle=0;if(Math.abs(dx)>4)Q.flip=dx<0?-1:1;Q.ph+=dt*10;}
+      if(!s2Walk(px,py)){if(s2Walk(px,Q.y))py=Q.y;else if(s2Walk(Q.x,py))px=Q.x;else{px=Q.x;py=Q.y;}}Q.x=px;Q.y=py;Q.mv=true;Q.idle=0;if(Math.abs(dx)>4)Q.flip=dx<0?-1:1;Q.back=Q.back?(dy<0&&-dy/.78>Math.abs(dx)*.8):(dy<0&&-dy/.78>Math.abs(dx)*1.25);Q.ph+=dt*10;}
     else{Q.mv=false;Q.idle+=dt;}
     if(Q.wag>0)Q.wag-=dt;else if(!Q.mv&&Q.idle>2&&Q.idle<7&&Math.random()<dt*.25)Q.wag=1.2;}}
 function s2Nearest(){let best=null,bd=1e9;const H=s2H(S2.y);
@@ -5419,7 +5470,8 @@ function s2Sprite(g,c,x,y,H,f,flip){const M=c.meta,im=c.mat.map.image;const dh=H
 function s2Human(g){if(S2.act&&r2ActDraw(g,S2))return;const c=spr2d();if(!c)return;const M=c.meta;const v=S2.view,moving=S2.spd>.15;const list=v===0?M.fw:v===1?M.sw:M.bw;let f=v;
   if(moving&&list&&list.length===4)f=list[Math.floor(((S2.ph*1.3/(PI*2))%1+1)%1*4)];s2Sprite(g,c,S2.x,S2.y,s2H(S2.y),f,v===1?S2.flip:1);}
 function s2Pet(g){const o=PETOBJ;if(!o||!o.spr||!o.spr.ready||!o.spr.mat.map)return;const c=o.spr,A_=c.meta.act||{},Q=S2.pet;let f=0,flip=1;
-  if(o.trick||o.anim){f=c.frame;flip=Math.sign(c.m.scale.x)||1;}else if(Q.mv){f=A_.run_1!=null?A_['run_'+(Math.floor(Q.ph%4)+1)]:(Math.sin(Q.ph)>0?1:2);flip=Q.flip;}
+  if(o.trick||o.anim){f=c.frame;flip=Math.sign(c.m.scale.x)||1;}else if(Q.mv&&Q.back&&c.meta.bw){f=Math.sin(Q.ph)>0?c.meta.bw[0]:c.meta.bw[1];}   // walking up the picture = away from the viewer: back frames
+  else if(Q.mv){f=A_.run_1!=null?A_['run_'+(Math.floor(Q.ph%4)+1)]:(Math.sin(Q.ph)>0?1:2);flip=Q.flip;}
   else if(Q.idle>16&&A_.sleep!=null)f=A_.sleep;else if(Q.idle>8&&A_.lie!=null)f=A_.lie;else if(Q.wag>0&&A_.wag_A!=null)f=Math.floor(Q.wag*6)%2?A_.wag_B:A_.wag_A;
   s2Sprite(g,c,Q.x,Q.y,s2H(Q.y)*.42,f,flip);}
 function s2Master(g){const n=NPC_SPR.find(n=>Math.abs(n.pos.x-STX)<8&&Math.abs(n.pos.z-STZ)<6);if(!n||!n.c.ready||!n.c.mat.map)return;
@@ -6024,10 +6076,15 @@ function sqStory(id){const st=SQW.find(s=>s.id===id);say(st.n,st.s,{onEnd:()=>sq
    const FAC=['#f6ecda','#eee0ca','#e4ddd2','#f0dccb','#f3e3c2','#dfe4df','#e2e8da','#f7f0e3'].map(c=>lam(c));
    const FACT=['#d8bfa6','#e2cfb2','#cbc3b6','#ecdcc6'].map(c=>lam('#ffffff',{map:tiles(c)}));
    const TINW=[['#cfd6d9','#b7c0c4'],['#a9c3cf','#91abb8'],['#d8d2c4','#c2bbab'],['#b9c9b4','#a3b39e'],['#e6e2d6','#cfcabd']].map(([a,b])=>TM(a,b,12,true));
-   const ROOF=[['#3f6ea8','#33598a'],['#3f6ea8','#33598a'],['#4a8466','#3c6e54'],['#b24a32','#953c28'],['#c8cdd0','#adb3b6'],['#dfe2df','#c6cac7']].map(([a,b])=>TM(a,b,10,true));
-   const WOOD=TM('#7a5a40','#5f452f',9,false),SHUT=TM('#b4b8bb','#979ca0',14,false);surfSet(WOOD,'wood_plank',1,'#b08258',1,{chroma:.5});
-   FAC.forEach(m=>surfSet(m,'wall_plaster',1));FACT.forEach((m,i)=>surfSet(m,'wall_tile',1,['#dcc4aa','#e6d4b8','#cfc7bb','#eedfca'][i],1,{chroma:.6}));
-   TINW.forEach((m,i)=>surfSet(m,'roof_metal',1,['#cfd6d9','#a9c3cf','#d8d2c4','#b9c9b4','#e6e2d6'][i]));ROOF.forEach((m,i)=>surfSet(m,'roof_metal',2,['#3f6ea8','#3f6ea8','#4a8466','#b24a32','#c8cdd0','#dfe2df'][i]));
+   const ROOF=[['#3f6ea8','#33598a'],['#b24a32','#953c28'],['#4a8466','#3c6e54'],['#3f6ea8','#33598a'],['#b24a32','#953c28'],['#4a8466','#3c6e54']].map(([a,b])=>TM(a,b,10,true));
+   const WOOD=TM('#7a5a40','#5f452f',9,false),SHUT=TM('#b4b8bb','#979ca0',14,false);
+   // 第二批 textures (no rand(): only the materials change, every house keeps its pick): roofs blue / red / green corrugated metal,
+   // one plaster colour in eight becomes red brick, two of the five tin-wall colours become blue / green metal and one vertical wood boards; wood houses use the board texture
+   const TX2=(m,k,mode,base,o={})=>{if(SURF[k])surfSet(m,k,mode,base,1,Object.assign({chroma:1},o));};
+   if(SURF.wall_wood)TX2(WOOD,'wall_wood',1,'#896647');else surfSet(WOOD,'wood_plank',1,'#b08258',1,{chroma:.5});
+   FAC.forEach((m,i)=>{if(i===6&&SURF.wall_brick_red)TX2(m,'wall_brick_red',1,'#925545');else surfSet(m,'wall_plaster',1);});FACT.forEach((m,i)=>surfSet(m,'wall_tile',1,['#dcc4aa','#e6d4b8','#cfc7bb','#eedfca'][i],1,{chroma:.6}));
+   TINW.forEach((m,i)=>{const k2=[null,'metal_blue',null,'metal_green','wall_wood'][i];if(k2&&SURF[k2])TX2(m,k2,1,{metal_blue:'#4f7fae',metal_green:'#5f9068',wall_wood:'#896647'}[k2]);else surfSet(m,'roof_metal',1,['#cfd6d9','#a9c3cf','#d8d2c4','#b9c9b4','#e6e2d6'][i]);});
+   ROOF.forEach((m,i)=>{const k2=['metal_blue','metal_red','metal_green'][i%3];if(SURF[k2])TX2(m,k2,2,{metal_blue:'#315986',metal_red:'#88362e',metal_green:'#3e6e49'}[k2]);else surfSet(m,'roof_metal',2,['#3f6ea8','#b24a32','#4a8466'][i%3]);});
    const EAVEB=lam('#5b4636'),FR=lam('#3d4045'),RAIL=lam('#5b5f64'),BAND=lam('#bdb5a6'),DARK=lam('#3b3530'),AC=lam('#ecece6'),STEEL=lam('#d6dadd'),BLUET=lam('#3d6fb0'),STEP=lam('#b3ada2'),POST=lam('#7c8186');
    const DOORS=[lam('#a8392f'),lam('#3f6f5a'),M.doorWood,lam('#5a6b7a'),lam('#8a5a3a')],AWN=[lam('#c8432b'),lam('#3b6ea5'),lam('#e0a020'),lam('#4f8a5b'),lam('#e8e4da')];
    const CRATE=[lam('#3b6ea5'),lam('#e0a020'),lam('#4f8a5b'),lam('#d9573b')],TRUCK=[lam('#3d6fb0'),lam('#f2efe8'),lam('#c8432b')];
@@ -6948,7 +7005,7 @@ function frame(){
   if(envK<1){envK=Math.min(1,envK+dt/3.4);blendState(envFrom,envTo,envK*envK*(3-2*envK),S);}
   updatePlayer(dt);dustTick(dt);if(GOALM.visible){GOALM.userData.t+=dt;const k=1+.15*Math.sin(GOALM.userData.t*6);GOALM.scale.set(k,1,k);if(!P.goal)GOALM.visible=false;}questTick(dt);martTick(dt);updateTrain(dt);updateVehicles(dt);updateCats(dt);updateBirds(dt);updateCamera(dt);cutCam(dt);sprTick(dt);homeTick(dt);reqTick(dt);updateAmbient(dt);applyEnv();advTick(dt);cabTick(dt);cutFx(dt);inkPerf(dt);tbTick(dt);try{presTick(dt);}catch(e){}
   if(!CUTON&&(areaTick-=dt)<=0){areaTick=.3;areaCheck();}
-  updateUI(dt);updateMarkers();blinkPeople(dt);trackerTick(dt);TM.ring.rotation.z+=dt*.8;sky.position.copy(camera.position);
+  updateUI(dt);updateMarkers();blinkPeople(dt);trackerTick(dt);TM.ring.rotation.z+=dt*.8;sky.position.copy(camera.position);ridgeTick();
   if(S2.retry&&ST_IN&&!S2.on&&!CUTON&&started&&s2Ok()){s2Enter();}
   if(R2.on)r2Draw(dt);else if(S2.on)s2Draw(dt);else if(h2Active())h2Draw(dt);else{h2Hide();renderer.render(scene,camera);}requestAnimationFrame(frame);}
 try{console.log('detail materials',detPass(scene));}catch(e){console.error(e);}

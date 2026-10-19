@@ -286,25 +286,25 @@
   {
    "file": "assets/characters/pets/ani_hudie_f0.webp",
    "group": "characters/pets",
-   "bytes": 93322,
+   "bytes": 89400,
    "note": "hudie_f0"
   },
   {
    "file": "assets/characters/pets/ani_hudie_f1.webp",
    "group": "characters/pets",
-   "bytes": 97954,
+   "bytes": 94778,
    "note": "hudie_f1"
   },
   {
    "file": "assets/characters/pets/ani_hudie_f2.webp",
    "group": "characters/pets",
-   "bytes": 106204,
+   "bytes": 101812,
    "note": "hudie_f2"
   },
   {
    "file": "assets/characters/pets/ani_hudie_f3.webp",
    "group": "characters/pets",
-   "bytes": 115244,
+   "bytes": 110638,
    "note": "hudie_f3"
   },
   {
@@ -474,6 +474,30 @@
    "group": "characters/residents",
    "bytes": 81308,
    "note": ""
+  },
+  {
+   "file": "assets/env/ridge_shiomi.webp",
+   "group": "env",
+   "bytes": 353366,
+   "note": "distant mountain panorama"
+  },
+  {
+   "file": "assets/env/ridge_shiomi_2k.webp",
+   "group": "env",
+   "bytes": 165578,
+   "note": "distant mountain panorama"
+  },
+  {
+   "file": "assets/env/ridge_sqoyaw.webp",
+   "group": "env",
+   "bytes": 309564,
+   "note": "distant mountain panorama"
+  },
+  {
+   "file": "assets/env/ridge_sqoyaw_2k.webp",
+   "group": "env",
+   "bytes": 148352,
+   "note": "distant mountain panorama"
   },
   {
    "file": "assets/rooms/bath/bath_landscape_bg.webp",
@@ -1570,13 +1594,97 @@
   {
    "file": "assets/rooms/sfield/sfield_landscape_bg.webp",
    "group": "rooms/sfield",
-   "bytes": 388930,
+   "bytes": 460596,
    "note": ""
   },
   {
-   "file": "assets/rooms/sfield/sfield_o_hoop.webp",
+   "file": "assets/rooms/sfield/sfield_landscape_o_deck_fence_left.webp",
    "group": "rooms/sfield",
-   "bytes": 12960,
+   "bytes": 3244,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_landscape_o_deck_fence_right.webp",
+   "group": "rooms/sfield",
+   "bytes": 1948,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_landscape_o_flagpole.webp",
+   "group": "rooms/sfield",
+   "bytes": 1848,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_landscape_o_foreground_shrub.webp",
+   "group": "rooms/sfield",
+   "bytes": 16648,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_landscape_o_foreground_tree.webp",
+   "group": "rooms/sfield",
+   "bytes": 65390,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_landscape_o_hoop.webp",
+   "group": "rooms/sfield",
+   "bytes": 15032,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_landscape_o_stage_front.webp",
+   "group": "rooms/sfield",
+   "bytes": 5424,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_portrait_bg.webp",
+   "group": "rooms/sfield",
+   "bytes": 487298,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_portrait_o_deck_fence_left.webp",
+   "group": "rooms/sfield",
+   "bytes": 3336,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_portrait_o_deck_fence_right.webp",
+   "group": "rooms/sfield",
+   "bytes": 2650,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_portrait_o_flagpole.webp",
+   "group": "rooms/sfield",
+   "bytes": 2256,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_portrait_o_foreground_shrub.webp",
+   "group": "rooms/sfield",
+   "bytes": 34528,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_portrait_o_foreground_tree.webp",
+   "group": "rooms/sfield",
+   "bytes": 127942,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_portrait_o_hoop.webp",
+   "group": "rooms/sfield",
+   "bytes": 13234,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sfield/sfield_portrait_o_stage_front.webp",
+   "group": "rooms/sfield",
+   "bytes": 5674,
    "note": ""
   },
   {
@@ -1916,6 +2024,24 @@
    "note": "surface texture"
   },
   {
+   "file": "assets/tex/metal_blue.webp",
+   "group": "tex",
+   "bytes": 12668,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/metal_green.webp",
+   "group": "tex",
+   "bytes": 14184,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/metal_red.webp",
+   "group": "tex",
+   "bytes": 12236,
+   "note": "surface texture"
+  },
+  {
    "file": "assets/tex/roof_metal.webp",
    "group": "tex",
    "bytes": 13144,
@@ -1934,6 +2060,12 @@
    "note": "surface texture"
   },
   {
+   "file": "assets/tex/wall_brick_red.webp",
+   "group": "tex",
+   "bytes": 20546,
+   "note": "surface texture"
+  },
+  {
    "file": "assets/tex/wall_pebble.webp",
    "group": "tex",
    "bytes": 78024,
@@ -1949,6 +2081,12 @@
    "file": "assets/tex/wall_tile.webp",
    "group": "tex",
    "bytes": 30606,
+   "note": "surface texture"
+  },
+  {
+   "file": "assets/tex/wall_wood.webp",
+   "group": "tex",
+   "bytes": 38234,
    "note": "surface texture"
   },
   {
