@@ -1,0 +1,8 @@
+# 建置和素材轉換用的 Python 套件（在 dev/ 底下執行 python3 build.py 或 *_build.py）
+# 測試時的版本：Python 3.11.15
+Pillow==12.2.0
+numpy==2.4.4
+scipy            # 部分角色、換臉腳本用到（scipy.ndimage）
+opencv-python    # 少數換臉腳本 import cv2
+# 遊戲本身不需要安裝任何東西：three.js r128 已經內嵌在 src/engine.js
+# 自動測試：Node 22 + dev/tests/package.json（playwright-core ^1.63），瀏覽器用 Chromium

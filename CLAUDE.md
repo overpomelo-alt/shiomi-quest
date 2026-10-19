@@ -69,7 +69,9 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 │  ├─ src/              ← 遊戲原始碼和處理過的素材（build 的輸入）
 │  ├─ tests/            ← 自動測試和截圖腳本
 │  └─ .webcache/        ← 網路版圖片壓縮快取（保留，可以讓 build 快很多）
-├─ docs/待修清單.md      ← 每一批改了什麼的完整紀錄（第一批到第十二批）
+├─ docs/交接說明.md      ← 給任何接手者的總覽（技術、部署、Firebase 資料結構、已知問題）
+├─ docs/設計要求.md      ← 使用者已確認的遊戲規則、學校配置、角色規格、畫風、要保留的功能
+├─ docs/待修清單.md      ← 每一批改了什麼的完整紀錄
 ├─ docs/raw_map.json    ← 舊 raw/ 資料夾對應到 assets/source/ 的哪裡
 └─ CLAUDE.md
 ```
