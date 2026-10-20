@@ -2653,7 +2653,37 @@ function aqPump(){while(AQ.open&&AQ.busy<AQ.max&&AQ.q.length){const j=AQ.q.shift
 function aqLoad(img,src){return new Promise((res,rej)=>{img.onload=()=>{const fin=()=>res(img);img.decode?img.decode().then(fin,fin):fin();};img.onerror=rej;img.src=src;});}
 // lazy image: an <img> whose file is fetched when the queue reaches it (or at once if urgent)
 function qImg(src,urgent){const i=new Image();const job={src,go:done=>{aqLoad(i,src).then(done,done);}};if(urgent||!/^assets\//.test(src))aqLoad(i,src).catch(()=>{});else AQ.q.push(job);aqPump();return i;}
-function hurry(re){const a=[],b=[];AQ.q.forEach(j=>(re.test(j.src)?a:b).push(j));AQ.q=a.concat(b);if(a.length){const n=AQ.busy;AQ.open=true;a.slice(0,3).forEach(j=>{AQ.q.splice(AQ.q.indexOf(j),1);AQ.busy++;j.go(()=>{AQ.busy--;aqPump();});});}aqPump();}
+/* ===== 手繪場景質感（網址加 ?look=soft／?look=pale；預設 orig＝原本） */
+// 第十五批: a one-time colour grade baked into each hand-drawn scene picture right after it loads (rooms, school, station hall).
+// No per-frame cost (important for the school tablets); buttons, menus and icons are never touched. Characters are drawn as before.
+const LOOKS={orig:null,
+  soft:{sat:.85,con:.93,matte:.06,grain:4},     // 柔和：飽和度約 -15%、對比略降、一點霧面、很輕的顆粒
+  pale:{sat:.70,con:.86,matte:.11,grain:5}};    // 更淡
+const LOOK_DEFAULT='orig';
+const LOOK=(()=>{let v='';try{v=(new URLSearchParams(location.search).get('look')||'').toLowerCase();}catch(e){}return v in LOOKS?v:LOOK_DEFAULT;})();
+const LOOKQ=[];let LOOK_BUSY=false,LOOK_N=null;
+function lookNoise(){if(LOOK_N)return LOOK_N;const n=new Int8Array(4096);let x=12345;for(let i=0;i<4096;i++){x=(x*1103515245+12345)&0x7fffffff;n[i]=((x>>16)&255)-128;}return LOOK_N=n;}
+function lookBake(map,key,im){const P=LOOKS[LOOK];if(map[key]!==im)return;const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h)return;
+  // read and write on a CPU canvas (fast pixel access), then hand the game a normal canvas that behaves like the loaded picture
+  const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);let d;try{d=g.getImageData(0,0,w,h);}catch(e){return;}
+  const a=d.data,N=lookNoise(),sat=P.sat,con=P.con,m=P.matte,k=1-m,pr=246*m,pg=240*m,pb=230*m,gr=P.grain/128;
+  for(let y=0,o=0;y<h;y++)for(let x=0;x<w;x++,o+=4){if(!a[o+3])continue;let r=a[o],gg=a[o+1],b=a[o+2];const l=.299*r+.587*gg+.114*b;
+    r=l+(r-l)*sat;gg=l+(gg-l)*sat;b=l+(b-l)*sat;r=(r-128)*con+128;gg=(gg-128)*con+128;b=(b-128)*con+128;
+    const n=N[(x*73+y*4099)&4095]*gr;a[o]=r*k+pr+n;a[o+1]=gg*k+pg+n;a[o+2]=b*k+pb+n;}
+  g.putImageData(d,0,0);const f=document.createElement('canvas');f.width=w;f.height=h;f.getContext('2d').drawImage(c,0,0);
+  f.complete=true;f.naturalWidth=w;f.naturalHeight=h;f.src=im.src;map[key]=f;}
+const LOOKQ2=[];
+function lookPump(){if(LOOK_BUSY)return;const hi=LOOKQ.length>0,it=hi?LOOKQ.shift():LOOKQ2.shift();if(!it)return;LOOK_BUSY=true;try{lookBake(...it);}catch(e){}
+  setTimeout(()=>{LOOK_BUSY=false;lookPump();},hi?16:200);}
+// Only the pictures of the scene you are entering are graded (hurry() asks for them), so nothing extra runs at start-up
+// or while walking around; backgrounds go first. Window/night masks and UI icons are left alone.
+const LOOKREG=[];
+function lookGo(e){if(e.want)return;e.want=true;const [map,key,im]=e.it;const go=()=>{const cur=innerWidth>=innerHeight?'landscape':'portrait';
+    if(!key.includes(cur))LOOKQ2.push(e.it);else if(/_bg$/.test(key))LOOKQ.unshift(e.it);else LOOKQ.push(e.it);lookPump();};   // the other orientation is done later, slowly
+  if(im.complete&&im.naturalWidth)go();else im.addEventListener('load',go,{once:true});}
+function lookHook(map,key,src,now){if(!LOOKS[LOOK]||/mask|^ic_/.test(key))return;const im=map[key];if(!im)return;const e={it:[map,key,im],src:String(src||''),want:false};LOOKREG.push(e);if(now)lookGo(e);}
+function lookWant(re){if(!LOOKREG.length||!re)return;LOOKREG.forEach(e=>{if(!e.want&&re.test(e.src))lookGo(e);});}
+function hurry(re){lookWant(re);const a=[],b=[];AQ.q.forEach(j=>(re.test(j.src)?a:b).push(j));AQ.q=a.concat(b);if(a.length){const n=AQ.busy;AQ.open=true;a.slice(0,3).forEach(j=>{AQ.q.splice(AQ.q.indexOf(j),1);AQ.busy++;j.go(()=>{AQ.busy--;aqPump();});});}aqPump();}
 setTimeout(()=>{AQ.open=true;aqPump();},2500);
 const IMGP={};function loadImg(src,lazy){if(IMGP[src]&&!lazy){const j=AQ.q.find(j=>j.src===src);if(j){AQ.q.splice(AQ.q.indexOf(j),1);AQ.busy++;j.go(()=>{AQ.busy--;aqPump();});}}if(!IMGP[src])IMGP[src]=new Promise((res,rej)=>{const i=new Image();if(lazy&&/^assets\//.test(src)){AQ.q.push({src,go:done=>{aqLoad(i,src).then(im=>{done();res(im);},e=>{done();rej(e);});}});aqPump();}else aqLoad(i,src).then(res,rej);});return IMGP[src];}
 // Face swap: for each chosen part, draw that part's "blank piece" (the base's skin, only where the
@@ -4059,7 +4089,7 @@ function goDest(d){if(!d.open){say('站務員',[d.id==='tribe'?'往部落的路�
   else if(d.id==='cabin'){trainRide('汐見町',()=>{leaveStation();enterCabinDirect();});}}
 function stationTalk(){if(TS()){say('站務員',['老師好！今天要去哪裡呢？'],{onEnd:()=>chooseDest()});return;}const first=!W.stSeen;W.stSeen=true;save();
   say('站務員',first?[`${W.name||''}，你好！歡迎來到平等車站。`,'你就是今天要去汐見町找印章的孩子吧？燈塔等你很久了。','這裡是大家出發的地方。要搭火車，先來這裡拿車票，再從右邊的剪票口進去。','想回家的話，不用車票，從左邊的「出口」走出去就到家了！','牆上的「班級公告」有老師的最新消息，記得看一看。']:[pick([`${W.name||''}，今天要去哪裡呢？`,'火車準時發車喔！','闖關累了就回家休息一下吧。'])],{onEnd:()=>chooseDest()});}
-function enterStation(opts={}){const fromHome=HOME_IN;const go=()=>{INDOOR=true;ST_IN=true;HOME_IN=false;$('homeBar').hidden=true;P.sit=null;P.pos.set(STX-1,0,STZ+2.4);P.vel.set(0,0,0);P.yaw=PI;cam.yaw=0;cam.pos.set(STX,3,STZ+6.5);cam.look.set(STX,.5,STZ);
+function enterStation(opts={}){lookWant(/rooms\/station\//);const fromHome=HOME_IN;const go=()=>{INDOOR=true;ST_IN=true;HOME_IN=false;$('homeBar').hidden=true;P.sit=null;P.pos.set(STX-1,0,STZ+2.4);P.vel.set(0,0,0);P.yaw=PI;cam.yaw=0;cam.pos.set(STX,3,STZ+6.5);cam.look.set(STX,.5,STZ);
   curArea=null;areaCoolReset();if(PETOBJ){PETOBJ.g.position.set(STX,0,STZ+2.6);PETOBJ.by=0;}drawDepBoard();SND.chime&&SND.chime();
   (ST.exitM||[]).forEach(m=>m.visible=!TS());s2Enter(fromHome?'home':null);
   if(opts.login&&!TS()&&!W.introSeen){setTimeout(()=>playOpening(),350);}
@@ -4264,7 +4294,7 @@ function r2Bath(on){hurry(/rooms\/bath\//);if(!TROOM||!TROOM.bath)return;fadeTo(
     R2.vx=R2.vy=0;R2.view=on?2:0;R2.tgt=R2.pend=null;R2.cx=R2.cy=null;[R2.pet.x,R2.pet.y]=r2Near(R2.x+40,R2.y+6);SND.step&&SND.step('wood');});}
 function r2Soak(){say('浴室',['放滿一缸熱水，慢慢泡進去……','♨️ 今天也辛苦了。肩膀放鬆、深呼吸，把今天的事情先放下。'],{onEnd:()=>toast('泡完澡，整個人都暖起來了 ♨️')});}
 function r2Sink(){choose('洗手台','要做什麼呢？',[{label:'🧼 洗洗手、洗把臉',fn:()=>say(null,['冰冰涼涼的山泉水，一下子清醒了！'])},{label:'🪞 照鏡子（換造型）',fn:()=>openDress()},{label:'算了',fn:null}]);}
-if(TROOM){const im=TROOM.img||{};Object.keys(im).forEach(k=>{R2.img[k]=qImg(im[k]);});}
+if(TROOM){const im=TROOM.img||{};Object.keys(im).forEach(k=>{R2.img[k]=qImg(im[k]);lookHook(R2.img,k,im[k]);});}
 // 五年級教室 (2D painted room from the classroom pack): walk in from the school corridor in Sqoyaw
 let CLS_IN=false;const CLS_DOOR=[-64.05,20.04];
 // 便利商店 (2D painted store from the mart pack): the same shop for ひだまりマート and the Sqoyaw 7-11
@@ -5378,7 +5408,7 @@ const S2CFG={
     lines:{bench_left:[[150,1222],[25,1532]],bench_right:[[930,1222],[1055,1532]]},
     spots:[['回家',150,1068,[0,420,120,700]],['班級公告',218,880,[110,520,90,300]],['=看時刻表',300,812,[225,410,140,150]],['站務員',540,852,[350,480,380,360]],
       ['發車時刻表',752,814,[700,400,160,170]],['剪票口',905,985,[830,640,200,300]],['長椅',212,1350,[0,1090,160,450]],['長椅',866,1350,[920,1090,160,450]]]}};
-if(SROOM){Object.keys(SROOM.img||{}).forEach(k=>{S2.img[k]=qImg(SROOM.img[k],!/^ic_|door|glow/.test(k));});}
+if(SROOM){Object.keys(SROOM.img||{}).forEach(k=>{S2.img[k]=qImg(SROOM.img[k],!/^ic_|door|glow/.test(k));lookHook(S2.img,k,SROOM.img[k]);});}
 // station v2 (entrance at the bottom, 任意門 painted on the left wall, platform on the right)
 if(SROOM&&SROOM.landscape&&SROOM.landscape.walk){['landscape','portrait'].forEach(sk=>{const D=SROOM[sk],A=D.acc,port=sk==='portrait';
   const bb=P=>{const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);return [Math.min(...xs),Math.min(...ys),Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys)];},ob=id=>(D.occ.find(o=>o.id===id)||{b:[0,0,1,1]}).b;
