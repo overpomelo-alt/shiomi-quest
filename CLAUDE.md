@@ -32,7 +32,7 @@ python3 build.py        # src/ → dist/（本機版）＋ web/（網路版）
 
 **發布**：把 `dev/web/` 的內容複製到 repo 根目錄，再 commit、push。
 - 要複製的檔案：`index.html`、`sw.js`、`version.json`、`manifest.webmanifest`、`icon-192.png`、`icon-512.png`。
-- `assets/` 要和 `dev/web/assets/` 同步：刪掉多出來的檔案，但**不要動 `assets/source/`**。
+- `assets/` 要和 `dev/web/assets/` 同步：刪掉多出來的檔案，但**不要動 `assets/source/`**（它是另一個私人 repo 的資料夾）。
 - 機器上沒有 rsync，同步可以用一小段 Python。
 - commit 作者用 `overpomelo-alt <overpomelo@gmail.com>`。
 - push 後用 `gh api repos/overpomelo-alt/shiomi-quest/commits/main/check-runs` 等 build 和 deploy 都顯示 success。
@@ -61,7 +61,7 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 /                       ← GitHub Pages 直接發布這一層（index.html、sw.js、version.json、manifest、icons）
 ├─ assets/              ← 遊戲用的圖（由 build.py 產生，不要手改）
 │  ├─ art/  characters/  rooms/  tex/  ui/  catalog.json
-│  └─ source/           ← 原始素材（ChatGPT 原圖、修過的圖、規格書），見第 4 節
+│  └─ source/           ← 原始素材（ChatGPT 原圖、修過的圖、規格書），見第 4 節。**是另一個私人 repo，不在這個 repo 裡**
 ├─ dev/                 ← 程式碼
 │  ├─ build.py          ← 組裝遊戲
 │  ├─ *_build.py 等     ← 把 ChatGPT 素材包轉成遊戲格式的腳本，見第 3 節
@@ -75,7 +75,12 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 ├─ docs/raw_map.json    ← 舊 raw/ 資料夾對應到 assets/source/ 的哪裡
 └─ CLAUDE.md
 ```
-注意：`assets/source/` 大約 690 MB。GitHub Pages 整個網站的上限是 1 GB，目前加起來大約 735 MB，素材再多下去要考慮搬到另一個 repo 或改用 Git LFS。
+**原始素材在私人 repo**：`assets/source/`（約 800 MB）在 2026-10-20 搬到私人 repo `overpomelo-alt/shiomi-quest-source`，因為 GitHub Pages 網站上限 1 GB。
+- 這個 repo 的 `.gitignore` 排除了 `assets/source/`，網站不會發布它。
+- 開工時請把私人 repo clone 到 `assets/source/`：`git clone https://github.com/overpomelo-alt/shiomi-quest-source assets/source`（雲端環境要先用 add_repo 加入這個 repo）。
+- `dev/*_build.py` 照舊讀 `../assets/source/...`，不用改。
+- **新素材包、截圖、規格書都 commit 到私人 repo**，不要放進這個 repo。
+- 這個 repo 的 git 歷史裡還留著舊的素材檔（只佔 .git 空間，不會發布到網站）。要不要清歷史由使用者決定。
 
 ---
 
@@ -155,7 +160,7 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 
 ## 4. 素材在哪裡、怎麼命名
 
-### 原始素材 `assets/source/`（ChatGPT 原檔，要重修就從這裡改）
+### 原始素材 `assets/source/`（ChatGPT 原檔，要重修就從這裡改；私人 repo `shiomi-quest-source`）
 | 資料夾 | 內容 |
 |---|---|
 | `characters/sheets/` | 6 位學生造型的原圖和修過的圖（hero1 草帽、sailor、hoodie 粉帽 T、sporty 黃 T、green 綠帽 T、redcap 紅帽），`face_*`／`sface_*`／`piece_*` 換臉零件，`prev*_*` 各版預覽，`bak_*` 備份 |
@@ -273,7 +278,7 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 
 ### D. 其他
 - `game.js` 是一個 900 KB 的大檔，搜尋和修改都慢。之後可以考慮拆成多個模組，但要注意亂數規則。
-- 素材資料夾接近 GitHub Pages 1 GB 的上限（第十二批後 `assets/source/` 約 690 MB）。
+- 素材容量：`assets/source/` 已搬到私人 repo（2026-10-20），網站本身約 70 MB。
 
 ### 寫程式的地雷
 - **亂數規則**：Sqoyaw 房子的位置由 `rand()` 的呼叫順序決定。在房子產生之前**不能增加或減少任何 rand() 呼叫**，後處理一律用固定的雜湊。改完要用 `bld_dump.js` 比對確認。
