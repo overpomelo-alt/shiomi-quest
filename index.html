@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant" translate="no" class="notranslate"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>汐見町闖關</title><meta name="theme-color" content="#16121f"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#16121f;color:#141413}</style><script>window.SHIOMI_BUILD="1020-1512";(function(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){if(j&&j.v&&j.v!==window.SHIOMI_BUILD&&sessionStorage.getItem("shiomi_rl")!==j.v){sessionStorage.setItem("shiomi_rl",j.v);location.reload();}}).catch(function(){});}catch(e){}})();</script></head><body>
+<!doctype html><html lang="zh-Hant" translate="no" class="notranslate"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>汐見町闖關</title><meta name="theme-color" content="#16121f"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#16121f;color:#141413}</style><script>window.SHIOMI_BUILD="1020-1532";(function(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){if(j&&j.v&&j.v!==window.SHIOMI_BUILD&&sessionStorage.getItem("shiomi_rl")!==j.v){sessionStorage.setItem("shiomi_rl",j.v);location.reload();}}).catch(function(){});}catch(e){}})();</script></head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
@@ -3577,6 +3577,38 @@ function lookGo(e){if(e.want)return;e.want=true;const [map,key,im]=e.it;const go
   if(im.complete&&im.naturalWidth)go();else im.addEventListener('load',go,{once:true});}
 function lookHook(map,key,src,now){if(!LOOKS[LOOK]||/mask|^ic_/.test(key))return;const im=map[key];if(!im)return;const e={it:[map,key,im],src:String(src||''),want:false};LOOKREG.push(e);if(now)lookGo(e);}
 function lookWant(re){if(!LOOKREG.length||!re)return;LOOKREG.forEach(e=>{if(!e.want&&re.test(e.src))lookGo(e);});}
+/* ===== 人物質感（網址加 ?char=soft／?char=mid；預設 off＝原本） */
+// 第十五批: characters drawn in the hand-drawn scenes (student, pet, 蝴蝶, clerk, station staff, visiting classmates) get a lighter
+// version of the scene grade plus a light tint from the scene's light, and a soft contact shadow. Each sprite sheet is graded
+// once (in the background) for the scene you are in and then drawn as usual, so walking costs nothing extra. Only the current
+// scene's graded sheets are kept, so memory stays small on the school tablets.
+const CHARS={off:null,
+  soft:{sat:.90,con:.955,matte:.04,tint:1,shadow:.34},    // 輕：約背景柔和的 65%
+  mid:{sat:.82,con:.93,matte:.06,tint:1.6,shadow:.42}};   // 較重
+const CHAR_DEFAULT='off';
+const CHAR=(()=>{let v='';try{v=(new URLSearchParams(location.search).get('char')||'').toLowerCase();}catch(e){}return v in CHARS?v:CHAR_DEFAULT;})();
+// light of each scene: c = colour, a = strength (0~1). A scene can override it in its data: room.json[room][sk].char_tint = {c:'#hex', a:.1}
+const CHAR_TINT={class:{c:'#fff1dc',a:.10},home:{c:'#fff0da',a:.10},cabin:{c:'#ffd79a',a:.14},bath:{c:'#ffe6c4',a:.10},
+  mart:{c:'#eef2ff',a:.08},station:{c:'#ffdcae',a:.12},gate:{c:'#9fb9d8',a:.14},field:{c:'#9fb9d8',a:.14},outdoor:{c:'#9fb9d8',a:.14}};
+function chTint(){const room=S2.on?'station':R2.on?R2.room:'outdoor';const D=TROOM&&TROOM[room]&&R2.sk&&TROOM[room][R2.sk];return (D&&D.char_tint)||CHAR_TINT[room]||CHAR_TINT.outdoor;}
+let CHW=new WeakMap(),CH_KEY='';const CHQ=[];let CH_BUSY=false;
+function chBake(im,t,out){const P=CHARS[CHAR],w=im.naturalWidth||im.width,h=im.naturalHeight||im.height;if(!w||!h)return;
+  const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);let d;try{d=g.getImageData(0,0,w,h);}catch(e){return;}
+  const a=d.data,sat=P.sat,con=P.con,m=P.matte,k=1-m,pr=246*m,pg=240*m,pb=230*m,tc=new T.Color(t.c),A=Math.min(.6,t.a*P.tint);
+  for(let o=0;o<a.length;o+=4){if(!a[o+3])continue;let r=a[o],gg=a[o+1],b=a[o+2];const l=.299*r+.587*gg+.114*b;
+    r=l+(r-l)*sat;gg=l+(gg-l)*sat;b=l+(b-l)*sat;r=(r-128)*con+128;gg=(gg-128)*con+128;b=(b-128)*con+128;r=r*k+pr;gg=gg*k+pg;b=b*k+pb;
+    const wt=A*(1-.5*l/255);a[o]=r+(r*tc.r-r)*wt;a[o+1]=gg+(gg*tc.g-gg)*wt;a[o+2]=b+(b*tc.b-b)*wt;}   // tint is a little stronger in the shadows
+  g.putImageData(d,0,0);const f=document.createElement('canvas');f.width=w;f.height=h;f.getContext('2d').drawImage(c,0,0);f.complete=true;f.naturalWidth=w;f.naturalHeight=h;out.v=f;}
+function chPump(){if(CH_BUSY||!CHQ.length)return;CH_BUSY=true;const [im,t,out,key]=CHQ.shift();if(key===CH_KEY){try{chBake(im,t,out);}catch(e){}}setTimeout(()=>{CH_BUSY=false;chPump();},16);}
+function chImg(im){if(!im||!CHARS[CHAR])return im;if(im.complete===false)return im;const t=chTint(),key=t.c+'|'+t.a;
+  if(key!==CH_KEY){CH_KEY=key;CHW=new WeakMap();CHQ.length=0;}   // new scene light: drop the old graded sheets
+  let out=CHW.get(im);if(!out){out={v:null};CHW.set(im,out);CHQ.push([im,t,out,key]);chPump();}return out.v||im;}
+// soft contact shadow under the feet (a pre-drawn blurred ellipse, scaled to the character); the old hard ellipse when ?char is off
+let CH_SH=null;
+function chShadow(g,rx,ry,alpha){if(!CHARS[CHAR]){g.fillStyle=`rgba(40,20,10,${alpha})`;g.beginPath();g.ellipse(0,0,rx,ry,0,0,7);g.fill();return;}
+  if(!CH_SH){CH_SH=document.createElement('canvas');CH_SH.width=128;CH_SH.height=128;const x=CH_SH.getContext('2d'),gr=x.createRadialGradient(64,64,0,64,64,64);
+    gr.addColorStop(0,'rgba(35,25,20,1)');gr.addColorStop(.45,'rgba(35,25,20,.6)');gr.addColorStop(1,'rgba(35,25,20,0)');x.fillStyle=gr;x.fillRect(0,0,128,128);}
+  const ga=g.globalAlpha;g.globalAlpha=ga*CHARS[CHAR].shadow;g.drawImage(CH_SH,-rx*1.35,-ry*1.6,rx*2.7,ry*3.2);g.globalAlpha=ga;}
 function hurry(re){lookWant(re);const a=[],b=[];AQ.q.forEach(j=>(re.test(j.src)?a:b).push(j));AQ.q=a.concat(b);if(a.length){const n=AQ.busy;AQ.open=true;a.slice(0,3).forEach(j=>{AQ.q.splice(AQ.q.indexOf(j),1);AQ.busy++;j.go(()=>{AQ.busy--;aqPump();});});}aqPump();}
 setTimeout(()=>{AQ.open=true;aqPump();},2500);
 const IMGP={};function loadImg(src,lazy){if(IMGP[src]&&!lazy){const j=AQ.q.find(j=>j.src===src);if(j){AQ.q.splice(AQ.q.indexOf(j),1);AQ.busy++;j.go(()=>{AQ.busy--;aqPump();});}}if(!IMGP[src])IMGP[src]=new Promise((res,rej)=>{const i=new Image();if(lazy&&/^assets\//.test(src)){AQ.q.push({src,go:done=>{aqLoad(i,src).then(im=>{done();res(im);},e=>{done();rej(e);});}});aqPump();}else aqLoad(i,src).then(res,rej);});return IMGP[src];}
@@ -5255,7 +5287,7 @@ if(TROOM&&TROOM.mart)['landscape','portrait'].forEach(sk=>{const D=TROOM.mart[sk
 const MART_SIGN={sign_rice:'飯糰・便當',sign_bread:'麵包・甜點',sign_snack:'零食',sign_noodle:'泡麵',sign_stationery:'文具',sign_pet:'寵物',sign_drink:'飲料',sign_ice:'冰品',sign_gacha:'扭蛋'};
 const MSC={};
 const MCLERK={img:null,ld:false,pos:{landscape:[1772,598],portrait:[1046,812]}};
-function martClerk(g){const M=SPRITES.clerk;if(!M)return;if(!MCLERK.ld){MCLERK.ld=true;loadImg(M.src).then(im=>MCLERK.img=im).catch(()=>{});}const im=MCLERK.img;if(!im)return;
+function martClerk(g){const M=SPRITES.clerk;if(!M)return;if(!MCLERK.ld){MCLERK.ld=true;loadImg(M.src).then(im=>MCLERK.img=im).catch(()=>{});}const im=chImg(MCLERK.img);if(!im)return;
   const [x,y]=MCLERK.pos[R2.sk],H=r2H(y),dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch,br=1+Math.sin(R2.t*2.1)*.008;g.save();g.translate(x,y);g.scale(1,br);const [sx,sy]=fxy(M,0);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+3/M.ch*dh,dw,dh);g.restore();}
 function martSign(g,k){const D=TROOM.mart[R2.sk],r=D.slots[k];if(!r)return;const txt=k==='sign_counter'?(MART.from==='tribe'?'7-ELEVEN 環山門市':'ひだまりマート'):MART_SIGN[k];if(!txt)return;
   const q=D.quads[k],key=R2.sk+k+txt;let c=MSC[key];
@@ -5508,17 +5540,17 @@ function r2ActTick(dt,E=R2){const A=E.act;if(!A||!A.im)return;A.t+=dt;A.el+=dt;i
 function r2ActDraw(g,E=R2){const A=E.act;if(!A||!A.im)return false;const M=A.M,f=A.a.f[A.i],key=M.keys[f];const x=A.at?A.at[0]:E.x,y=A.at?A.at[1]:E.y;
   const H=(E===R2?r2H:s2H)(A.foot||y),dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch,k=dh/M.ch;const [sx,sy]=fxy(M,f);
   let ax=M.cw/2,ay=M.ch-(M.foot!=null?M.foot:3);const sa=A.at&&M.seat_anchor&&M.seat_anchor[key];if(sa){ax=sa[0];ay=sa[1];}
-  g.save();g.translate(x,y);if(!A.at){g.fillStyle='rgba(40,20,10,.28)';g.beginPath();g.ellipse(0,0,dw*.26,dw*.07,0,0,7);g.fill();}
-  g.scale(/_side/.test(key)?A.flip:1,1);g.drawImage(A.im,sx,sy,M.cw,M.ch,-ax*k,-ay*k,dw,dh);g.restore();return true;}
+  g.save();g.translate(x,y);if(!A.at){chShadow(g,dw*.26,dw*.07,.28);}
+  g.scale(/_side/.test(key)?A.flip:1,1);g.drawImage(chImg(A.im),sx,sy,M.cw,M.ch,-ax*k,-ay*k,dw,dh);g.restore();return true;}
 // walking input ends a room action (after a short moment, so the tap that started it doesn't end it)
 function r2ActInput(dt,E){r2ActTick(dt,E);const any=keys.w||keys.a||keys.s||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright||Math.hypot(STK.x,STK.y)>.3;
   if(E.act&&any&&!DLG.open&&!uiOpen()&&E.act.el>.5)r2ActStop(E);P.moving=0;}
-function r2Human(g){if(R2.act&&r2ActDraw(g))return;const c=spr2d();if(!c)return;const M=c.meta,im=c.mat.map.image;const H=r2H(R2.y),dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;const v=R2.view,moving=R2.spd>.15;
+function r2Human(g){if(R2.act&&r2ActDraw(g))return;const c=spr2d();if(!c)return;const M=c.meta,im=chImg(c.mat.map.image);const H=r2H(R2.y),dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;const v=R2.view,moving=R2.spd>.15;
   const list=v===0?M.fw:v===1?M.sw:M.bw;let f=v;if(moving&&list&&list.length===4){f=list[Math.floor(((R2.ph*1.3/(PI*2))%1+1)%1*4)];}
   const br=moving?1:1+Math.sin(R2.t*2.2)*.008;
-  g.save();g.translate(R2.x,R2.y);g.fillStyle='rgba(40,20,10,.28)';g.beginPath();g.ellipse(0,0,dw*.26,dw*.07,0,0,7);g.fill();
+  g.save();g.translate(R2.x,R2.y);chShadow(g,dw*.26,dw*.07,.28);
   g.scale(v===1?R2.flip:1,br);const [sx,sy]=fxy(M,f);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+(M.foot!=null?M.foot:3)/M.ch*dh,dw,dh);g.restore();}
-function r2Pet(g){const o=PETOBJ;if(!o||!o.spr||!o.spr.ready||!o.spr.mat.map)return;const c=o.spr,M=c.meta,A_=M.act||{},im=c.mat.map.image,Q=R2.pet;
+function r2Pet(g){const o=PETOBJ;if(!o||!o.spr||!o.spr.ready||!o.spr.mat.map)return;const c=o.spr,M=c.meta,A_=M.act||{},im=chImg(c.mat.map.image),Q=R2.pet;
   const H=r2H(Q.y)*.42,dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;let f=0,flip=1,rz=0;
   const dtp=o._r2t!=null?Math.min(.1,Math.max(0,R2.t-o._r2t)):0;o._r2t=R2.t;
   if(o.anim&&o.anim.type==='seq'&&M.anims&&M.anims[o.anim.name]){o.anim.t+=dtp;const S_=M.anims[o.anim.name];if(o.anim.t>o.anim.dur){o.anim=null;}else{let t=o.anim.t,i=0;while(i<S_.f.length-1&&t>S_.d[i]){t-=S_.d[i];i++;}f=S_.f[i];}}
@@ -5526,7 +5558,7 @@ function r2Pet(g){const o=PETOBJ;if(!o||!o.spr||!o.spr.ready||!o.spr.mat.map)ret
   else if(Q.mv&&Q.back&&M.bw){f=Math.sin(Q.ph)>0?M.bw[0]:M.bw[1];}   // walking up the picture = away from the viewer: back frames
   else if(Q.mv){f=A_.run_1!=null?A_['run_'+(Math.floor(Q.ph%4)+1)]:(Math.sin(Q.ph)>0?1:2);flip=Q.flip;}
   else if(Q.idle>16&&A_.sleep!=null)f=A_.sleep;else if(Q.idle>8&&A_.lie!=null)f=A_.lie;else if(Q.wag>0&&A_.wag_A!=null)f=Math.floor(Q.wag*6)%2?A_.wag_B:A_.wag_A;
-  g.save();g.translate(Q.x,Q.y);g.fillStyle='rgba(40,20,10,.24)';g.beginPath();g.ellipse(0,0,dw*.28,dw*.07,0,0,7);g.fill();
+  g.save();g.translate(Q.x,Q.y);chShadow(g,dw*.28,dw*.07,.24);
   if(rz){g.translate(0,-dh*.35);g.rotate(-rz);g.translate(0,dh*.35);}g.scale(flip,1);const [sx,sy]=fxy(M,f);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+(M.foot!=null?M.foot:3)/M.ch*dh,dw,dh);g.restore();}
 function r2Mirror(g,x,y,w,h){g.save();g.fillStyle='rgba(40,20,10,.25)';g.beginPath();g.ellipse(x+w/2,y+h,w*.6,w*.12,0,0,7);g.fill();
   g.fillStyle='#8a5a32';g.beginPath();g.ellipse(x+w/2,y+h*.42,w/2,h*.42,0,0,7);g.fill();const gr=g.createLinearGradient(x,y,x+w,y+h);gr.addColorStop(0,'#dff1f7');gr.addColorStop(.5,'#b9d9e6');gr.addColorStop(1,'#e9f5f8');
@@ -5544,10 +5576,10 @@ function cdogTick(dt){CDOG.hide=!!(W.pet&&W.pet.kind==='dog'&&(W.pet.coat==='mal
     if(d<6||CDOG.t<0){CDOG.st='idle';CDOG.t=rr(3,8);CDOG.pose=pick(['sit','sit','lie','sleep','wag']);}
     else{const sp=Math.min(d,H*.7*dt),nx=CDOG.x+dx/d*sp,ny=CDOG.y+dy/d*sp;if(r2Walk(nx,ny)){CDOG.x=nx;CDOG.y=ny;}else CDOG.t=-1;if(Math.abs(dx)>3)CDOG.flip=dx<0?-1:1;CDOG.ph+=dt*9;}}
   else if(CDOG.t<0&&CDOG.wag<=0){const [x,y]=r2Near(rr(D.w*.12,D.w*.88),rr(D.h*.5,D.h*.95));CDOG.tx=x;CDOG.ty=y;CDOG.st='walk';CDOG.t=9;}}
-function cdogDraw(g){const M=SPRITES[cdogSid()],im=CDOG.img;if(!M||!im)return;const A=M.act||{};let f=0,fl=1;
+function cdogDraw(g){const M=SPRITES[cdogSid()],im=chImg(CDOG.img);if(!M||!im)return;const A=M.act||{};let f=0,fl=1;
   if(CDOG.st==='walk'){f=Math.sin(CDOG.ph)>0?1:2;fl=CDOG.flip;}else if(CDOG.wag>0&&A.wag_A!=null)f=Math.floor(CDOG.wag*6)%2?A.wag_B:A.wag_A;
   else if(CDOG.pose==='lie'&&A.lie!=null)f=A.lie;else if(CDOG.pose==='sleep'&&A.sleep!=null)f=A.sleep;else if(CDOG.pose==='wag'&&A.wag_A!=null)f=Math.floor(R2.t*5)%2?A.wag_B:A.wag_A;
-  const H=r2H(CDOG.y)*.5,dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;g.save();g.translate(CDOG.x,CDOG.y);g.fillStyle='rgba(40,20,10,.22)';g.beginPath();g.ellipse(0,0,dw*.26,dw*.06,0,0,7);g.fill();
+  const H=r2H(CDOG.y)*.5,dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;g.save();g.translate(CDOG.x,CDOG.y);chShadow(g,dw*.26,dw*.06,.22);
   g.scale(fl,1);const [sx,sy]=fxy(M,f);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+(M.foot!=null?M.foot:4)/M.ch*dh,dw,dh);g.restore();}
 function cdogSpot(){if(R2.room!=='cabin'||!CDOG.img||CDOG.hide)return null;const H=r2H(CDOG.y)*.5;
   return {def:['蝴蝶',CDOG.x+(CDOG.x<R2.x?H*.35:-H*.35),CDOG.y+3,[CDOG.x-H*.45,CDOG.y-H*.75,H*.9,H*.8]],it:null,label:'摸摸蝴蝶（老師的狗）',
@@ -6223,10 +6255,10 @@ function h2Click(X,Y){const H=homeState(),sk=H2.sk;
   if(HOME.pending.it){const it=HOME.pending.it;Object.keys(it.d).forEach(k=>delete it.d[k]);Object.assign(it.d,d);placeItemGroup(it.g,it.d);HOME.sel=it;}
   else{H.items.push(d);HOME.sel=spawnItem(d);}
   HOME.pending=null;rebuildHomeCols();save();SND.pick&&A.ready&&SND.pick();renderDecor();}
-function h2Sprite(g,c,x,y,z,sk){if(!c||!c.ready||!c.mat.map)return null;const M=c.meta,im=c.mat.map.image;const [X,Y,s0]=h2Pt(sk,x,y,z);const PH=c.m.geometry.parameters.height;
+function h2Sprite(g,c,x,y,z,sk){if(!c||!c.ready||!c.mat.map)return null;const M=c.meta,im=chImg(c.mat.map.image);const [X,Y,s0]=h2Pt(sk,x,y,z);const PH=c.m.geometry.parameters.height;
   // damp the perspective so a kid by the door doesn't balloon to a third of the screen
   const sm=h2Pt(sk,0,0,-.4)[2],s=lerp(sm,s0,sk==='portrait'?.5:.45);const dh=PH*s*.86,dw=dh*M.cw/M.ch,fl=Math.sign(c.m.scale.x)||1,rz=c.pivot?c.pivot.rotation.z:0;
-  g.save();g.translate(X,Y);g.fillStyle='rgba(40,20,10,.22)';g.beginPath();g.ellipse(0,0,dw*.24,dw*.065,0,0,7);g.fill();
+  g.save();g.translate(X,Y);chShadow(g,dw*.24,dw*.065,.22);
   if(rz){g.translate(0,-dh*.3);g.rotate(-rz);g.translate(0,dh*.3);}g.scale(fl,1);const [sx,sy]=fxy(M,c.frame);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+(M.foot!=null?M.foot:3)/M.ch*dh,dw,dh);g.restore();return [X-dw/2,Y-dh,dw,dh];}
 function h2Furn(g,it,sk,night){const id=FURN_SPR[it.d.k],f=id&&HROOM.furn[id];const im=f&&h2Img('f_'+id);if(!im)return;const d=it.d;let X,Y,s,ax,ay;
   if(d.wall){if(d.wall==='wf')return;const x=d.wall==='wb'?d.u:d.wall==='wl'?-3.45:3.45,z=d.wall==='wb'?-3:d.u;[X,Y,s]=h2Pt(sk,x,d.y||1.75,z);const wa=f.wa||[256,256];ax=wa[0];ay=wa[1];}
@@ -6400,8 +6432,8 @@ function s2SlotCanvas(k){const now=Math.floor(Date.now()/60000),key=k+':'+now+':
       x.fillStyle='rgba(60,50,40,.45)';for(let j=0;j<3;j++)x.fillRect(-w/2+14,-h/2+(n?68:28)+j*14,w-28,4);x.restore();});}
   S2.slotC[k]={key,c};return c;}
 function s2Slots(g){const D=SROOM[S2.sk];Object.entries(D.slots||{}).forEach(([k,q])=>{const c=s2SlotCanvas(k);g.save();if(k!=='class_noticeboard'){g.globalAlpha=.97;}s2Quad(g,c,q);g.restore();});}
-function s2Sprite(g,c,x,y,H,f,flip){const M=c.meta,im=c.mat.map.image;const dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;
-  g.save();g.translate(x,y);g.fillStyle='rgba(40,20,10,.28)';g.beginPath();g.ellipse(0,0,dw*.26,dw*.07,0,0,7);g.fill();g.scale(flip||1,1);const [sx,sy]=fxy(M,f);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+(M.foot!=null?M.foot:3)/M.ch*dh,dw,dh);g.restore();}
+function s2Sprite(g,c,x,y,H,f,flip){const M=c.meta,im=chImg(c.mat.map.image);const dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;
+  g.save();g.translate(x,y);chShadow(g,dw*.26,dw*.07,.28);g.scale(flip||1,1);const [sx,sy]=fxy(M,f);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+(M.foot!=null?M.foot:3)/M.ch*dh,dw,dh);g.restore();}
 function s2Human(g){if(S2.act&&r2ActDraw(g,S2))return;const c=spr2d();if(!c)return;const M=c.meta;const v=S2.view,moving=S2.spd>.15;const list=v===0?M.fw:v===1?M.sw:M.bw;let f=v;
   if(moving&&list&&list.length===4)f=list[Math.floor(((S2.ph*1.3/(PI*2))%1+1)%1*4)];s2Sprite(g,c,S2.x,S2.y,s2H(S2.y),f,v===1?S2.flip:1);}
 function s2Pet(g){const o=PETOBJ;if(!o||!o.spr||!o.spr.ready||!o.spr.mat.map)return;const c=o.spr,A_=c.meta.act||{},Q=S2.pet;let f=0,flip=1;
