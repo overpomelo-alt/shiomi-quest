@@ -66,7 +66,7 @@ loader = open(S + 'loader.js').read().replace('__SHEET__', put(S + 'loader/run-1
 
 # ---- rooms
 def room_dir(key):
-    for p in ('home_', 'bath_', 'rest_', 'class_', 'mart_', 'sfield_', 'sgate_'):
+    for p in ('home_', 'bath_', 'rest_', 'class_', 'mart_', 'sfield_', 'sgate_', 'sq_'):
         if key.startswith(p): return p[:-1]
     return 'cabin'
 

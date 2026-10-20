@@ -48,6 +48,21 @@
   - 第 1 包是村子中心、同學巷、動物之家，只要白天的圖，夜晚遮罩之後再補。
   - 接入時沿用 gate／field 的格式和做法：走進出口就換場景、人物大小用 `character_scale`、遮擋物看 `sort_y`。
 
+## ★ Sqoyaw 手繪第一批（2026-10-20 接入，只在 `?sq2d=1` 才開）
+
+- **預設沒動**：不加 `?sq2d=1` 時，Sqoyaw 還是原本的 3D。程式搜尋 `SQ2D`。使用者還沒說「預設改成手繪」。
+- 三個場景：`sq_bus`（村子中心）、`sq_classmates`（同學巷）、`sq_animals`（動物之家）。原始包在私人 repo `sqoyaw/batch1/`，轉換用 `dev/sqoyaw_build.py`。
+- 程式區塊搜尋「Sqoyaw 手繪場景」：`sqEnter`、`sqExit`、`sq2dArrive`、`sqBuildCfg`、`SQ_PEN`、`sqDoor`、`sqAnimals`、`sqSigns`。
+  - 從車站、公車、任意門、出家門到 Sqoyaw → `arriveTribe` 裡的 `sq2dArrive` 會改進手繪場景（沒畫的目的地照舊進 3D）。
+  - 出口走進去就觸發；目的地還沒畫（果園、教會、第二條巷子）→ 顯示「尚未開放」，人物退回原地，不會跳到不存在的場景。
+  - 村子中心往左是校門口（`gateEnter`）；校門口往外走（`gateLeave`）在 `?sq2d=1` 時回村子中心。
+- **人物大小**：同學巷、動物之家用包裡的 `spatial_scale`（錨點 [x, y, 身高]，距離平方反比內插，`r2H(y,x)` 讀 `C.ss`）；村子中心用 `character_scale`（`hh`）。最近的身高照包裡給的：橫式 430、直式 530（使用者還沒表示要不要改）。
+- **門牌**：`home_1`～`home_5` = 1～5 號，對應座號 `((座號-1)%5)+1`（和 3D 同一套）。自己家 → 進自己房間；別人家 → 拜訪（`doorKnock`），回來站在那扇門口（`SQ_BACK`）。
+- **動物之家的欄**（`SQ_PEN`）：pen_1 石虎、pen_2 黑豹、pen_5 台灣黑熊 → 照顧（`acCare`）；pen_3 狼犬、pen_4 咖啡色貴賓 → 領養問答。已領養的狗不會再畫在欄裡。馬爾濟斯沒有欄，仍在照顧台的領養選單。
+- 人物調色（`?char=`）在這三個場景用戶外冷藍。
+- 測試：`Q=sq2d=1 PORT=8765 node dev/tests/sq2d.js <輸出資料夾> <標記> [l|p]`（到站→果園出口→同學巷→3 號門→回家再出門→動物之家→一路走回→校門口→回來）。
+- **還沒做**：夜晚遮罩、居民／NPC 站位（包裡有 `npc_spots`、`npc_paths`，還沒用）、橫式信箱和 1 號門牌共用一個牌子、果園／教會／第二條巷子和貨車目的地顯示「尚未開放」。
+
 ## 0. 開工前必讀：使用者的偏好
 
 - **先討論，再一次做完**：先把這一批要做的事和做法談好，確定後一口氣做完、一次回報。不要做一點回報一點。一批最好 3～5 件，避免其中一件卡住拖累整批。
@@ -190,6 +205,7 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 | `field_build.py` | 正式操場 field-v1 包 → 操場 field（舊的暫時版改名 `field_build_v02_old.py`） |
 | `env_build.py` | 遠山包 → src/env |
 | `gate_build.py` | 校門口 gate-v1 包 → gate |
+| `sqoyaw_build.py` | Sqoyaw 手繪場景包（`assets/source/sqoyaw/batch*/<場景>-v<N>/`，同一場景取最新版本）→ `troom/sq_*`＋room.json。遮擋物照 sgate 裁切；`spatial_scale` 錨點存成 `ss` |
 | `station_v4.py` | 車站剪票口 v4 → sroom |
 | `tex_build.py` | 材質包＋第二批貼圖＋正式 shiomi-tiles（`assets/source/textures/shiomi-tiles`，藍／紅／綠鐵皮、紅磚、木板、Sqoyaw 地面 grass_t）→ src/tex |
 | `pack_actions.py` | 動作包（坐、揮手、跑步等）→ act0N 圖集 |
@@ -232,6 +248,7 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
   - `mart_`：便利商店。
   - `sfield_`：操場。
   - `sgate_`：校門口。
+  - `sq_`：Sqoyaw 手繪場景（`sq_bus` 村子中心、`sq_classmates` 同學巷、`sq_animals` 動物之家），發布在 `assets/rooms/sq/`。
   - 沒有前綴的 `landscape_*`／`portrait_*`：老師房。
 - 每個場景都分 `landscape`（橫式）和 `portrait`（直式）兩套：`<前綴><sk>_bg.webp` 是背景，`<前綴><sk>_o_<id>.webp` 是遮擋物（會擋在人物前面的家具）。
 - `room.json[場景][sk]` 的欄位：

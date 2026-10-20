@@ -4201,7 +4201,7 @@ function visitEnter(seat,nm,o){const home=Object.assign({wall:'cream',floor:'woo
   fadeTo(()=>{INDOOR=true;HOME_IN=true;ST_IN=false;homeSpawn(true);try{applyHome();}catch(e){}if(TROOM&&TROOM.home&&r2Ok())hrEnter(false);
     if(PETOBJ){PETOBJ.g.position.set(HX+PETBED.x,0,HZ+PETBED.z);PETOBJ.by=0;}$('homeBar').hidden=true;curArea=null;areaCool=0;SND.chime&&SND.chime();
     setTimeout(()=>say(`${nm}的房間`,[`這是 ${seat} 號${nm}佈置的房間。`,'看完了，從房門走出去就會回到他家門口。'],{noWave:1}),600);});}
-function visitLeave(){const b=VISIT&&VISIT.back;fadeTo(()=>{VISIT=null;r2Off();INDOOR=false;HOME_IN=false;HOME.from=null;$('homeBar').hidden=true;try{applyHome();}catch(e){}
+function visitLeave(){const b=VISIT&&VISIT.back;if(SQ2D&&SQ_BACK&&VISIT&&String(VISIT.seat)===SQ_BACK.seat&&Date.now()-SQ_BACK.t<36e5){const k=SQ_BACK.key;SQ_BACK=null;VISIT=null;HOME_IN=false;HOME.from=null;try{applyHome();}catch(e){}r2Off();sqEnter('sq_classmates',k);return;}fadeTo(()=>{VISIT=null;r2Off();INDOOR=false;HOME_IN=false;HOME.from=null;$('homeBar').hidden=true;try{applyHome();}catch(e){}
   if(b)warpTown(b.x,b.z,b.yaw+PI);if(PETOBJ){PETOBJ.g.position.set(P.pos.x+1,P.pos.y,P.pos.z+.6);PETOBJ.by=P.pos.y;}});}
 // classmates' notes on a door board: shiomi/msg-<seat> {d: JSON list of {id,from,name,text,t}}
 const msgId=seat=>'/msg-'+String(seat).replace(/[^0-9A-Za-z-]/g,'');
@@ -4345,11 +4345,11 @@ if(TROOM&&TROOM.gate)['landscape','portrait'].forEach(sk=>{const D=TROOM.gate[sk
     ['往操場',E.to_field.center[0],E.to_field.center[1],R2BB(E.to_field.polygon),'沿著跑道走到操場',()=>{gateOff();fieldEnter('gate');}]]};});
 function gateOff(){GATE_IN=false;}
 function gateEnter(from){if(!TROOM||!TROOM.gate||!R2.img.sgate_landscape_bg||!spr2d()){fieldEnter();return;}hurry(/rooms\/sgate\//);
-  fadeTo(()=>{GATE_IN=true;FIELD_IN=false;INDOOR=true;P.sit=null;P.pos.set(TB.x-48,tribeH(-48,26),26);P.vel.set(0,0,0);curArea=null;areaCool=0;R2.act=null;R2.rest=null;if(S2.on)s2Off();
+  fadeTo(()=>{GATE_IN=true;FIELD_IN=false;SQ_IN=false;INDOOR=true;P.sit=null;P.pos.set(TB.x-48,tribeH(-48,26),26);P.vel.set(0,0,0);curArea=null;areaCool=0;R2.act=null;R2.rest=null;if(S2.on)s2Off();
     R2.on=true;R2.room='gate';R2.sk=r2Scene();const D=TROOM.gate[R2.sk],e=D.exits[from==='field'?'to_field':'to_map'];[R2.x,R2.y]=r2Near(e.spawn[0],e.spawn[1]);R2.vx=R2.vy=0;
     R2.view=e.facing==='right'?1:e.facing==='back'?2:0;R2.flip=1;R2.tgt=R2.pend=null;R2.cx=R2.cy=null;R2.exitArm=false;
     const Q=R2.pet;[Q.x,Q.y]=r2Near(R2.x+r2H(R2.y)*.4,R2.y+4);Q.idle=0;Q.mv=false;Q.flip=-1;R2.cv.hidden=false;toast('🏫 平等國小・校門口');});}
-function gateLeave(){fadeTo(()=>{r2Off();GATE_IN=false;INDOOR=false;warpTown(TB.x-42.6,TB.z+24.8,-PI/2);});}
+function gateLeave(){if(SQ2D&&sqHas('sq_bus')){GATE_IN=false;sqEnter('sq_bus','to_gate');return;}fadeTo(()=>{r2Off();GATE_IN=false;INDOOR=false;warpTown(TB.x-42.6,TB.z+24.8,-PI/2);});}
 let FIELD_IN=false,CLS_FROM=null;R2CFG.field={};
 // 平等國小操場 (field-v1 pack): exits are walked into — right track -> 校門口, white door -> 五年級教室, left track -> 3D 單槓草地 (painted lawn not drawn yet)
 if(TROOM&&TROOM.field)['landscape','portrait'].forEach(sk=>{const D=TROOM.field[sk],A=D.acc,T_=D.tgt||{},H=D.hh[3],E=D.exits;
@@ -4373,6 +4373,76 @@ function fieldEnter(from){if(!TROOM||!TROOM.field||!R2.img.sfield_landscape_bg||
     [R2.x,R2.y]=r2Near(sp[0],sp[1]);R2.vx=R2.vy=0;R2.view=e?(e.facing==='left'||e.facing==='right'?1:e.facing==='back'?2:0):2;R2.flip=e&&e.facing==='left'?-1:1;R2.tgt=R2.pend=null;R2.cx=R2.cy=null;R2.exitArm=false;
     const Q=R2.pet;[Q.x,Q.y]=r2Near(R2.x+r2H(R2.y)*.4,R2.y+4);Q.idle=0;Q.mv=false;Q.flip=-1;R2.cv.hidden=false;toast('🏫 平等國小・操場');});}
 function fieldLeave(){if(TROOM&&TROOM.gate){FIELD_IN=false;gateEnter('field');return;}fadeTo(()=>{r2Off();FIELD_IN=false;INDOOR=false;warpTown(TB.x-46.4,TB.z+24.8,PI/2);});}
+
+/* ===== Sqoyaw 手繪場景（網址加 ?sq2d=1 才會用；預設維持 3D Sqoyaw） */
+// 第一批：村子中心 sq_bus、同學巷 sq_classmates、動物之家 sq_animals（素材在私人 repo sqoyaw/batch1，sqoyaw_build.py 轉檔）。
+// Exits are walked into (like the school gate / field); doors and everything else use the interact key.
+// Exits to scenes that are not drawn yet say 「尚未開放」 and put you back on the path.
+const SQ2D=(()=>{try{return new URLSearchParams(location.search).get('sq2d')==='1';}catch(e){return false;}})();
+var SQ_IN=false;
+const SQ_NAME={sq_bus:'村子中心・公車站',sq_classmates:'同學巷',sq_animals:'動物之家',sq_orchard:'甜柿果園',sq_street:'台7甲街上',sq_church:'教會・泰雅文物館',sq_lane2:'環山二巷',sq_market:'幼兒園・水果賣場',sq_trail:'獵人步道登山口'};
+const SQ_3D={sq_bus:'bus',sq_classmates:'houses',sq_animals:'animals'};   // where the (hidden) 3D player stands, so place names and saves stay right
+// 動物之家：pen -> existing feature. 狼犬、咖啡色貴賓 are the adoptable dogs; 石虎、黑豹、黑熊 the care animals.
+const SQ_PEN={pen_1:{sid:'ani_leopardcat',nm:'石虎',care:'lc',h:.30},pen_2:{sid:'ani_blackleopard',nm:'黑豹',care:'bl',h:.55},pen_3:{sid:'ani_shepherd',nm:'狼犬',dog:'shepherd',h:.52},
+  pen_4:{sid:'ani_poodle',nm:'咖啡色貴賓',dog:'poodle',h:.32},pen_5:{sid:'ani_blackbear',nm:'台灣黑熊',care:'bb',h:.78}};
+function sqHas(room){return !!(TROOM&&TROOM[room]&&R2CFG[room]&&R2CFG[room].landscape);}
+function sqTruck(){const two=[{label:'🏠 我家門口',fn:()=>sqEnter('sq_classmates',tbMySeat()?'door:home_'+tbMySeat():'to_bus')},{label:'🏫 平等國小',fn:()=>gateEnter('map')},
+  {label:'🐾 動物之家',fn:()=>sqEnter('sq_animals','to_classmates')},{label:'🚌 公車站',fn:()=>sqEnter('sq_bus','acc:bus_stop')}];
+  const soon=['🍊 甜柿果園','🌉 四季蘭溪吊橋','🏪 7-11'].map(l=>({label:l+'（尚未開放）',fn:()=>toast('這裡的手繪畫面還在畫，尚未開放')}));
+  choose('蹦蹦車','噗噗噗～要載你去哪裡？',[...two,...soon,{label:'不用了',fn:null}]);}
+function sqBus(){choose('環山公車站','要搭車去哪裡呢？',[{label:'🚉 平等車站',fn:()=>trainRide('平等',()=>enterStation({now:true}),'🚌')},{label:'🌊 汐見町（去闖關）',fn:()=>trainRide('汐見町',()=>arriveShiomi(),'🚌')},{label:'📍 看地標打卡卡',fn:()=>sqCard()},{label:'再逛一下',fn:null}]);}
+function sqDoor(n){const seat=n;if(seat===tbMySeat()&&!TS()){HOME.from='tribe';enterHome();return;}SQ_BACK={seat:String(n),t:Date.now(),room:'sq_classmates',key:'door:home_'+n};doorKnock(seat);}
+let SQ_BACK=null;
+function sqMail(){const me=tbMySeat();choose('同學巷的信箱','要看誰的留言板？',[...(me&&!TS()?[{label:'📮 我家門口的留言板',fn:()=>openHomeBoard()}]:[]),
+  ...[1,2,3,4,5].filter(k=>k!==me||TS()).map(k=>({label:`${k} 號的留言板`,fn:()=>TS()?teacherHomeBoard(String(k)):classBoard(k)})),{label:'算了',fn:null}]);}
+function sqPen(k){const P_=SQ_PEN[k];if(!P_)return;if(P_.care){acCare(P_.care);return;}
+  const d=AC_DOGS.find(d=>d.coat===P_.dog);if(!d||!W.seat)return;
+  if(W.pet){say('保育員 小岑',[`這隻${d.name}在等新家。`,`你已經有${W.pet.name}了，好好照顧一隻寵物最重要。`],{noWave:1});return;}
+  acView('dog');choose('動物之家',`這隻${d.name}（${d.desc}）在等新家。領養前，我們會先問你幾個問題。`,[{label:`🐕 我想領養${d.name}`,fn:()=>acAdoptQuiz(d,shuffle(AC_ADOPT.slice()).slice(0,3),0)},{label:'再想想',fn:()=>{}}]);}
+function sqBuildCfg(){if(!TROOM)return;Object.keys(TROOM).filter(k=>/^sq_/.test(k)).forEach(room=>{R2CFG[room]={};['landscape','portrait'].forEach(sk=>{const D=TROOM[room][sk];if(!D)return;
+  const A=D.acc,T_=D.tgt||{},H=D.hh[3],ob=id=>(D.occ.find(o=>o.id===id)||{}).b,around=(p,w=.55,h=.8)=>[p[0]-H*w/2,p[1]-H*h,H*w,H*h],tg=k=>around(T_[k]||A[k]);
+  const sp=[],add=(k,label,fn,box)=>{if(A[k])sp.push([typeof label==='function'?k:label,A[k][0],A[k][1],box||ob(k)||tg(k),label,fn]);};
+  if(room==='sq_bus'){add('bus_stop','搭公車',sqBus);add('bench','坐在候車長椅上',()=>say(null,['你在候車長椅坐下，看著對面的紫色壁畫。','公車還沒來，風從山上吹下來，涼涼的。'],{noWave:1}));
+    add('truck','坐蹦蹦車',sqTruck);add('notice_board','看公告欄',()=>openBoard('news'));}
+  if(room==='sq_classmates'){[1,2,3,4,5].forEach(n=>add('door_'+n,()=>(n===tbMySeat()&&!TS())?'走進我家（我的房間）':`走進 ${n} 號的家`,()=>sqDoor(n),tg('door_'+n)));add('mailbox','看信箱・留言板',sqMail);}
+  if(room==='sq_animals'){add('care_desk','動物之家・照護站',()=>acMenu());Object.keys(SQ_PEN).forEach(k=>{const P_=SQ_PEN[k];add(k,P_.care?`照顧${P_.nm}`:`看看${P_.nm}`,()=>sqPen(k));});}
+  Object.keys(D.exits||{}).forEach(k=>{const e=D.exits[k];sp.push(['往'+(SQ_NAME[e.to]||(e.to==='gate'?'平等國小':e.to)),e.center[0],e.center[1],R2BB(e.polygon),'往'+(SQ_NAME[e.to]||(e.to==='gate'?'平等國小':e.to)),()=>sqExit(k)]);});
+  R2CFG[room][sk]={hA:D.hh,ss:D.ss,zoom:1.0,bgkey:D.bgkey,spots:sp};});});}
+sqBuildCfg();
+// where to stand when arriving: 'to_xxx' = that exit's spawn, 'door:home_n' = in front of that door, 'acc:k' = that spot
+function sqSpawn(D,key){if(Array.isArray(key))return {p:key,f:'front'};const [t,k]=key&&key.includes(':')?key.split(':'):['exit',key];
+  if(t==='door'&&D.doors[k])return {p:D.doors[k].spawn,f:D.doors[k].facing};if(t==='acc'&&D.acc[k])return {p:[D.acc[k][0],D.acc[k][1]+12],f:'front'};
+  const e=D.exits[k]||Object.values(D.exits)[0];return {p:e.spawn,f:e.facing};}
+function sqEnter(room,key,o={}){if(!sqHas(room)||!spr2d()){toast('這裡的手繪畫面還在準備中');return false;}hurry(new RegExp('rooms/sq/'+room+'_'));
+  const go=()=>{SQ_IN=true;GATE_IN=FIELD_IN=CLS_IN=MART_IN=false;INDOOR=true;HOME_IN=false;$('homeBar').hidden=true;P.sit=null;const t=TB.spots[SQ_3D[room]]||TB.spots.bus;P.pos.set(TB.x+t[0],tribeH(t[0],t[1]),TB.z+t[1]);P.vel.set(0,0,0);
+    curArea=null;areaCool=0;R2.act=null;R2.rest=null;if(S2.on)s2Off();R2.on=true;R2.room=room;R2.sk=r2Scene();const D=TROOM[room][R2.sk],S_=sqSpawn(D,key);
+    [R2.x,R2.y]=r2Near(S_.p[0],S_.p[1]);R2.vx=R2.vy=0;R2.view=S_.f==='left'||S_.f==='right'?1:S_.f==='back'?2:0;R2.flip=S_.f==='left'?-1:1;R2.tgt=R2.pend=null;R2.cx=R2.cy=null;R2.exitArm=false;
+    const Q=R2.pet;[Q.x,Q.y]=r2Near(R2.x+r2H(R2.y,R2.x)*.4,R2.y+4);Q.idle=0;Q.mv=false;Q.flip=-1;R2.cv.hidden=false;toast('📍 Sqoyaw・'+(SQ_NAME[room]||room));};
+  if(o.now)go();else fadeTo(go);return true;}
+function sqExit(k){const D=r2D(),e=D&&D.exits[k];if(!e)return;R2.tgt=R2.pend=null;
+  if(e.to==='gate'){SQ_IN=false;gateEnter('map');return;}
+  if(sqHas(e.to)){const back=Object.keys(TROOM[e.to].landscape.exits).find(b=>TROOM[e.to].landscape.exits[b].to===R2.room);sqEnter(e.to,back);return;}
+  toast(`往${SQ_NAME[e.to]||'那裡'}的路：手繪畫面還在畫，尚未開放`);[R2.x,R2.y]=r2Near(e.spawn[0],e.spawn[1]);R2.exitArm=false;}
+// arriving in Sqoyaw (train, bus, truck, leaving home) while ?sq2d=1 is on
+function sq2dArrive(at){if(!SQ2D||!sqHas('sq_bus'))return false;const me=tbMySeat();
+  if(at==null||at==='bus'||at==='station')return sqEnter('sq_bus','acc:bus_stop',{now:true});
+  if(at==='home')return sqEnter('sq_classmates',me?'door:home_'+me:'to_bus',{now:true});
+  if(at==='houses')return sqEnter('sq_classmates','to_bus',{now:true});
+  if(at==='animals')return sqEnter('sq_animals','to_classmates',{now:true});
+  if(at==='school'){gateEnter('map');return true;}
+  return false;}
+// animals in the pens (drawn between the fences, so the wire mesh and fronts cover them), and the blank signs get their words
+const SQ_ANI={};
+function sqAnimals(g,L){if(R2.room!=='sq_animals')return;const D=r2D();Object.keys(SQ_PEN).forEach(k=>{const P_=SQ_PEN[k],at=D.animal_spots&&D.animal_spots[k],M=SPRITES[P_.sid];if(!at||!M)return;
+  if(P_.dog&&W.pet&&W.pet.kind==='dog'&&W.pet.coat===P_.dog)return;   // adopted: it lives with you now
+  let o=SQ_ANI[P_.sid];if(!o){o=SQ_ANI[P_.sid]={img:null};loadImg(M.src).then(im=>o.img=im).catch(()=>{});}const im=chImg(o.img);if(!im)return;
+  L.push([at[1],()=>{const A_=M.act||{},seq=['front_sit','front_sit','alert','front_sit','eat','front_sit','groom','lie'].filter(a=>A_[a]!=null),f=seq.length?A_[seq[Math.floor((R2.t/2.2+at[0]*.01)%seq.length)]]:0;
+    const H=r2H(at[1],at[0])*P_.h,dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch,[sx,sy]=fxy(M,f);g.save();g.translate(at[0],at[1]);chShadow(g,dw*.26,dw*.06,.22);
+    g.scale(at[0]>D.w/2?-1:1,1);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+(M.foot!=null?M.foot:4)/M.ch*dh,dw,dh);g.restore();}]);});}
+function sqSigns(g){const D=r2D(),S_=D&&D.signs;if(!S_)return;const txt=k=>R2.room==='sq_classmates'&&/^home_\d$/.test(k)?k.slice(5)+'號':R2.room==='sq_animals'&&SQ_PEN[k]?SQ_PEN[k].nm:k==='care_desk'?'動物之家':k==='bus_stop'?'環山':null;
+  Object.keys(S_).forEach(k=>{const t=txt(k);if(!t)return;const q=S_[k],xs=q.map(p=>p[0]),ys=q.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),w=x1-x0,h=y1-y0;
+    const vert=h>w*1.6,fs=Math.max(7,Math.min(vert?w*.8:h*.62,(vert?h/t.length:w/t.length)*.9));g.save();g.fillStyle='rgba(60,45,30,.85)';g.font=`700 ${fs}px "Noto Sans TC",sans-serif`;g.textAlign='center';g.textBaseline='middle';
+    if(vert)[...t].forEach((c,i)=>g.fillText(c,(x0+x1)/2,y0+h*(i+.5)/t.length));else g.fillText(t,(x0+x1)/2,(y0+y1)/2);g.restore();});}
 // the little blank name plate above the classroom door
 const FSIGN={};
 function fieldSign(g){const D=TROOM.field[R2.sk],r=D&&D.sign;if(!r)return;let c=FSIGN[R2.sk];
@@ -4434,8 +4504,8 @@ function clsLeave(){if(CLS_FROM==='field'&&TROOM&&TROOM.field){CLS_FROM=null;CLS
 const R2INT={};
 function r2Int(key){if(R2INT[key])return R2INT[key];const lb=it=>typeof it.label==='function'?it.label():it.label;
   const it=INT.find(it=>it.pos&&Math.abs(it.pos.x-TCX)<7&&Math.abs(it.pos.z-TCZ)<4.5&&String(lb(it)).includes(key));if(it)R2INT[key]=it;return it;}
-function r2D(sk){return (R2.room==='bath'?TROOM.bath:R2.room==='home'?TROOM.home:R2.room==='class'?TROOM.class:R2.room==='mart'?TROOM.mart:R2.room==='field'?TROOM.field:R2.room==='gate'?TROOM.gate:TROOM)[sk||R2.sk];}
-function r2C(){return R2.room==='class'?R2CFG.class[R2.sk]:R2.room==='mart'?R2CFG.mart[R2.sk]:R2.room==='field'?R2CFG.field[R2.sk]:R2.room==='gate'?R2CFG.gate[R2.sk]:R2.room==='bath'?R2CFG.bath[R2.sk]:R2.room==='home'?hrCfg(R2.sk):R2CFG[R2.sk];}
+function r2D(sk){return (/^sq_/.test(R2.room)?TROOM[R2.room]:R2.room==='bath'?TROOM.bath:R2.room==='home'?TROOM.home:R2.room==='class'?TROOM.class:R2.room==='mart'?TROOM.mart:R2.room==='field'?TROOM.field:R2.room==='gate'?TROOM.gate:TROOM)[sk||R2.sk];}
+function r2C(){return /^sq_/.test(R2.room)?R2CFG[R2.room][R2.sk]:R2.room==='class'?R2CFG.class[R2.sk]:R2.room==='mart'?R2CFG.mart[R2.sk]:R2.room==='field'?R2CFG.field[R2.sk]:R2.room==='gate'?R2CFG.gate[R2.sk]:R2.room==='bath'?R2CFG.bath[R2.sk]:R2.room==='home'?hrCfg(R2.sk):R2CFG[R2.sk];}
 function r2Spots(){const C=r2C();if(!C)return [];const out=[];
   for(const d of C.spots){if(d[5]){if(d[6]&&!d[6]())continue;out.push({def:d,it:null,label:typeof d[4]==='function'?d[4]():d[4],act:d[5]});continue;}const it=r2Int(d[0]);if(!it)continue;if(it.hide&&it.hide())continue;out.push({def:d,it,label:d[4]||(typeof it.label==='function'?it.label():it.label),act:it.act});}
   const dg=cdogSpot();if(dg)out.push(dg);if(R2.room==='home'&&VISIT)return out.filter(s=>/出門|離開/.test(s.def[0]+s.label));return out;}
@@ -4453,7 +4523,8 @@ function avatarSnap(){if(SNAP&&SNAP.look===JSON.stringify(W.look||{}))return SNA
     SNAP={id:'snap',look:JSON.stringify(W.look||{}),ready:true,meta:{cw,ch,n:3,hpx,foot,fw:[],sw:[],bw:[]},mat:{map:{image:cv}}};return SNAP;}catch(e){return null;}}
 function spr2d(){if(SPR.c)return SPR.c.ready&&SPR.c.mat.map&&SPR.c.mat.map.image?SPR.c:null;return avatarSnap();}
 function r2Ok(){return !!(TROOM&&TROOM.landscape&&R2.img.landscape_bg&&spr2d());}
-function r2H(y){const a=r2C().hA;return lerp(a[2],a[3],clamp((y-a[0])/(a[1]-a[0]),0,1));}
+function r2H(y,x){const C=r2C(),a=C.hA;if(C.ss){if(x==null)x=R2.x;let n=0,d=0;for(const [ax,ay,h] of C.ss){const q=(x-ax)*(x-ax)+(y-ay)*(y-ay);if(q<1e-6)return h;const w=1/q;n+=w*h;d+=w;}return n/d;}   // runtime_helpers.js heightAt: 1/d² over the pack's anchors
+  return lerp(a[2],a[3],clamp((y-a[0])/(a[1]-a[0]),0,1));}
 function r2Scene(){return innerWidth>=innerHeight?'landscape':'portrait';}
 function r2Pip(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const a=p[i],b=p[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c;}return c;}
 function r2Walk(x,y){const W_=r2D().walk;if(!W_.some(w=>r2Pip(x,y,w.outer)&&!w.holes.some(h=>r2Pip(x,y,h))))return false;return R2.room!=='home'||hrFree(x,y);}
@@ -4475,7 +4546,7 @@ function r2Move(dt){let ix=0,iy=0;const free=!DLG.open&&started&&!uiOpen();
   const nx=R2.x+R2.vx*dt,ny=R2.y+R2.vy*dt,ox=R2.x,oy=R2.y;
   if(r2Walk(nx,ny)){R2.x=nx;R2.y=ny;}else if(r2Walk(nx,R2.y)){R2.x=nx;R2.vy*=.5;}else if(r2Walk(R2.x,ny)){R2.y=ny;R2.vx*=.5;}else{R2.vx*=.3;R2.vy*=.3;}
   const moved=Math.hypot(R2.x-ox,R2.y-oy);if(R2.tgt&&moved<spW*dt*.05)R2.stuck=(R2.stuck||0)+dt;else R2.stuck=0;
-  {const D_=r2D();if(D_&&D_.exits&&(R2.room==='gate'||R2.room==='field')){let inside=null;for(const k in D_.exits)if(r2Pip(R2.x,R2.y,D_.exits[k].polygon))inside=k;if(!inside)R2.exitArm=true;else if(R2.exitArm&&moved>0){R2.exitArm=false;R2.tgt=R2.pend=null;if(R2.room==='field'){if(inside==='to_gate')fieldLeave();else if(inside==='classroom_door'){CLS_FROM='field';clsEnter();}else if(inside==='to_lawn')fieldLawn();}else if(inside==='to_map')gateLeave();else{gateOff();fieldEnter('gate');}}}}
+  {const D_=r2D();if(D_&&D_.exits&&(R2.room==='gate'||R2.room==='field'||/^sq_/.test(R2.room))){let inside=null;for(const k in D_.exits)if(r2Pip(R2.x,R2.y,D_.exits[k].polygon))inside=k;if(!inside)R2.exitArm=true;else if(R2.exitArm&&moved>0){R2.exitArm=false;R2.tgt=R2.pend=null;if(/^sq_/.test(R2.room))sqExit(inside);else if(R2.room==='field'){if(inside==='to_gate')fieldLeave();else if(inside==='classroom_door'){CLS_FROM='field';clsEnter();}else if(inside==='to_lawn')fieldLawn();}else if(inside==='to_map')gateLeave();else{gateOff();fieldEnter('gate');}}}}
   const spd=moved/Math.max(dt,1e-4);R2.spd=spd/spW;P.moving=R2.spd*3.9;
   if(spd>spW*.12){const ax=Math.abs(R2.vx),ay=Math.abs(R2.vy)/.78;
     if(R2.view===1?ax>ay*.6:ax>ay*1.25){R2.view=1;R2.flip=R2.vx<0?-1:1;}else R2.view=R2.vy<0?2:0;}
@@ -4651,13 +4722,13 @@ function r2ActDraw(g,E=R2){const A=E.act;if(!A||!A.im)return false;const M=A.M,f
 // walking input ends a room action (after a short moment, so the tap that started it doesn't end it)
 function r2ActInput(dt,E){r2ActTick(dt,E);const any=keys.w||keys.a||keys.s||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright||Math.hypot(STK.x,STK.y)>.3;
   if(E.act&&any&&!DLG.open&&!uiOpen()&&E.act.el>.5)r2ActStop(E);P.moving=0;}
-function r2Human(g){if(R2.act&&r2ActDraw(g))return;const c=spr2d();if(!c)return;const M=c.meta,im=chImg(c.mat.map.image);const H=r2H(R2.y),dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;const v=R2.view,moving=R2.spd>.15;
+function r2Human(g){if(R2.act&&r2ActDraw(g))return;const c=spr2d();if(!c)return;const M=c.meta,im=chImg(c.mat.map.image);const H=r2H(R2.y,R2.x),dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;const v=R2.view,moving=R2.spd>.15;
   const list=v===0?M.fw:v===1?M.sw:M.bw;let f=v;if(moving&&list&&list.length===4){f=list[Math.floor(((R2.ph*1.3/(PI*2))%1+1)%1*4)];}
   const br=moving?1:1+Math.sin(R2.t*2.2)*.008;
   g.save();g.translate(R2.x,R2.y);chShadow(g,dw*.26,dw*.07,.28);
   g.scale(v===1?R2.flip:1,br);const [sx,sy]=fxy(M,f);g.drawImage(im,sx,sy,M.cw,M.ch,-dw/2,-dh+(M.foot!=null?M.foot:3)/M.ch*dh,dw,dh);g.restore();}
 function r2Pet(g){const o=PETOBJ;if(!o||!o.spr||!o.spr.ready||!o.spr.mat.map)return;const c=o.spr,M=c.meta,A_=M.act||{},im=chImg(c.mat.map.image),Q=R2.pet;
-  const H=r2H(Q.y)*.42,dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;let f=0,flip=1,rz=0;
+  const H=r2H(Q.y,Q.x)*.42,dh=H*M.ch/M.hpx,dw=dh*M.cw/M.ch;let f=0,flip=1,rz=0;
   const dtp=o._r2t!=null?Math.min(.1,Math.max(0,R2.t-o._r2t)):0;o._r2t=R2.t;
   if(o.anim&&o.anim.type==='seq'&&M.anims&&M.anims[o.anim.name]){o.anim.t+=dtp;const S_=M.anims[o.anim.name];if(o.anim.t>o.anim.dur){o.anim=null;}else{let t=o.anim.t,i=0;while(i<S_.f.length-1&&t>S_.d[i]){t-=S_.d[i];i++;}f=S_.f[i];}}
   else if(o.trick||o.anim){f=c.frame;rz=c.pivot.rotation.z;flip=Math.sign(c.m.scale.x)||1;}
@@ -4700,12 +4771,12 @@ function r2Draw(dt){R2.t+=dt;cdogTick(dt);const cv=R2.cv,g=R2.g;const dpr=Math.m
   R2.view_={s:s/dpr,ox:R2.cx,oy:R2.cy};
   g.setTransform(1,0,0,1,0,0);g.fillStyle='#2a1a10';g.fillRect(0,0,cw,ch);g.setTransform(s,0,0,s,-R2.cx*s,-R2.cy*s);g.imageSmoothingQuality='medium';
   const bg=R2.img[C.bgkey||((BATH?'bath_':HOMER?'home_':CLS?'class_':R2.room==='mart'?'mart_':'')+R2.sk+'_bg')];if(bg&&bg.complete)g.drawImage(bg,0,0,Wi,Hi);
-  if(HOMER)hrBack(g,C);else if(R2.room==='mart')martSign(g,'sign_counter');else if(R2.room==='field')fieldSign(g);else if(!BATH&&!CLS&&R2.room!=='field'&&R2.room!=='gate')r2Slots(g);
+  if(HOMER)hrBack(g,C);else if(R2.room==='mart')martSign(g,'sign_counter');else if(R2.room==='field')fieldSign(g);else if(/^sq_/.test(R2.room))sqSigns(g);else if(!BATH&&!CLS&&R2.room!=='field'&&R2.room!=='gate')r2Slots(g);
   const L=[];if(HOMER)hrItems(g,L);if(R2.room==='mart')L.push([MCLERK.pos[R2.sk][1],()=>martClerk(g)]);const RS=R2.rest&&R2.room==='cabin'&&TROOM.rest?TROOM.rest[R2.sk]:null;if(RS){const ob=C.occ.find(o=>o.id==='bed');L.push([(ob?r2Sort(ob,R2.x):R2.y)+.5,()=>r2RestDraw(g,RS)]);}const HRS=R2.rest&&R2.room==='home';if(HRS){const sb=(C.occ.find(o=>o.id==='bed_end')||{sort:R2.y}).sort;L.push([sb+.5,()=>hrRestDraw(g)]);}
   C.occ.forEach(o=>{const im0=R2.img[o.file];const side=(R2.room==='home'||R2.room==='cabin')&&!(RS&&o.id==='bed')&&!o.line&&im0&&im0.width&&(R2.x<o.x+im0.width*.12||R2.x>o.x+im0.width*.88);L.push([side?-1e9:r2Sort(o,R2.x),()=>{const im=R2.img[o.file];if(im&&im.complete)g.drawImage(im,o.x,o.y);const ow=C.own&&C.own[o.id];if(ow)ow.forEach(k=>r2SlotOwned(g,k));}]);});
-  if(R2.room==='cabin'&&CDOG.img&&!CDOG.hide)L.push([CDOG.y,()=>cdogDraw(g)]);if(!RS&&!HRS)L.push([R2.act&&R2.act.over!=null?R2.act.over:R2.y,()=>r2Human(g)]);if(PETOBJ)L.push([R2.pet.y,()=>r2Pet(g)]);L.sort((a,b)=>a[0]-b[0]).forEach(e=>e[1]());
-  const nt=(R2.room==='mart'||R2.room==='gate'||R2.room==='field')?0:(S.night||0);if(nt>.02){g.save();g.globalCompositeOperation='multiply';g.fillStyle=`rgba(120,110,170,${nt*.35})`;g.fillRect(0,0,Wi,Hi);g.restore();}
-  const n=R2.near;if(n&&!/離開小屋|回到小屋|出門|離開教室|離開便利商店|離開操場|離開學校|往操場/.test(n.def[0])&&!DLG.open){const h=n.def[3],mx=h[0]+h[2]/2,my=Math.max(R2.cy+30,h[1]-8)+Math.sin(R2.t*4)*6,sz=r2H(R2.y)*.07;
+  sqAnimals(g,L);if(R2.room==='cabin'&&CDOG.img&&!CDOG.hide)L.push([CDOG.y,()=>cdogDraw(g)]);if(!RS&&!HRS)L.push([R2.act&&R2.act.over!=null?R2.act.over:R2.y,()=>r2Human(g)]);if(PETOBJ)L.push([R2.pet.y,()=>r2Pet(g)]);L.sort((a,b)=>a[0]-b[0]).forEach(e=>e[1]());
+  const nt=(R2.room==='mart'||R2.room==='gate'||R2.room==='field'||/^sq_/.test(R2.room))?0:(S.night||0);if(nt>.02){g.save();g.globalCompositeOperation='multiply';g.fillStyle=`rgba(120,110,170,${nt*.35})`;g.fillRect(0,0,Wi,Hi);g.restore();}
+  const n=R2.near;if(n&&!/離開小屋|回到小屋|出門|離開教室|離開便利商店|離開操場|離開學校|往操場|^往/.test(n.def[0])&&!DLG.open){const h=n.def[3],mx=h[0]+h[2]/2,my=Math.max(R2.cy+30,h[1]-8)+Math.sin(R2.t*4)*6,sz=r2H(R2.y)*.07;
     g.save();g.fillStyle='#fff';g.strokeStyle='rgba(60,30,10,.6)';g.lineWidth=sz*.18;g.beginPath();g.moveTo(mx-sz,my-sz*1.3);g.lineTo(mx+sz,my-sz*1.3);g.lineTo(mx,my);g.closePath();g.stroke();g.fill();g.restore();}}
 
 /* ================================================================
@@ -4927,7 +4998,7 @@ const SHOTS=[
 /* ---------- run / end ---------- */
 function playOpening(opts={}){try{cutBuild();}catch(e){console.error(e);showStory(()=>{});return;}
   CUT.replay=!!opts.replay;CUT.T=0;CUT.shot=-1;CUT.sub='';CUT.ended=false;CUT.flash=0;CUT.shake=0;CUT.black=1;CUT.fx.th1=CUT.fx.th2=CUT.fx.crash=CUT.fx.dead=CUT.fx.growl=CUT.fx.knock=CUT.fx.tkS=CUT.fx.flipS=CUT.fx.meow2=0;for(let i=0;i<5;i++)CUT.fx['l'+i]=0;
-  if(CLS_IN||FIELD_IN||MART_IN||GATE_IN){CLS_IN=FIELD_IN=MART_IN=GATE_IN=false;INDOOR=false;r2Off();}
+  if(CLS_IN||FIELD_IN||MART_IN||GATE_IN||SQ_IN){CLS_IN=FIELD_IN=MART_IN=GATE_IN=SQ_IN=false;INDOOR=false;r2Off();}
   CUT.snap={f:{INDOOR,HOME_IN,CH_IN,TC_IN,ST_IN,MZ_IN,ISL_IN,CY_IN},p:P.pos.clone(),yaw:P.yaw,cy:cam.yaw,cp:cam.pitch,tod:todIdx,r2:R2.on,s2:S2.on,pet:PETOBJ?PETOBJ.g.visible:null};
   CUT.save.lampE=COAST.lampMat.emissive.clone();CUT.save.train={x:TRAIN.x,state:TRAIN.state,v:TRAIN.v,dir:TRAIN.dir,stopT:TRAIN.stopT,wait:TRAIN.wait};
   if(R2.on)r2Off();if(S2.on)s2Off();if(DLG.open)closeDlg();closeCabin&&closeCabin();CH_IN=TC_IN=MZ_IN=ISL_IN=CY_IN=false;
@@ -5574,7 +5645,7 @@ function s2Draw(dt){S2.t+=dt;const cv=S2.cv,g=S2.g;const dpr=Math.min(1.5,device
    ================================================================ */
 function warpTown(x,z,yaw,y){const gy=y!=null?y:groundH(x,z);P.sit=null;P.pos.set(x,gy,z);P.vel.set(0,0,0);P.yaw=yaw;cam.yaw=yaw+PI;cam.pitch=.22;
   cam.pos.set(x-Math.sin(yaw)*5,gy+3,z-Math.cos(yaw)*5);cam.look.set(x,gy+1.4,z);curArea=null;areaCoolReset();if(PETOBJ){PETOBJ.g.position.set(x+1,gy,z+.6);PETOBJ.by=gy;}}
-function portalReset(){VISIT=null;if(CLS_IN||FIELD_IN||MART_IN||GATE_IN){CLS_IN=FIELD_IN=MART_IN=GATE_IN=false;INDOOR=false;}if(DLG.open)closeDlg();closeShop();closeBag();try{closeCabin();}catch(e){}try{closeDecor();}catch(e){}r2Off();s2Off();
+function portalReset(){VISIT=null;if(CLS_IN||FIELD_IN||MART_IN||GATE_IN||SQ_IN){CLS_IN=FIELD_IN=MART_IN=GATE_IN=SQ_IN=false;INDOOR=false;}if(DLG.open)closeDlg();closeShop();closeBag();try{closeCabin();}catch(e){}try{closeDecor();}catch(e){}r2Off();s2Off();
   if(MZ_IN){MZ_IN=false;$('mzMap').hidden=true;LANTERN.intensity=0;sky.visible=true;scene.background=null;}
   CH_IN=ISL_IN=TC_IN=CY_IN=HOME_IN=false;if(ST_IN)leaveStation();INDOOR=false;$('homeBar').hidden=true;P.sit=null;MART.basket=[];if(typeof updateBasket==='function')updateBasket();}
 const PORTAL={
@@ -6607,7 +6678,8 @@ function tbPick(){if(!tbSeason()){say('甜柿果園',['柿子還是綠色的，�
   if(W.fruit.n>=10){say('甜柿果園',['今天已經幫忙採了 10 顆，剩下的留給明天吧！','採下來的甜柿在背包裡，可以吃掉。']);return;}
   W.fruit.n++;addItem('甜柿');W.coins+=2;led(2,'幫忙採甜柿','獎勵');renderPouch();save();SND.pick&&SND.pick();toast(`🍊 採到一顆甜柿！幫忙採收 +2 金幣（今天 ${W.fruit.n}/10）`);}
 function tbRide(to){fadeTo(()=>{arriveTribe(to,true);});if(A.ready){const t=A.ctx.currentTime;for(let i=0;i<10;i++)nburst(t+i*.09,.07,'lowpass',180,.8,.3,A.sfx);}}
-function arriveTribe(at,quiet){if(ST_IN)leaveStation();VISIT=null;if(CLS_IN||FIELD_IN||MART_IN||GATE_IN){CLS_IN=FIELD_IN=MART_IN=GATE_IN=false;r2Off();}INDOOR=false;HOME_IN=false;CH_IN=TC_IN=MZ_IN=ISL_IN=CY_IN=false;$('homeBar').hidden=true;P.sit=null;
+function arriveTribe(at,quiet){if(ST_IN)leaveStation();VISIT=null;if(CLS_IN||FIELD_IN||MART_IN||GATE_IN||SQ_IN){CLS_IN=FIELD_IN=MART_IN=GATE_IN=SQ_IN=false;r2Off();}INDOOR=false;HOME_IN=false;CH_IN=TC_IN=MZ_IN=ISL_IN=CY_IN=false;$('homeBar').hidden=true;P.sit=null;
+  if(sq2dArrive(at))return;
   let [x,z,yaw]=TB.spots.bus;let home=null;
   if(at==='home'){home=TB.houses[tbMySeat()];if(home){x=home.x;z=home.z;yaw=Math.atan2(-home.f[0],-home.f[1])+PI;}else [x,z,yaw]=TB.spots.houses;}
   else if(at&&TB.spots[at])[x,z,yaw]=TB.spots[at];
@@ -6815,7 +6887,7 @@ function updatePlayer(dt){
   if(ACT.on&&ACT.lock){P.vel.set(0,0,0);P.pos.y=groundH(P.pos.x,P.pos.z);pl.g.position.copy(P.pos);pl.g.rotation.y=P.yaw;P.moving=0;return;}
   if(ACT.on&&!P.sit&&(Math.hypot(STK.x,STK.y)>.2||keys.w||keys.a||keys.s||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright))actStop();
   // 2D rooms walk in real time even when a slow tablet (or pictures still loading) drops frames: catch up in small steps
-  if(R2.on){if(!TC_IN&&!HOME_IN&&!CLS_IN&&!MART_IN&&!FIELD_IN&&!GATE_IN)r2Off();else{for(let t=Math.max(dt,FRAME_RAW);t>1e-4;t-=.05)r2Move(Math.min(.05,t));return;}}
+  if(R2.on){if(!TC_IN&&!HOME_IN&&!CLS_IN&&!MART_IN&&!FIELD_IN&&!GATE_IN&&!SQ_IN)r2Off();else{for(let t=Math.max(dt,FRAME_RAW);t>1e-4;t-=.05)r2Move(Math.min(.05,t));return;}}
   if(S2.on){if(!ST_IN||CUTON)s2Off();else{for(let t=Math.max(dt,FRAME_RAW);t>1e-4;t-=.05)s2Move(Math.min(.05,t));return;}}
   if(P.sit&&!DLG.open&&started&&!uiOpen()&&(Math.hypot(STK.x,STK.y)>.35||keys.w||keys.s||keys.arrowup||keys.arrowdown))standUp();
   if(P.sit){P.pos.copy(P.sit.pos);pl.g.position.set(P.pos.x,P.pos.y-.05,P.pos.z);P.yaw=lerpAng(P.yaw,P.sit.face,dt*6);pl.g.rotation.y=P.yaw;pose(pl,0,0,true);return;}

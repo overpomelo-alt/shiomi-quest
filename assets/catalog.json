@@ -1796,6 +1796,444 @@
    "note": ""
   },
   {
+   "file": "assets/rooms/sq/sq_animals_landscape_bg.webp",
+   "group": "rooms/sq",
+   "bytes": 357500,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_care_counter.webp",
+   "group": "rooms/sq",
+   "bytes": 1410,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_care_supplies.webp",
+   "group": "rooms/sq",
+   "bytes": 3272,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_foreground_wall.webp",
+   "group": "rooms/sq",
+   "bytes": 8868,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_left_lamp.webp",
+   "group": "rooms/sq",
+   "bytes": 2628,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_pen_1_front.webp",
+   "group": "rooms/sq",
+   "bytes": 17014,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_pen_1_shelter.webp",
+   "group": "rooms/sq",
+   "bytes": 5062,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_pen_1_side.webp",
+   "group": "rooms/sq",
+   "bytes": 7818,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_pen_2_front.webp",
+   "group": "rooms/sq",
+   "bytes": 12380,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_pen_2_shelter.webp",
+   "group": "rooms/sq",
+   "bytes": 4272,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_pen_3_front.webp",
+   "group": "rooms/sq",
+   "bytes": 28556,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_pen_3_shelter.webp",
+   "group": "rooms/sq",
+   "bytes": 5302,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_pen_4_front.webp",
+   "group": "rooms/sq",
+   "bytes": 22320,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_pen_5_front.webp",
+   "group": "rooms/sq",
+   "bytes": 32712,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_pen_5_side.webp",
+   "group": "rooms/sq",
+   "bytes": 2766,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_right_lamp.webp",
+   "group": "rooms/sq",
+   "bytes": 9374,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_landscape_o_tree_trunk.webp",
+   "group": "rooms/sq",
+   "bytes": 5950,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_bg.webp",
+   "group": "rooms/sq",
+   "bytes": 390730,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_care_counter.webp",
+   "group": "rooms/sq",
+   "bytes": 1322,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_care_supplies.webp",
+   "group": "rooms/sq",
+   "bytes": 3164,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_foreground_wall.webp",
+   "group": "rooms/sq",
+   "bytes": 7240,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_left_lamp.webp",
+   "group": "rooms/sq",
+   "bytes": 4276,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_pen_1_front.webp",
+   "group": "rooms/sq",
+   "bytes": 16288,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_pen_1_shelter.webp",
+   "group": "rooms/sq",
+   "bytes": 5092,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_pen_1_side.webp",
+   "group": "rooms/sq",
+   "bytes": 7120,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_pen_2_front.webp",
+   "group": "rooms/sq",
+   "bytes": 19050,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_pen_2_shelter.webp",
+   "group": "rooms/sq",
+   "bytes": 4582,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_pen_3_front.webp",
+   "group": "rooms/sq",
+   "bytes": 25396,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_pen_3_shelter.webp",
+   "group": "rooms/sq",
+   "bytes": 6080,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_pen_4_front.webp",
+   "group": "rooms/sq",
+   "bytes": 17240,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_pen_5_front.webp",
+   "group": "rooms/sq",
+   "bytes": 21138,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_right_lamp.webp",
+   "group": "rooms/sq",
+   "bytes": 11642,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_animals_portrait_o_tree_trunk.webp",
+   "group": "rooms/sq",
+   "bytes": 5784,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_landscape_bg.webp",
+   "group": "rooms/sq",
+   "bytes": 525864,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_landscape_o_bench.webp",
+   "group": "rooms/sq",
+   "bytes": 2368,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_landscape_o_bus_stop_sign.webp",
+   "group": "rooms/sq",
+   "bytes": 1858,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_landscape_o_lamp_waiting.webp",
+   "group": "rooms/sq",
+   "bytes": 1936,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_landscape_o_notice_board.webp",
+   "group": "rooms/sq",
+   "bytes": 1184,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_landscape_o_platform_front.webp",
+   "group": "rooms/sq",
+   "bytes": 15986,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_landscape_o_platform_seat.webp",
+   "group": "rooms/sq",
+   "bytes": 2140,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_landscape_o_traffic_mirror.webp",
+   "group": "rooms/sq",
+   "bytes": 11458,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_landscape_o_truck.webp",
+   "group": "rooms/sq",
+   "bytes": 2092,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_portrait_bg.webp",
+   "group": "rooms/sq",
+   "bytes": 597760,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_portrait_o_bench.webp",
+   "group": "rooms/sq",
+   "bytes": 2150,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_portrait_o_bus_stop_sign.webp",
+   "group": "rooms/sq",
+   "bytes": 1868,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_portrait_o_lamp_street.webp",
+   "group": "rooms/sq",
+   "bytes": 1472,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_portrait_o_lamp_waiting.webp",
+   "group": "rooms/sq",
+   "bytes": 2022,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_portrait_o_notice_board.webp",
+   "group": "rooms/sq",
+   "bytes": 1090,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_portrait_o_platform_front.webp",
+   "group": "rooms/sq",
+   "bytes": 10670,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_portrait_o_platform_seat.webp",
+   "group": "rooms/sq",
+   "bytes": 1828,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_portrait_o_traffic_mirror.webp",
+   "group": "rooms/sq",
+   "bytes": 9976,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_bus_portrait_o_truck.webp",
+   "group": "rooms/sq",
+   "bytes": 2398,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_landscape_bg.webp",
+   "group": "rooms/sq",
+   "bytes": 296222,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_landscape_o_gas_cylinders.webp",
+   "group": "rooms/sq",
+   "bytes": 2668,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_landscape_o_house_1_edge.webp",
+   "group": "rooms/sq",
+   "bytes": 44708,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_landscape_o_house_3_low_wall.webp",
+   "group": "rooms/sq",
+   "bytes": 3506,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_landscape_o_laundry.webp",
+   "group": "rooms/sq",
+   "bytes": 6096,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_landscape_o_left_retaining_wall.webp",
+   "group": "rooms/sq",
+   "bytes": 9620,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_landscape_o_middle_retaining_wall.webp",
+   "group": "rooms/sq",
+   "bytes": 2704,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_landscape_o_red_chair.webp",
+   "group": "rooms/sq",
+   "bytes": 2184,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_landscape_o_right_lamp.webp",
+   "group": "rooms/sq",
+   "bytes": 9026,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_landscape_o_scooter.webp",
+   "group": "rooms/sq",
+   "bytes": 3152,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_bg.webp",
+   "group": "rooms/sq",
+   "bytes": 342652,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_o_gas_cylinders.webp",
+   "group": "rooms/sq",
+   "bytes": 2060,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_o_house_1_edge.webp",
+   "group": "rooms/sq",
+   "bytes": 33848,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_o_house_3_low_wall.webp",
+   "group": "rooms/sq",
+   "bytes": 1752,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_o_laundry.webp",
+   "group": "rooms/sq",
+   "bytes": 4512,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_o_left_retaining_wall.webp",
+   "group": "rooms/sq",
+   "bytes": 7462,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_o_middle_retaining_wall.webp",
+   "group": "rooms/sq",
+   "bytes": 2206,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_o_notice_board.webp",
+   "group": "rooms/sq",
+   "bytes": 1540,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_o_red_chair.webp",
+   "group": "rooms/sq",
+   "bytes": 2002,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_o_right_lamp.webp",
+   "group": "rooms/sq",
+   "bytes": 9208,
+   "note": ""
+  },
+  {
+   "file": "assets/rooms/sq/sq_classmates_portrait_o_scooter.webp",
+   "group": "rooms/sq",
+   "bytes": 2148,
+   "note": ""
+  },
+  {
    "file": "assets/rooms/station/door_closed.webp",
    "group": "rooms/station",
    "bytes": 20996,
