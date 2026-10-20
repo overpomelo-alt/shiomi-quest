@@ -9,4 +9,4 @@ dev/tests/*.jpg
 dev/tests/*.log
 
 # 原始素材搬到私人 repo overpomelo-alt/shiomi-quest-source（2026-10-20），clone 到這個位置使用，不發布到網站
-assets/source/
+assets/source
