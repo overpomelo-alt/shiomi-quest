@@ -51,6 +51,7 @@
 ## ★ Sqoyaw 手繪第一批（2026-10-20 接入，只在 `?sq2d=1` 才開）
 
 - **預設沒動**：不加 `?sq2d=1` 時，Sqoyaw 還是原本的 3D。程式搜尋 `SQ2D`。使用者還沒說「預設改成手繪」。
+- **給使用者的網址一定要帶 `&teacher`**（例如 `?sq2d=1&teacher`）：她用老師身分登入，沒有 `teacher` 就不會出現「老師登入」按鈕，她會以為遊戲登不進去（2026-10-20 發生過）。所有參數網址都一樣。
 - 三個場景：`sq_bus`（村子中心）、`sq_classmates`（同學巷）、`sq_animals`（動物之家）。原始包在私人 repo `sqoyaw/batch1/`，轉換用 `dev/sqoyaw_build.py`。
 - 程式區塊搜尋「Sqoyaw 手繪場景」：`sqEnter`、`sqExit`、`sq2dArrive`、`sqBuildCfg`、`SQ_PEN`、`sqDoor`、`sqAnimals`、`sqSigns`。
   - 從車站、公車、任意門、出家門到 Sqoyaw → `arriveTribe` 裡的 `sq2dArrive` 會改進手繪場景（沒畫的目的地照舊進 3D）。
