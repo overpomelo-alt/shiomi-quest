@@ -5,6 +5,19 @@
 
 ---
 
+## ⚠️ 2026-10-20 清過 git 歷史：一定要重新下載這個 repo
+
+- 這一天把 `assets/source/`（原始素材）從這個 repo 的**整段歷史**裡清掉了，所有紀錄的編號（commit SHA）都換了。
+- **在這之前下載（clone）的副本都不能再用**：不能從舊副本 commit、push、pull 或 merge。舊副本一推上來，舊歷史和素材就會被帶回公開 repo。
+- 其他對話、別台電腦要接手時，**一律重新 clone**：
+  ```bash
+  git clone https://github.com/overpomelo-alt/shiomi-quest
+  git clone https://github.com/overpomelo-alt/shiomi-quest-source shiomi-quest/assets/source   # 原始素材（私人）
+  ```
+- 不確定手上的副本新不新：執行 `git log --oneline | tail -1`，最舊那一筆的編號如果是 `ab1d3d3`，就是舊副本，丟掉重新下載。
+- 清之前的完整舊歷史：私人 repo `shiomi-quest-source` 的 `backup/public-history-20261020` 分支（不要刪）。
+- 沒發布的修改「學校不切手繪畫面」：私人 repo 的 `patches/`（使用者決定不發布，只是留底）。
+
 ## 0. 開工前必讀：使用者的偏好
 
 - **先討論，再一次做完**：先把這一批要做的事和做法談好，確定後一口氣做完、一次回報。不要做一點回報一點。一批最好 3～5 件，避免其中一件卡住拖累整批。
@@ -80,7 +93,7 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 - 開工時請把私人 repo clone 到 `assets/source/`：`git clone https://github.com/overpomelo-alt/shiomi-quest-source assets/source`（雲端環境要先用 add_repo 加入這個 repo）。
 - `dev/*_build.py` 照舊讀 `../assets/source/...`，不用改。
 - **新素材包、截圖、規格書都 commit 到私人 repo**，不要放進這個 repo。
-- 這個 repo 的 git 歷史裡還留著舊的素材檔（只佔 .git 空間，不會發布到網站）。要不要清歷史由使用者決定。
+- 2026-10-20 已清掉這個 repo 歷史裡的 `assets/source/`（其他 45 筆紀錄都保留，內容不變，只有紀錄編號全部換新）。清之前的完整舊歷史備份在私人 repo 的 `backup/public-history-20261020` 分支。
 
 ---
 
