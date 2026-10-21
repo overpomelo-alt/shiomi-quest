@@ -1,7 +1,7 @@
 /* hosted boot: read the teacher's saved settings (shiomi/config in Firestore) before the game starts.
    Waits at most 3.5 s — without a network the game starts with the settings built into the page. */
-(function(){const KEY='AIzaSyBadU_r4HVpovuYmKh60Fzra1DJjwg80Xs',BASE='https://firestore.googleapis.com/v1/projects/shiomi-quest/databases/(default)/documents/shiomi';
-  let done=false;const run=()=>{if(done)return;done=true;['engine','game'].forEach(id=>{const o=document.getElementById(id);const s=document.createElement('script');s.textContent=o.textContent;document.body.appendChild(s);});};
+(function(){window.__ldStage='boot';const KEY='AIzaSyBadU_r4HVpovuYmKh60Fzra1DJjwg80Xs',BASE='https://firestore.googleapis.com/v1/projects/shiomi-quest/databases/(default)/documents/shiomi';
+  let done=false;const run=()=>{if(done)return;done=true;window.__ldStage='run';['engine','game'].forEach(id=>{const o=document.getElementById(id);const s=document.createElement('script');s.textContent=o.textContent;document.body.appendChild(s);});};
   const T=setTimeout(run,3500);
   const to=(p,ms)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j(new Error('timeout')),ms))]);
   async function auth(){let s=null;try{s=JSON.parse(localStorage.getItem('shiomi-fb')||'null');}catch(e){}

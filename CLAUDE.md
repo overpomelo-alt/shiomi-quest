@@ -153,9 +153,9 @@ node nreal.js TAG night '{}'                            # 用老師設定的天�
 | `markup.html` | HUD、面板、選單的 HTML，由 game.js 注入頁面 |
 | `style.css` | 全部樣式 |
 | `quest.json` | 預設題目和設定。老師在遊戲裡改的版本存在雲端，會覆蓋這份 |
-| `loader.js`、`loader/` | 載入畫面（跑步的小人） |
+| `loader.js`、`loader/` | 載入畫面（跑步的小人）。進度 20 秒沒動會顯示「卡住了：哪一步」和「清除舊檔、重新載入」按鈕（清掉離線快取和 sw，不動存檔）；步驟由 boot.js 的 `window.__ldStage` 標記。使用者回報開不起來時，請她截這個畫面 |
 | `web/boot.js` | 網路版開機：先從 Firestore 讀老師設定，再啟動遊戲 |
-| `web/sw.js` | 離線快取。頁面先試網路，10 秒沒回應才用快取 |
+| `web/sw.js` | 離線快取。頁面先試網路，10 秒沒回應才用快取。手機儲存空間卡住時 3 秒就放棄、直接走網路（`lim`）；更新時只留每張圖最新的一份 |
 | `sprites/` | 角色圖集（webp）、`meta.json`（每格大小、影格表）、`faces.json`（換臉資料）、`resfaces.json` |
 | `troom/` | 所有 **2D 手繪場景**的圖和 `room.json`（可走區域、遮擋物、互動點、遠近身高）。檔名前綴對應場景，見第 4 節 |
 | `sroom/` | 車站大廳 2D 場景、任意門地點圖 |

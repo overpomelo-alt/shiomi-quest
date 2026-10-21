@@ -34,6 +34,22 @@
     raf=requestAnimationFrame(draw);}
   raf=requestAnimationFrame(draw);
   const bar=el.querySelector('.bl-bar i'),msg=el.querySelector('.bl-msg');
+  // watchdog: if loading stops moving for 20 s, say which step it is stuck on and offer a clean reload
+  // (drops the offline copies and the service worker; the student's save is kept)
+  window.__ldErr=window.__ldErr||'';addEventListener('error',e=>{window.__ldErr=(e&&e.message)||'error';});addEventListener('unhandledrejection',e=>{const r=e&&e.reason;window.__ldErr=(r&&r.message)||String(r||'');});
+  let lastW='',lastT=performance.now(),help=null;
+  function stage(){const s=window.__ldStage;const b=document.getElementById('startBtn');
+    if(window.__ldErr&&s==='run')return '遊戲程式出錯：'+String(window.__ldErr).slice(0,120);
+    if(!s)return '網頁還在下載中（網路比較慢，或手機裡留著舊的檔案）';if(s==='boot')return '正在讀老師的設定';if(!b)return '遊戲程式啟動中';return '正在蓋小鎮（'+(b.textContent||'').replace(/[^0-9%]/g,'')+'）';}
+  function showHelp(){if(!help){help=document.createElement('div');help.style.cssText='margin-top:14px;max-width:300px;font-size:13px;line-height:1.6;letter-spacing:.04em;color:#4E3B2B';
+      help.innerHTML='<p class="bl-why" style="margin:0 0 8px"></p><button type="button" style="font:700 15px system-ui,sans-serif;padding:10px 18px;border-radius:999px;border:0;background:#365E50;color:#fff">清除舊檔、重新載入</button><p style="margin:8px 0 0;font-size:11px;opacity:.6" class="bl-ver"></p>';
+      el.querySelector('.bl-mid').appendChild(help);help.querySelector('button').onclick=async function(){this.disabled=true;this.textContent='重新載入中…';
+        try{if(navigator.serviceWorker){const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()));}}catch(e){}
+        try{if(window.caches){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}}catch(e){}
+        try{sessionStorage.removeItem('shiomi_rl');}catch(e){}location.reload();};}
+    help.querySelector('.bl-why').textContent='卡住了：'+stage();help.querySelector('.bl-ver').textContent='版本 '+(window.SHIOMI_BUILD||'?')+(navigator.onLine===false?'・手機沒有連上網路':'');}
+  const dog=setInterval(()=>{if(dead||el.classList.contains('out')){clearInterval(dog);return;}const w=bar.style.width+'|'+(window.__ldStage||'');if(w!==lastW){lastW=w;lastT=performance.now();}
+    if(performance.now()-lastT>20000||(window.__ldErr&&window.__ldStage==='run'&&performance.now()-lastT>4000))showHelp();},1000);
   const poll=setInterval(()=>{const b=document.getElementById('startBtn');if(!b)return;const m=/(\d+)%/.exec(b.textContent||'');if(m)bar.style.width=Math.max(3,+m[1])+'%';
     if(/蓋不起來/.test(b.textContent||'')||!b.disabled){bar.style.width='100%';msg.textContent=b.disabled?'':'小鎮蓋好了！';clearInterval(poll);setTimeout(()=>{el.classList.add('out');setTimeout(()=>{dead=true;cancelAnimationFrame(raf);el.remove();},900);},350);}},150);
 })();
