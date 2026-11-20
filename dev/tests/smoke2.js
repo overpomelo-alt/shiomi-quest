@@ -1,7 +1,7 @@
 const start=require('./base.js');
 (async()=>{const {b,p,W,cl,errs}=await start({seat:'4'});const out={};
  await p.evaluate(()=>{window.__qf().arriveTribe('school',true);});await W(3000);await cl();
- await p.evaluate(()=>{window.__qf().clsEnter();});await W(4000);out.cls=await p.evaluate(()=>window.__qf().CLS());await p.screenshot({path:'s2_cls.png'});
+ await p.evaluate(()=>{window.__qf().clsEnter();});await p.waitForFunction(()=>window.__qf().CLS(),null,{timeout:15000}).catch(()=>{});await W(1000);out.cls=await p.evaluate(()=>window.__qf().CLS());await p.screenshot({path:'s2_cls.png'});
  await p.evaluate(()=>{window.__qf().clsLeave();});await W(3000);out.clsOut=await p.evaluate(()=>window.__qf().CLS());
  await p.evaluate(()=>{window.__qf().arriveTribe('animals',true);});await W(3000);await cl();
  await p.evaluate(()=>{window.__qf().acAdopt();});await W(2500);out.adopt=await p.evaluate(()=>[...document.querySelectorAll('#dialog button')].map(b=>b.textContent.slice(0,12)));await cl();

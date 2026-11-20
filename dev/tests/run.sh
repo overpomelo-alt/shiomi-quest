@@ -12,7 +12,7 @@ PORT=${PORT:-8765}; export PORT
 [ -d node_modules/playwright-core ] || npm i --silent
 python3 mk_test.py >/dev/null
 # 本機伺服器（只在沒開的時候開）
-if ! curl -s -o /dev/null "http://localhost:$PORT/test.html"; then (cd ../dist && python3 -m http.server "$PORT" >/dev/null 2>&1 &); sleep 1; fi
+if ! curl -s -o /dev/null "http://localhost:$PORT/test.html"; then (cd ../dist && setsid nohup python3 -m http.server "$PORT" </dev/null >/dev/null 2>&1 &); sleep 1; fi
 FAIL=0
 run(){ # run <名稱> <指令…>：跑一支，看輸出裡有沒有錯誤
   local name=$1; shift; echo "── $name"; local log="$OUT/${name// /_}.log"
