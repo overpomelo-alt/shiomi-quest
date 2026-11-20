@@ -1,0 +1,8 @@
+{
+  "name": "shiomi-quest",
+  "private": true,
+  "description": "汐見町闖關：只放檢查用的指令。遊戲本身用 dev/build.py 建。",
+  "scripts": {
+    "check": "node scripts/check.mjs"
+  }
+}

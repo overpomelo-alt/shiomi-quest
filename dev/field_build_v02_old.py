@@ -3,6 +3,7 @@
    One landscape painting; portrait phones pan across the same picture. Only the basketball stand can stand in front
    of the player (everything else is behind the walkable ground), so it is the one occluder, cut out by colour."""
 import json, os
+import troomdb  # 場景資料一個場景一個檔（src/troom/rooms/）
 import numpy as np
 from PIL import Image, ImageFilter
 
@@ -42,7 +43,7 @@ D = {'w': W, 'h': H, 'walk': [{'outer': outer, 'holes': holes}],
      'exit': {'polygon': [[600, 968], [930, 968], [940, 1018], [590, 1018]], 'center': [765, 995], 'spawn': [765, 930], 'facing': 'back'},
      'acc': {'classroom': [196, 652], 'hoop': [1010, 760], 'deck': [624, 668], 'board': [1334, 676], 'storeroom': [1222, 672], 'track': [300, 960]},
      'hh': [650, 1018, 78, 236], 'bgkey': 'sfield_landscape_bg', 'own': {}}
-RJ = os.path.join(OUT, 'room.json'); R = json.load(open(RJ))
+R = troomdb.load()
 R['field'] = {'landscape': D, 'portrait': D}
-json.dump(R, open(RJ, 'w'), ensure_ascii=False, separators=(',', ':'))
+troomdb.save(R, only=['field'])
 print('field', W, H, 'hoop occluder', bb)

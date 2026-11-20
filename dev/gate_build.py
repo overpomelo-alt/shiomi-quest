@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """平等國小校門口・魚溜滑梯 (../assets/source/school/school_gate_v1, gate-v1 pack) -> src/troom/sgate_<sk>_*.webp + room.json['gate']"""
 import json, os, glob
+import troomdb  # 場景資料一個場景一個檔（src/troom/rooms/）
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 PK = os.path.join(ROOT, '../assets/source/school/school_gate_v1/shiomi-school-outdoor')
 OUT = os.path.join(ROOT, 'src/troom')
 M = json.load(open(os.path.join(PK, 'manifest.json')))
-RJ = os.path.join(OUT, 'room.json'); R = json.load(open(RJ))
+R = troomdb.load()
 for f in glob.glob(os.path.join(OUT, 'sgate_*.webp')): os.remove(f)
 pt = lambda p: [round(p[0]), round(p[1])]
 R['gate'] = {}
@@ -31,4 +32,4 @@ for sk in ('landscape', 'portrait'):
     D['exit'] = D['exits']['to_map']   # the engine's default door
     R['gate'][sk] = D
     print('gate', sk, len(occ), 'occ', D['hh'], sorted(D['acc']))
-json.dump(R, open(RJ, 'w'), ensure_ascii=False, separators=(',', ':'))
+troomdb.save(R, only=['gate'])

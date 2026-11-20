@@ -4,13 +4,14 @@
    Exits: to_gate (right track) -> 校門口, classroom_door (white door + mat) -> 五年級教室, to_lawn (left track) -> 3D 單槓草地 until the painted lawn arrives.
    (The old temporary field made from the art-pack picture is field_build_v02_old.py.)"""
 import json, os, glob
+import troomdb  # 場景資料一個場景一個檔（src/troom/rooms/）
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 PK = os.path.join(ROOT, '../assets/source/school/school_field_v1/shiomi-school-outdoor')
 OUT = os.path.join(ROOT, 'src/troom')
 M = json.load(open(os.path.join(PK, 'manifest.json')))
-RJ = os.path.join(OUT, 'room.json'); R = json.load(open(RJ))
+R = troomdb.load()
 for f in glob.glob(os.path.join(OUT, 'sfield_*.webp')): os.remove(f)
 pt = lambda p: [round(p[0]), round(p[1])]
 R['field'] = {}
@@ -36,4 +37,4 @@ for sk in ('landscape', 'portrait'):
     D['exit'] = D['exits']['to_gate']   # the engine's default door
     R['field'][sk] = D
     print('field', sk, len(occ), 'occ', D['hh'], sorted(D['acc']), 'spawn', D['spawn'])
-json.dump(R, open(RJ, 'w'), ensure_ascii=False, separators=(',', ':'))
+troomdb.save(R, only=['field'])

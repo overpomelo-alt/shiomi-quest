@@ -1,0 +1,130 @@
+{
+ "landscape": {
+  "heads": {
+   "01": [
+    1434,
+    289,
+    "rest_landscape_head01"
+   ],
+   "02": [
+    1444,
+    300,
+    "rest_landscape_head02"
+   ],
+   "03": [
+    1441,
+    298,
+    "rest_landscape_head03"
+   ],
+   "04": [
+    1441,
+    284,
+    "rest_landscape_head04"
+   ],
+   "05": [
+    1443,
+    293,
+    "rest_landscape_head05"
+   ],
+   "06": [
+    1438,
+    290,
+    "rest_landscape_head06"
+   ]
+  },
+  "pillow_dent": [
+   1396,
+   290,
+   "rest_landscape_pillow_dent"
+  ],
+  "blanket_front": [
+   1370,
+   334,
+   "rest_landscape_blanket_front"
+  ],
+  "hh": 72,
+  "rot": 0,
+  "head": [
+   1484,
+   344
+  ],
+  "body": {
+   "feet": [
+    1316,
+    538
+   ],
+   "hips": [
+    1626,
+    582
+   ],
+   "shoulders": [
+    1484,
+    374
+   ]
+  }
+ },
+ "portrait": {
+  "heads": {
+   "01": [
+    885,
+    635,
+    "rest_portrait_head01"
+   ],
+   "02": [
+    897,
+    649,
+    "rest_portrait_head02"
+   ],
+   "03": [
+    895,
+    646,
+    "rest_portrait_head03"
+   ],
+   "04": [
+    894,
+    631,
+    "rest_portrait_head04"
+   ],
+   "05": [
+    895,
+    640,
+    "rest_portrait_head05"
+   ],
+   "06": [
+    889,
+    638,
+    "rest_portrait_head06"
+   ]
+  },
+  "pillow_dent": [
+   838,
+   636,
+   "rest_portrait_pillow_dent"
+  ],
+  "blanket_front": [
+   816,
+   708,
+   "rest_portrait_blanket_front"
+  ],
+  "hh": 85,
+  "rot": 0,
+  "head": [
+   944,
+   700
+  ],
+  "body": {
+   "feet": [
+    772,
+    912
+   ],
+   "hips": [
+    948,
+    980
+   ],
+   "shoulders": [
+    944,
+    730
+   ]
+  }
+ }
+}

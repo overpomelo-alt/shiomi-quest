@@ -7,13 +7,13 @@ plus the pack's scale data: character_scale -> hh, spatial_scale anchors -> ss (
 Re-run after a new scene pack is dropped in; the newest version folder of each scene wins.
 """
 import glob, json, os, re
+import troomdb  # 場景資料一個場景一個檔（src/troom/rooms/）
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(ROOT, '../assets/source/sqoyaw')
 OUT = os.path.join(ROOT, 'src/troom')
-RJ = os.path.join(OUT, 'room.json')
-R = json.load(open(RJ))
+R = troomdb.load()
 pt = lambda p: [round(p[0]), round(p[1])]
 cen = lambda P: [round(sum(p[0] for p in P) / len(P)), round(sum(p[1] for p in P) / len(P))]
 
@@ -55,4 +55,4 @@ for sid, (ver, PK) in sorted(packs.items()):
              'own': {}}
         R[sid][sk] = D
         print(sid, f'v{ver}', sk, len(occ), 'occ', 'hh', D['hh'], 'spatial' if D['ss'] else '', 'exits', {k: e.get('to') for k, e in D['exits'].items()}, 'doors', len(D['doors']))
-json.dump(R, open(RJ, 'w'), ensure_ascii=False, separators=(',', ':'))
+troomdb.save(R, only=list(packs))

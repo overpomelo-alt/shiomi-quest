@@ -1,0 +1,84 @@
+{
+  "說明": "誰管哪些檔案。每個對話只改自己 owns 裡的檔案；合併前主程式跑 node scripts/team/owner-check.mjs <角色> <分支>，會列出超出範圍的檔案。** 是任何一層資料夾，* 是檔名裡任何字，{a,b} 是 a 或 b。",
+  "roles": {
+    "主程式": {
+      "branch": "workshop",
+      "owns": [
+        "dev/src/game.js",
+        "dev/src/engine.js",
+        "dev/src/markup.html",
+        "dev/src/style.css",
+        "dev/src/loader.js",
+        "dev/src/web/**",
+        "dev/src/quest.json",
+        "dev/src/icons/**",
+        "dev/src/_old_parts/**",
+        "dev/build.py",
+        "dev/troomdb.py",
+        "dev/ui_icons.py",
+        "dev/tests/**",
+        "dev/.webcache/**",
+        "scripts/**",
+        ".nojekyll",
+        "dev/requirements.txt",
+        "package.json",
+        ".gitignore",
+        ".github/**",
+        "wrangler.*",
+        "CLAUDE.md",
+        "README.md",
+        "docs/**",
+        "handoff/team/owners.json",
+        "handoff/team/opening-texts.md",
+        "handoff/team/主程式.md",
+        "index.html",
+        "sw.js",
+        "version.json",
+        "manifest.webmanifest",
+        "icon-*.png",
+        "assets/**"
+      ]
+    },
+    "背景": {
+      "branch": "bg",
+      "owns": [
+        "dev/src/troom/rooms/{gate,field}.json",
+        "dev/src/troom/rooms/sq_*.json",
+        "dev/src/troom/{sgate_,sfield_,sq_}*",
+        "dev/src/env/**",
+        "dev/src/tex/**",
+        "dev/src/art/**",
+        "dev/{sqoyaw_build,gate_build,field_build,field_build_v02_old,env_build,tex_build}.py",
+        "handoff/team/背景.md"
+      ]
+    },
+    "室內": {
+      "branch": "indoor",
+      "owns": [
+        "dev/src/troom/rooms/{cabin,bath,rest,home,class,mart}.json",
+        "dev/src/troom/{landscape_,portrait_,bath_,rest_,home_,class_,mart_}*",
+        "dev/src/sroom/**",
+        "dev/src/hroom/**",
+        "dev/src/cabin/**",
+        "dev/{rooms_v3_build,studentroom_v3_build,bedrest_build,classroom_build,station_v4}.py",
+        "handoff/team/室內.md"
+      ]
+    },
+    "人物": {
+      "branch": "chars",
+      "owns": [
+        "dev/src/sprites/**",
+        "dev/src/loader/**",
+        "dev/ASSETS.md",
+        "dev/{pack_actions,pack_all,pack_animals,residents_q_build,hudie_build,add_pet_backs,sprite_pack,add_walks,bake_stride,side_prep,face_prep,faces_build,face_test}.py",
+        "handoff/team/人物.md"
+      ]
+    },
+    "遊戲設計": {
+      "branch": "design",
+      "owns": [
+        "handoff/team/遊戲設計.md"
+      ]
+    }
+  }
+}

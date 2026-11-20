@@ -2,12 +2,12 @@
 """Teacher room v3 rev4 (../assets/source/rooms/teacher_room/teacher_room_v3_rev4) -> the cabin room: src/troom/<sk>_*.webp, room.json[sk], room.json['rest'][sk]
    Mart (../assets/source/rooms/mart/mart_v3)                    -> src/troom/mart_<sk>_*.webp, room.json['mart'][sk]"""
 import json, os, glob
+import troomdb  # 場景資料一個場景一個檔（src/troom/rooms/）
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, 'src/troom')
-RJ = os.path.join(OUT, 'room.json')
-R = json.load(open(RJ))
+R = troomdb.load()
 r = lambda v: round(v)
 pt = lambda p: [r(p[0]), r(p[1])]
 rect4 = lambda b: [[r(b[0]), r(b[1])], [r(b[0] + b[2]), r(b[1])], [r(b[0] + b[2]), r(b[1] + b[3])], [r(b[0]), r(b[1] + b[3])]]
@@ -104,4 +104,4 @@ for sk in ('landscape', 'portrait'):
     R['mart'][sk] = D
     print('mart', sk, len(D['occ']), 'occ', sorted(D['acc']), D['hh'])
 
-json.dump(R, open(RJ, 'w'), ensure_ascii=False, separators=(',', ':'))
+troomdb.save(R, only=['cabin', 'rest', 'mart'])

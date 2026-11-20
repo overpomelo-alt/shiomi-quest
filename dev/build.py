@@ -71,7 +71,8 @@ def room_dir(key):
     return 'cabin'
 
 
-troom = json.load(open(S + 'troom/room.json'))
+import troomdb  # 2D 場景資料：src/troom/rooms/<場景>.json，一個場景一個檔
+troom = troomdb.load()
 troom['img'] = {f[:-5]: put(S + 'troom/' + f, 'rooms/%s/%s' % (room_dir(f[:-5]), f), 'rooms/' + room_dir(f[:-5]))
                 for f in sorted(os.listdir(S + 'troom')) if f.endswith('.webp')}
 hroom = json.load(open(S + 'hroom/hroom.json'))

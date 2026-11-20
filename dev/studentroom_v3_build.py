@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Student room v3 pack (../assets/source/rooms/student_room/student_room_v3) -> src/troom/home_<sk>_* webp + room.json['home'][sk]."""
 import json, os, glob
+import troomdb  # 場景資料一個場景一個檔（src/troom/rooms/）
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 PK = os.path.join(ROOT, '../assets/source/rooms/student_room/student_room_v3')
 OUT = os.path.join(ROOT, 'src/troom')
 M = json.load(open(os.path.join(PK, 'manifest.json')))
-RJ = os.path.join(OUT, 'room.json')
-R = json.load(open(RJ))
+R = troomdb.load()
 
 for f in glob.glob(os.path.join(OUT, 'home_*.webp')):
     os.remove(f)
@@ -90,4 +90,4 @@ for sk in ('landscape', 'portrait'):
     R['home'][sk] = D
     print(sk, 'occ', len(occ), 'walls', len(D['wall']), 'floors', len(D['floor']), 'hh', D['hh'])
 
-json.dump(R, open(RJ, 'w'), ensure_ascii=False, separators=(',', ':'))
+troomdb.save(R, only=['home'])

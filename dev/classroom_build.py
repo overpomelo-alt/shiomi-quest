@@ -1,9 +1,10 @@
 """五年級教室 (../assets/source/rooms/classroom/classroom, ChatGPT pack) -> src/troom/class_<sk>_bg.webp + class_<sk>_o_<id>.webp, layout in src/troom/room.json['class']"""
 import json, os
+import troomdb  # 場景資料一個場景一個檔（src/troom/rooms/）
 from PIL import Image
 R = '../assets/source/rooms/classroom/classroom/'; S = 'src/troom/'
 man = json.load(open(R + 'manifest.json'))
-room = json.load(open(S + 'room.json'))
+room = troomdb.load()
 for f in os.listdir(S):
     if f.startswith('class_'): os.remove(S + f)
 out = {}
@@ -20,5 +21,5 @@ for sk in ('landscape', 'portrait'):
     out[sk] = {'w': m['canvas']['width'], 'h': m['canvas']['height'], 'walk': [{'outer': m['walk']['outer'], 'holes': m['walk']['holes']}],
                'occ': occ, 'exit': m['exit'], 'acc': m['acc'], 'rev': man.get('revision')}
 room['class'] = out
-json.dump(room, open(S + 'room.json', 'w'))
+troomdb.save(room, only=['class'])
 print('classroom in place', {sk: len(out[sk]['occ']) for sk in out})

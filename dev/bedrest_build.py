@@ -1,8 +1,9 @@
 """student bed 'lie down' layers (../assets/source/rooms/student_room/student_bed_rest, ChatGPT pack drawn for this bed) -> src/troom/home_<sk>_bed_<layer>.webp, offsets in room.json home[sk].rest2"""
 import json, os
+import troomdb  # 場景資料一個場景一個檔（src/troom/rooms/）
 from PIL import Image
 R = '../assets/source/rooms/student_room/student_bed_rest/'; S = 'src/troom/'
-room = json.load(open(S + 'room.json'))
+room = troomdb.load()
 for sk in ('landscape', 'portrait'):
     out = {'heads': {}}
     for layer in ['pillow_dent', 'blanket_front'] + ['head0%d' % i for i in range(1, 7)]:
@@ -12,5 +13,5 @@ for sk in ('landscape', 'portrait'):
         if layer.startswith('head'): out['heads'][layer[-2:]] = e
         else: out[layer] = e
     room['home'][sk]['rest2'] = out
-json.dump(room, open(S + 'room.json', 'w'))
+troomdb.save(room, only=['home'])
 print({sk: list(room['home'][sk]['rest2']) for sk in ('landscape', 'portrait')})
