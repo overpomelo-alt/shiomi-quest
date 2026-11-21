@@ -41,6 +41,7 @@
 2. **畫面、質感、調色、人物處理**：一律做成網址參數（例如 `?look=`、`?char=`、`?sq2d=1`），**預設維持原樣**。Tien 在手機上比過、明確說「預設改成某某」才能改預設；沒有這句話不准改，也不要順手換掉。參數功能本身可以發布，回報要寫「預設沒動」並附各種網址和同場景比較截圖。
 - 現在的預設（每次回報前用 grep 確認）：`LOOK_DEFAULT='orig'`、`CHAR_DEFAULT='off'`、手繪 Sqoyaw 只在 `?sq2d=1`（`SQ2D`）。
 - 學生在用：推正式版盡量挑放學後或週末。
+- 遊戲只在認得的網址用雲端存檔（`game.js` 的 `HOSTED`：github.io、workers.dev…）。**換新網址或自己的網域時，一定要加進 `HOSTED`**，不然那個網址存檔不會上雲端。
 
 ## 四、遊戲的固定規則
 - 不放族語。部落叫「Sqoyaw」，介面上不要一直寫「部落」。
@@ -62,7 +63,8 @@
 - 只交圖、遊戲還沒用到的，先合進 workshop、不推 main，等程式做好一起上。
 - 改到存檔格式的，推 main 前先用雲端存檔的備份複本試過，舊紀錄都在。
 - 建置：`cd dev && python3 build.py`（src → dist 本機版 ＋ web 網路版）。
-- 上線（目前，搬到 Cloudflare 之前）：把 `dev/web/` 的 `index.html`、`sw.js`、`version.json`、`manifest.webmanifest`、`icon-192.png`、`icon-512.png` 複製到 repo 最上層，`assets/` 和 `dev/web/assets/` 同步（刪多的，**不要動 `assets/source/`**），commit、push main，再用 `gh api repos/overpomelo-alt/shiomi-quest/commits/main/check-runs` 等 build、deploy 都 success。commit 作者 `overpomelo-alt <overpomelo@gmail.com>`。
+- 上線：推 main → GitHub Actions（`.github/workflows/deploy.yml`）建一次遊戲，放到兩個地方：Cloudflare（`wrangler.jsonc`，有 `CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID` 祕密設定才做）和 GitHub Pages。push 後到 GitHub 的 Actions 頁面，或用 `curl -s https://api.github.com/repos/overpomelo-alt/shiomi-quest/commits/<commit>/check-runs` 確認都 success（這個環境的 `gh` 登入可能失效，用 curl 就好）。commit 作者 `overpomelo-alt <overpomelo@gmail.com>`。
+- **過渡期**（主程式筆記「現況」會寫目前在哪一步）：Tien 把 repo 的 Pages 來源改成「GitHub Actions」之前，舊網址還是從 main 最上層的檔案發布，所以上線時還要照舊把 `dev/web/` 的 `index.html`、`sw.js`、`version.json`、`manifest.webmanifest`、`icon-192.png`、`icon-512.png` 複製到最上層、`assets/` 和 `dev/web/assets/` 同步（刪多的，**不要動 `assets/source/`**）。改完以後就不用了，最上層的這些檔案會刪掉。
 
 ## 七、檢查和測試（分輕重）
 - `npm run check`：資料檢查（場景資料、圖在不在、題目格式），每次都跑。

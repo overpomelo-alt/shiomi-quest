@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant" translate="no" class="notranslate"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>汐見町闖關</title><meta name="theme-color" content="#16121f"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#16121f;color:#141413}</style><script>window.SHIOMI_BUILD="1021-1442";(function(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){if(j&&j.v&&j.v!==window.SHIOMI_BUILD&&sessionStorage.getItem("shiomi_rl")!==j.v){sessionStorage.setItem("shiomi_rl",j.v);location.reload();}}).catch(function(){});}catch(e){}})();</script></head><body>
+<!doctype html><html lang="zh-Hant" translate="no" class="notranslate"><head><meta charset="utf-8"><meta name="google" content="notranslate"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>汐見町闖關</title><meta name="theme-color" content="#16121f"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#16121f;color:#141413}</style><script>window.SHIOMI_BUILD="1121-0954";(function(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){if(j&&j.v&&j.v!==window.SHIOMI_BUILD&&!window.__playing&&sessionStorage.getItem("shiomi_rl")!==j.v){sessionStorage.setItem("shiomi_rl",j.v);location.reload();}}).catch(function(){});}catch(e){}})();</script></head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
@@ -883,8 +883,14 @@ body.touch #quests.closed{background:var(--sh-cream)!important}
         try{if(window.caches){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}}catch(e){}
         try{sessionStorage.removeItem('shiomi_rl');}catch(e){}location.reload();};}
     help.querySelector('.bl-why').textContent='卡住了：'+stage();help.querySelector('.bl-ver').textContent='版本 '+(window.SHIOMI_BUILD||'?')+(navigator.onLine===false?'・手機沒有連上網路':'');}
-  const dog=setInterval(()=>{if(dead||el.classList.contains('out')){clearInterval(dog);return;}const w=bar.style.width+'|'+(window.__ldStage||'');if(w!==lastW){lastW=w;lastT=performance.now();}
-    if(performance.now()-lastT>20000||(window.__ldErr&&window.__ldStage==='run'&&performance.now()-lastT>4000))showHelp();},1000);
+  // 自動重試：網頁已經下載完（不是網路慢），卻卡住 25 秒沒進度、或遊戲程式出錯，就自己重新整理，最多 3 次；3 次都不行才只留「卡住了」說明和按鈕
+  const RK='shiomi_retry';const tries=()=>{try{return +sessionStorage.getItem(RK)||0;}catch(e){return 9;}};
+  const htmlDone=()=>{try{const n=performance.getEntriesByType('navigation')[0];return !n||n.responseEnd>0;}catch(e){return true;}};
+  function autoRetry(){const n=tries();if(n>=3)return false;try{sessionStorage.setItem(RK,n+1);}catch(e){return false;}location.reload();return true;}
+  const dog=setInterval(()=>{if(dead||el.classList.contains('out')){clearInterval(dog);try{sessionStorage.removeItem(RK);}catch(e){}return;}const w=bar.style.width+'|'+(window.__ldStage||'');if(w!==lastW){lastW=w;lastT=performance.now();}
+    const stuck=performance.now()-lastT,bad=window.__ldErr&&window.__ldStage==='run'&&stuck>12000;
+    if((bad||stuck>25000)&&htmlDone()&&autoRetry())return;
+    if(stuck>20000||bad)showHelp();},1000);
   const poll=setInterval(()=>{const b=document.getElementById('startBtn');if(!b)return;const m=/(\d+)%/.exec(b.textContent||'');if(m)bar.style.width=Math.max(3,+m[1])+'%';
     if(/蓋不起來/.test(b.textContent||'')||!b.disabled){bar.style.width='100%';msg.textContent=b.disabled?'':'小鎮蓋好了！';clearInterval(poll);setTimeout(()=>{el.classList.add('out');setTimeout(()=>{dead=true;cancelAnimationFrame(raf);el.remove();},900);},350);}},150);
 })();
@@ -2276,12 +2282,21 @@ function loadSeat(seat){try{const v=localStorage.getItem(SKEY(seat));return v?JS
    one document per seat: shiomi/seat-<seat> {d: JSON of W, t: W.last, seat, name}
    local save stays the source of truth on this device; the cloud copy is pushed at most once a minute,
    and when the page is hidden / the student logs out. At login the newer of (cloud, local) wins. */
-// HOSTED: the game runs on its own address (GitHub Pages / Firebase), not inside Claude — teacher edits then live in Firestore
-const HOSTED=/(github\.io|web\.app|firebaseapp\.com|localhost|127\.0\.0\.1)$/.test(location.hostname);
+// HOSTED: the game runs on its own address (GitHub Pages / Cloudflare / Firebase), not inside Claude — teacher edits then live in Firestore
+// workers.dev：Cloudflare 的網址（2026-11 起）。之後有自己的網域，也要加在這裡，不然那個網址不會用雲端存檔
+const HOSTED=/(github\.io|web\.app|firebaseapp\.com|workers\.dev|localhost|127\.0\.0\.1)$/.test(location.hostname);
 const FB={key:'AIzaSyBadU_r4HVpovuYmKh60Fzra1DJjwg80Xs',proj:'shiomi-quest',db:'(default)',alt:'shiomi-quest-1a2b3'};
 const CLOUD={rst:{},st:'init',tok:null,rt:null,exp:0,busy:null,at:0,okT:0,dirty:false,timer:0,pushing:false,ver:true,base:0,all:{},allAt:0,fails:0};
 function fbBase(){return `https://firestore.googleapis.com/v1/projects/${FB.proj}/databases/${encodeURIComponent(FB.db)}/documents/shiomi`;}
-async function fbFetch(u,o={},ms=8000){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);try{return await fetch(u,Object.assign({signal:c.signal},o));}finally{clearTimeout(t);}}
+// 雲端連線：一下子就斷線、或伺服器忙（5xx、429）時自動再試 3 次（0.3、0.6、1.2 秒後）。
+// 等了 8 秒都沒回應的（網路很慢）不再試，免得學生一直等；手機顯示沒有網路時也不試。
+// 3 次都失敗（例如學校網路擋住雲端）就記住 1 分鐘：這段時間其他雲端連線不再重試，直接用這台機器的資料，登入不會被拖慢。
+let FB_DOWN=0;
+async function fbFetch1(u,o,ms){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);try{return await fetch(u,Object.assign({signal:c.signal},o));}finally{clearTimeout(t);}}
+async function fbFetch(u,o={},ms=8000){const max=Date.now()<FB_DOWN?0:3;for(let n=0;;n++){let r=null,err=null;try{r=await fbFetch1(u,o,ms);}catch(e){err=e;}
+  if(r&&!(r.status>=500||r.status===429)){FB_DOWN=0;return r;}
+  if(n>=max||(err&&err.name==='AbortError')||navigator.onLine===false){if(n>=3)FB_DOWN=Date.now()+60000;if(r)return r;throw err;}
+  await new Promise(ok=>setTimeout(ok,300*2**n));}}
 if(window.__fbTok&&window.__fbTok.tok){CLOUD.tok=window.__fbTok.tok;CLOUD.rt=window.__fbTok.rt;CLOUD.exp=window.__fbTok.exp;}
 function fbAuth(){if(CLOUD.tok&&Date.now()<CLOUD.exp-60000)return Promise.resolve(CLOUD.tok);if(CLOUD.busy)return CLOUD.busy;
   CLOUD.busy=(async()=>{try{let s=null;try{s=JSON.parse(localStorage.getItem('shiomi-fb')||'null');}catch(e){}
@@ -3513,7 +3528,7 @@ $('tpGo').onclick=async()=>{const v=$('inTPass').value.trim(),e=$('loginErr');
 $('inTPass').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('tpGo').click();}});
 if(CFG.classPass)$('passWrap').hidden=false;
 let LOGGING=false;
-$('loginForm').addEventListener('submit',async e=>{e.preventDefault();if(LOGGING)return;const seat=$('inSeat').value.trim().replace(/[^0-9A-Za-z-]/g,''),name=$('inName').value.trim();const err=$('loginErr');
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();window.__playing=true;if(LOGGING)return;const seat=$('inSeat').value.trim().replace(/[^0-9A-Za-z-]/g,''),name=$('inName').value.trim();const err=$('loginErr');
   const asT=TEACH_LOGIN&&IS_T;TEACH_LOGIN=false;
   if(!seat||!name){err.textContent='請填寫座號和姓名。';err.hidden=false;return;}
   if(!asT&&seat.toUpperCase()==='T'){err.textContent='這個座號不能使用，請輸入你的座號。';err.hidden=false;return;}
@@ -3560,7 +3575,10 @@ function faceKey(id,f){return f&&hasFace(id)&&(f.e>=0||f.m>=0||f.n>=0)?`${id}|${
 // (hurry() pulls a group to the front when the player heads there). decode() keeps big sheets off the main thread.
 const AQ={q:[],busy:0,max:3,open:false};
 function aqPump(){while(AQ.open&&AQ.busy<AQ.max&&AQ.q.length){const j=AQ.q.shift();AQ.busy++;j.go(()=>{AQ.busy--;aqPump();});}}
-function aqLoad(img,src){return new Promise((res,rej)=>{img.onload=()=>{const fin=()=>res(img);img.decode?img.decode().then(fin,fin):fin();};img.onerror=rej;img.src=src;});}
+// 讀不到的圖：照舊馬上回報失敗（不佔住排隊的位子，其他圖照常讀），同時在背景自動再試 3 次（1、2、4 秒後），
+// 網址多加 &r=<次數> 讓手機不要拿到同一個壞掉的回應；之後讀到了，畫面下一格就會畫出來
+function aqLoad(img,src){return new Promise((res,rej)=>{let n=0;img.onload=()=>{const fin=()=>res(img);img.decode?img.decode().then(fin,fin):fin();};
+  img.onerror=e=>{if(n===0)rej(e);if(n<3&&!/^(data|blob):/.test(src)){n++;setTimeout(()=>{img.src=src+(src.includes('?')?'&':'?')+'r='+n;},1000*2**(n-1));}};img.src=src;});}
 // lazy image: an <img> whose file is fetched when the queue reaches it (or at once if urgent)
 function qImg(src,urgent){const i=new Image();const job={src,go:done=>{aqLoad(i,src).then(done,done);}};if(urgent||!/^assets\//.test(src))aqLoad(i,src).catch(()=>{});else AQ.q.push(job);aqPump();return i;}
 /* ===== 手繪場景質感（網址加 ?look=soft／?look=pale；預設 orig＝原本） */

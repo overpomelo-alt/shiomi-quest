@@ -48,8 +48,14 @@
         try{if(window.caches){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}}catch(e){}
         try{sessionStorage.removeItem('shiomi_rl');}catch(e){}location.reload();};}
     help.querySelector('.bl-why').textContent='卡住了：'+stage();help.querySelector('.bl-ver').textContent='版本 '+(window.SHIOMI_BUILD||'?')+(navigator.onLine===false?'・手機沒有連上網路':'');}
-  const dog=setInterval(()=>{if(dead||el.classList.contains('out')){clearInterval(dog);return;}const w=bar.style.width+'|'+(window.__ldStage||'');if(w!==lastW){lastW=w;lastT=performance.now();}
-    if(performance.now()-lastT>20000||(window.__ldErr&&window.__ldStage==='run'&&performance.now()-lastT>4000))showHelp();},1000);
+  // 自動重試：網頁已經下載完（不是網路慢），卻卡住 25 秒沒進度、或遊戲程式出錯，就自己重新整理，最多 3 次；3 次都不行才只留「卡住了」說明和按鈕
+  const RK='shiomi_retry';const tries=()=>{try{return +sessionStorage.getItem(RK)||0;}catch(e){return 9;}};
+  const htmlDone=()=>{try{const n=performance.getEntriesByType('navigation')[0];return !n||n.responseEnd>0;}catch(e){return true;}};
+  function autoRetry(){const n=tries();if(n>=3)return false;try{sessionStorage.setItem(RK,n+1);}catch(e){return false;}location.reload();return true;}
+  const dog=setInterval(()=>{if(dead||el.classList.contains('out')){clearInterval(dog);try{sessionStorage.removeItem(RK);}catch(e){}return;}const w=bar.style.width+'|'+(window.__ldStage||'');if(w!==lastW){lastW=w;lastT=performance.now();}
+    const stuck=performance.now()-lastT,bad=window.__ldErr&&window.__ldStage==='run'&&stuck>12000;
+    if((bad||stuck>25000)&&htmlDone()&&autoRetry())return;
+    if(stuck>20000||bad)showHelp();},1000);
   const poll=setInterval(()=>{const b=document.getElementById('startBtn');if(!b)return;const m=/(\d+)%/.exec(b.textContent||'');if(m)bar.style.width=Math.max(3,+m[1])+'%';
     if(/蓋不起來/.test(b.textContent||'')||!b.disabled){bar.style.width='100%';msg.textContent=b.disabled?'':'小鎮蓋好了！';clearInterval(poll);setTimeout(()=>{el.classList.add('out');setTimeout(()=>{dead=true;cancelAnimationFrame(raf);el.remove();},900);},350);}},150);
 })();

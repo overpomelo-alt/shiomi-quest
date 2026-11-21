@@ -1,0 +1,10 @@
+// Cloudflare Workers 的設定：汐見町的網站（只放建好的靜態檔案）。
+// 部署由 GitHub Actions 做（.github/workflows/deploy.yml），用 dev/build.py 建出來的 dev/web/。
+// 以後要接 AI 角色對話時，在這裡加 "main"（Worker 程式），金鑰放 Cloudflare 的祕密設定。
+{
+  "name": "shiomi-quest",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dev/web"
+  }
+}

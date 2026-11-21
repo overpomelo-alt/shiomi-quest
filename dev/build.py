@@ -152,8 +152,9 @@ head = ('<!doctype html><html lang="zh-Hant" translate="no" class="notranslate">
         '<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">'
         '<style>' + RESET + '</style>'
         # version stamp: if the page came from an old copy (slow network -> service-worker copy), reload once to the live version
+        # 學生已經登入開始玩（window.__playing）就不重新載入，等下次打開才換新版
         '<script>window.SHIOMI_BUILD="' + BUILD + '";(function(){try{fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){'
-        'if(j&&j.v&&j.v!==window.SHIOMI_BUILD&&sessionStorage.getItem("shiomi_rl")!==j.v){sessionStorage.setItem("shiomi_rl",j.v);location.reload();}}).catch(function(){});}catch(e){}})();</script>'
+        'if(j&&j.v&&j.v!==window.SHIOMI_BUILD&&!window.__playing&&sessionStorage.getItem("shiomi_rl")!==j.v){sessionStorage.setItem("shiomi_rl",j.v);location.reload();}}).catch(function(){});}catch(e){}})();</script>'
         '</head><body>\n')
 boot = '<script id="boot">' + open(S + 'web/boot.js').read() + '</script>\n'
 open(WB + 'index.html', 'w').write(head + web + boot + '</body></html>\n')
@@ -161,4 +162,19 @@ open(WB + 'version.json', 'w').write(json.dumps({'v': BUILD}))
 for f in ('sw.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'):
     shutil.copy(S + 'web/' + f, WB + f)
 open(WB + '.nojekyll', 'w').write('')
+# Cloudflare 的快取設定（GitHub Pages 不看這個檔，不影響）：圖片網址都帶 ?v=<內容雜湊>，換圖網址就變，所以可以讓手機長期記住；
+# 網頁本身、版本號、sw.js 每次都要問最新的
+open(WB + '_headers', 'w').write('''/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/version.json
+  Cache-Control: no-store
+/sw.js
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Cache-Control: no-cache
+''')
 print('web/ ready:', os.path.getsize(WB + 'index.html'), 'bytes')
